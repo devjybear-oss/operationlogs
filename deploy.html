@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deploy โ€” Chillpay Operation Logs</title>
+  <title>Deploy — Chillpay Operation Logs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
 
 </head>
 <body>
-  <button class="sidebar-toggle" id="sidebarToggle" aria-label="เน€เธเธดเธ”เน€เธกเธเธน">โฐ</button>
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="เปิดเมนู">☰</button>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <aside class="sidebar" id="sidebar">
@@ -23,18 +23,18 @@
       </div>
     </div>
     <nav class="sidebar-nav">
-      <a class="nav-link" href="index.html"><span class="nav-icon">โ—</span><span class="nav-text"><strong>เธ เธฒเธเธฃเธงเธก</strong><small>Summary & Checklist</small></span></a>
-<a class="nav-link" href="registry.html"><span class="nav-icon">โ–ฃ</span><span class="nav-text"><strong>Registry</strong><small>ModuleType ยท MenuType ยท LogType</small></span></a>
-<a class="nav-link" href="ui.html"><span class="nav-icon">โ–ฆ</span><span class="nav-text"><strong>UI</strong><small>List ยท Detail ยท เธเธธเนเธก Logs</small></span></a>
-<a class="nav-link" href="search.html"><span class="nav-icon">โ•</span><span class="nav-text"><strong>Search</strong><small>เธเธฒเธฃเธเนเธเธซเธฒ & Filter</small></span></a>
-<a class="nav-link" href="api.html"><span class="nav-icon">โก</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
-<a class="nav-link" href="database.html"><span class="nav-icon">โฌก</span><span class="nav-text"><strong>Database</strong><small>Schema ยท Index ยท SQL Script</small></span></a>
-<a class="nav-link" href="files.html"><span class="nav-icon">โ—</span><span class="nav-text"><strong>เนเธเธฅเนเธ—เธตเนเน€เธเธตเนเธขเธงเธเนเธญเธ</strong><small>Repos & Source files</small></span></a>
-<a class="nav-link active" href="deploy.html"><span class="nav-icon">โ–ถ</span><span class="nav-text"><strong>Deploy</strong><small>เธฅเธณเธ”เธฑเธ deploy & Smoke test</small></span></a>
-<a class="nav-link" href="sync.html"><span class="nav-icon">โป</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
+      <a class="nav-link" href="index.html"><span class="nav-icon">◈</span><span class="nav-text"><strong>ภาพรวม</strong><small>Summary & Checklist</small></span></a>
+<a class="nav-link" href="registry.html"><span class="nav-icon">▣</span><span class="nav-text"><strong>Registry</strong><small>ModuleType · MenuType · LogType</small></span></a>
+<a class="nav-link" href="ui.html"><span class="nav-icon">▦</span><span class="nav-text"><strong>UI</strong><small>List · Detail · ปุ่ม Logs</small></span></a>
+<a class="nav-link" href="search.html"><span class="nav-icon">⌕</span><span class="nav-text"><strong>Search</strong><small>การค้นหา & Filter</small></span></a>
+<a class="nav-link" href="api.html"><span class="nav-icon">⟡</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
+<a class="nav-link" href="database.html"><span class="nav-icon">⬡</span><span class="nav-text"><strong>Database</strong><small>Schema · Index · SQL Script</small></span></a>
+<a class="nav-link" href="files.html"><span class="nav-icon">◎</span><span class="nav-text"><strong>ไฟล์ที่เกี่ยวข้อง</strong><small>Repos & Source files</small></span></a>
+<a class="nav-link active" href="deploy.html"><span class="nav-icon">▶</span><span class="nav-text"><strong>Deploy</strong><small>ลำดับ deploy & Smoke test</small></span></a>
+<a class="nav-link" href="sync.html"><span class="nav-icon">↻</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
     </nav>
     <div class="sidebar-footer">
-      <span>เธญเธฑเธเน€เธ”เธ• 2026-06-28</span>
+      <span>อัปเดต 2026-06-28</span>
       <span>Phase 1</span>
     </div>
   </aside>
@@ -43,35 +43,35 @@
     <header class="page-header">
       <p class="page-eyebrow">Chillpay Operation Logs</p>
       <h1 class="page-title">Deploy</h1>
-      <p class="page-subtitle">เธฅเธณเธ”เธฑเธ deploy & Smoke test</p>
+      <p class="page-subtitle">ลำดับ deploy & Smoke test</p>
     </header>
     
     <article class="content prose">
-      <h2 id="9-deploy-เนเธฅเธฐ-smoke-test">9. Deploy เนเธฅเธฐ Smoke test</h2>
-<h3 id="91-เธฅเธณเธ”เธฑเธ-deploy">9.1 เธฅเธณเธ”เธฑเธ deploy</h3>
+      <h2 id="9-deploy-และ-smoke-test">9. Deploy และ Smoke test</h2>
+<h3 id="91-ลำดับ-deploy">9.1 ลำดับ deploy</h3>
 <table>
 <thead>
 <tr>
-<th>เธฅเธณเธ”เธฑเธ</th>
-<th>เธเธฒเธ</th>
+<th>ลำดับ</th>
+<th>งาน</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>1</td>
-<td>เธฃเธฑเธ SQL ยง7.4 โ€” <code>Table</code> โ’ <code>Index</code> โ’ <code>View</code> (เธซเธฃเธทเธญ <code>Deploy.sql</code> เธเธฃเธฑเนเธเนเธฃเธ) เธ—เธธเธ env</td>
+<td>รัน SQL §7.4 — <code>Table</code> → <code>Index</code> → <code>View</code> (หรือ <code>Deploy.sql</code> ครั้งแรก) ทุก env</td>
 </tr>
 <tr>
 <td>2</td>
-<td>Deploy <code>operation-logs-api</code> เธ—เธธเธ env</td>
+<td>Deploy <code>operation-logs-api</code> ทุก env</td>
 </tr>
 <tr>
 <td>3</td>
-<td>Deploy <code>web-backend</code> + เธ•เธฃเธงเธ <code>OperationLogsApiUrl</code> เนเธ AppSettings</td>
+<td>Deploy <code>web-backend</code> + ตรวจ <code>OperationLogsApiUrl</code> ใน AppSettings</td>
 </tr>
 <tr>
 <td>4</td>
-<td>Smoke test เธ•เธฒเธก ยง9.2</td>
+<td>Smoke test ตาม §9.2</td>
 </tr>
 </tbody>
 </table>
@@ -80,41 +80,41 @@
 <thead>
 <tr>
 <th>#</th>
-<th>เธเธฑเนเธเธ•เธญเธ</th>
-<th>เธเธฅเธ—เธตเนเธเธฒเธ”เธซเธงเธฑเธ</th>
+<th>ขั้นตอน</th>
+<th>ผลที่คาดหวัง</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>1</td>
-<td>Save เธเนเธญเธกเธนเธฅเธเธเธซเธเนเธฒ Merchant/Settings เธ—เธตเนเธกเธต writer</td>
-<td>เธกเธต row เนเธซเธกเนเนเธ <code>ChillpayOperationLogs</code></td>
+<td>Save ข้อมูลบนหน้า Merchant/Settings ที่มี writer</td>
+<td>มี row ใหม่ใน <code>ChillpayOperationLogs</code></td>
 </tr>
 <tr>
 <td>2</td>
-<td>เน€เธเธดเธ”เธซเธเนเธฒ List โ€” filter Module + Menu + Merchant + เธงเธฑเธเธ—เธตเน</td>
-<td>เน€เธซเนเธ log เธ—เธตเนเน€เธเธดเนเธ save (filter เธเนเธฒเธ <code>merchantId</code>)</td>
+<td>เปิดหน้า List — filter Module + Menu + Merchant + วันที่</td>
+<td>เห็น log ที่เพิ่ง save (filter ผ่าน <code>merchantId</code>)</td>
 </tr>
 <tr>
 <td>3</td>
-<td>เธเธ” Log Id โ’ Detail</td>
-<td>เนเธชเธ”เธ OldValue/NewValue, MenuTypeText เธ–เธนเธเธ•เนเธญเธ</td>
+<td>กด Log Id → Detail</td>
+<td>แสดง OldValue/NewValue, MenuTypeText ถูกต้อง</td>
 </tr>
 <tr>
 <td>4</td>
-<td>เธเธฒเธเธซเธเนเธฒ Detail เธเธ”เธเธธเนเธก <strong>Logs</strong></td>
-<td>เน€เธเธดเธ” List เนเธ—เนเธเนเธซเธกเน filter เธ•เธฒเธก <code>menuType</code> + <code>dataId</code></td>
+<td>จากหน้า Detail กดปุ่ม <strong>Logs</strong></td>
+<td>เปิด List แท็บใหม่ filter ตาม <code>menuType</code> + <code>dataId</code></td>
 </tr>
 <tr>
 <td>5</td>
-<td>เน€เธเธฅเธตเนเธขเธ Module/Menu เนเธฅเนเธง Search เนเธซเธกเน</td>
-<td>deep link <code>dataId</code> เธ–เธนเธเน€เธเธฅเธตเธขเธฃเน</td>
+<td>เปลี่ยน Module/Menu แล้ว Search ใหม่</td>
+<td>deep link <code>dataId</code> ถูกเคลียร์</td>
 </tr>
 </tbody>
 </table>
     </article>
     <footer class="page-footer">
-      <a href="index.html" class="footer-link">โ เธเธฅเธฑเธเธ เธฒเธเธฃเธงเธก</a>
+      <a href="index.html" class="footer-link">← กลับภาพรวม</a>
     </footer>
   </main>
 

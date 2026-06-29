@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Search โ€” Chillpay Operation Logs</title>
+  <title>Search — Chillpay Operation Logs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
   </script>
 </head>
 <body>
-  <button class="sidebar-toggle" id="sidebarToggle" aria-label="เน€เธเธดเธ”เน€เธกเธเธน">โฐ</button>
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="เปิดเมนู">☰</button>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <aside class="sidebar" id="sidebar">
@@ -27,18 +27,18 @@
       </div>
     </div>
     <nav class="sidebar-nav">
-      <a class="nav-link" href="index.html"><span class="nav-icon">โ—</span><span class="nav-text"><strong>เธ เธฒเธเธฃเธงเธก</strong><small>Summary & Checklist</small></span></a>
-<a class="nav-link" href="registry.html"><span class="nav-icon">โ–ฃ</span><span class="nav-text"><strong>Registry</strong><small>ModuleType ยท MenuType ยท LogType</small></span></a>
-<a class="nav-link" href="ui.html"><span class="nav-icon">โ–ฆ</span><span class="nav-text"><strong>UI</strong><small>List ยท Detail ยท เธเธธเนเธก Logs</small></span></a>
-<a class="nav-link active" href="search.html"><span class="nav-icon">โ•</span><span class="nav-text"><strong>Search</strong><small>เธเธฒเธฃเธเนเธเธซเธฒ & Filter</small></span></a>
-<a class="nav-link" href="api.html"><span class="nav-icon">โก</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
-<a class="nav-link" href="database.html"><span class="nav-icon">โฌก</span><span class="nav-text"><strong>Database</strong><small>Schema ยท Index ยท SQL Script</small></span></a>
-<a class="nav-link" href="files.html"><span class="nav-icon">โ—</span><span class="nav-text"><strong>เนเธเธฅเนเธ—เธตเนเน€เธเธตเนเธขเธงเธเนเธญเธ</strong><small>Repos & Source files</small></span></a>
-<a class="nav-link" href="deploy.html"><span class="nav-icon">โ–ถ</span><span class="nav-text"><strong>Deploy</strong><small>เธฅเธณเธ”เธฑเธ deploy & Smoke test</small></span></a>
-<a class="nav-link" href="sync.html"><span class="nav-icon">โป</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
+      <a class="nav-link" href="index.html"><span class="nav-icon">◈</span><span class="nav-text"><strong>ภาพรวม</strong><small>Summary & Checklist</small></span></a>
+<a class="nav-link" href="registry.html"><span class="nav-icon">▣</span><span class="nav-text"><strong>Registry</strong><small>ModuleType · MenuType · LogType</small></span></a>
+<a class="nav-link" href="ui.html"><span class="nav-icon">▦</span><span class="nav-text"><strong>UI</strong><small>List · Detail · ปุ่ม Logs</small></span></a>
+<a class="nav-link active" href="search.html"><span class="nav-icon">⌕</span><span class="nav-text"><strong>Search</strong><small>การค้นหา & Filter</small></span></a>
+<a class="nav-link" href="api.html"><span class="nav-icon">⟡</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
+<a class="nav-link" href="database.html"><span class="nav-icon">⬡</span><span class="nav-text"><strong>Database</strong><small>Schema · Index · SQL Script</small></span></a>
+<a class="nav-link" href="files.html"><span class="nav-icon">◎</span><span class="nav-text"><strong>ไฟล์ที่เกี่ยวข้อง</strong><small>Repos & Source files</small></span></a>
+<a class="nav-link" href="deploy.html"><span class="nav-icon">▶</span><span class="nav-text"><strong>Deploy</strong><small>ลำดับ deploy & Smoke test</small></span></a>
+<a class="nav-link" href="sync.html"><span class="nav-icon">↻</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
     </nav>
     <div class="sidebar-footer">
-      <span>เธญเธฑเธเน€เธ”เธ• 2026-06-28</span>
+      <span>อัปเดต 2026-06-28</span>
       <span>Phase 1</span>
     </div>
   </aside>
@@ -47,11 +47,11 @@
     <header class="page-header">
       <p class="page-eyebrow">Chillpay Operation Logs</p>
       <h1 class="page-title">Search</h1>
-      <p class="page-subtitle">เธเธฒเธฃเธเนเธเธซเธฒ & Filter</p>
+      <p class="page-subtitle">การค้นหา & Filter</p>
     </header>
     
     <article class="content prose">
-      <h2 id="5-เธเธฒเธฃเธเนเธเธซเธฒ-search-design">5. เธเธฒเธฃเธเนเธเธซเธฒ (Search Design)</h2>
+      <h2 id="5-การค้นหา-search-design">5. การค้นหา (Search Design)</h2>
 <h3 id="51-flow">5.1 Flow</h3>
 <pre class="mermaid">flowchart LR
     UI[ChillpayOperationLogs.cshtml]
@@ -62,30 +62,30 @@
     UI --&gt;|POST Search| WB
     WB --&gt; API --&gt; VIEW</pre>
 
-<h3 id="52-เธชเธดเนเธเธ—เธตเนเน€เธฅเธดเธเนเธเน-ux-เน€เธ”เธดเธก">5.2 เธชเธดเนเธเธ—เธตเนเน€เธฅเธดเธเนเธเน (UX เน€เธ”เธดเธก)</h3>
+<h3 id="52-สิ่งที่เลิกใช้-ux-เดิม">5.2 สิ่งที่เลิกใช้ (UX เดิม)</h3>
 <table>
 <thead>
 <tr>
-<th>เธฃเธฒเธขเธเธฒเธฃ</th>
-<th>เนเธ—เธเธ—เธตเนเธ”เนเธงเธข</th>
+<th>รายการ</th>
+<th>แทนที่ด้วย</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Dropdown <strong>Mode</strong> (LogMode 2โ€“9)</td>
+<td>Dropdown <strong>Mode</strong> (LogMode 2–9)</td>
 <td><strong>Menu dropdown</strong></td>
 </tr>
 <tr>
-<td>เธเนเธญเธ <strong>Id</strong> เธเธเธซเธเนเธฒ List</td>
-<td><strong>dataId</strong> เธเธฒเธเธเธธเนเธก Logs เธซเธฃเธทเธญ optional เนเธเธญเธเธฒเธเธ•</td>
+<td>ช่อง <strong>Id</strong> บนหน้า List</td>
+<td><strong>dataId</strong> จากปุ่ม Logs หรือ optional ในอนาคต</td>
 </tr>
 <tr>
 <td><code>GetMenuTypeByLogMode</code> mapping</td>
-<td>เธชเนเธ <code>menuType</code> เธ•เธฃเธเธเธฒเธเธเธธเนเธก Logs</td>
+<td>ส่ง <code>menuType</code> ตรงจากปุ่ม Logs</td>
 </tr>
 <tr>
-<td>Merchant filter เธเนเธฒเธ <code>refType=[10000]</code> + <code>refId</code></td>
-<td><strong><code>merchantId[]</code></strong> โ€” เนเธเธ PayOut</td>
+<td>Merchant filter ผ่าน <code>refType=[10000]</code> + <code>refId</code></td>
+<td><strong><code>merchantId[]</code></strong> — แบบ PayOut</td>
 </tr>
 <tr>
 <td><code>POST /AjaxChillpayOperationLogs/SearchMerchant</code></td>
@@ -93,19 +93,19 @@
 </tr>
 <tr>
 <td><code>POST /AjaxChillpayOperationLogs/SearchSettings</code></td>
-<td>เน€เธซเธกเธทเธญเธเธเธฑเธ</td>
+<td>เหมือนกัน</td>
 </tr>
 <tr>
 <td><code>chillpay-operation-log-settings-constants.js</code></td>
-<td>import เธเธฒเธ <code>chillpay-operation-log-constants.js</code> เนเธ”เธขเธ•เธฃเธ</td>
+<td>import จาก <code>chillpay-operation-log-constants.js</code> โดยตรง</td>
 </tr>
 <tr>
-<td><code>RefType</code>/<code>RefId</code> เนเธ web-backend search model</td>
-<td>เนเธกเนเธชเนเธเธเธฒเธ UI โ€” API เธขเธฑเธเธฃเธญเธเธฃเธฑเธเธชเธณเธซเธฃเธฑเธ integration</td>
+<td><code>RefType</code>/<code>RefId</code> ใน web-backend search model</td>
+<td>ไม่ส่งจาก UI — API ยังรองรับสำหรับ integration</td>
 </tr>
 </tbody>
 </table>
-<h3 id="53-request-เธ•เธฑเธงเธญเธขเนเธฒเธ--browse">5.3 Request เธ•เธฑเธงเธญเธขเนเธฒเธ โ€” Browse</h3>
+<h3 id="53-request-ตัวอย่าง--browse">5.3 Request ตัวอย่าง — Browse</h3>
 <pre><code class="language-json">{
   &quot;moduleType&quot;: [2],
   &quot;menuType&quot;: [202],
@@ -122,7 +122,7 @@
   &quot;requestBy&quot;: 42
 }
 </code></pre>
-<h3 id="54-request-เธ•เธฑเธงเธญเธขเนเธฒเธ--เธเธฒเธเธเธธเนเธก-logs-deep-link">5.4 Request เธ•เธฑเธงเธญเธขเนเธฒเธ โ€” เธเธฒเธเธเธธเนเธก Logs (deep link)</h3>
+<h3 id="54-request-ตัวอย่าง--จากปุ่ม-logs-deep-link">5.4 Request ตัวอย่าง — จากปุ่ม Logs (deep link)</h3>
 <pre><code class="language-json">{
   &quot;moduleType&quot;: [2],
   &quot;menuType&quot;: [202],
@@ -132,84 +132,84 @@
   &quot;addedDateToTick&quot;: &quot;...&quot;
 }
 </code></pre>
-<h3 id="55-เธเธ-merchant-filter">5.5 เธเธ Merchant filter</h3>
+<h3 id="55-กฎ-merchant-filter">5.5 กฎ Merchant filter</h3>
 <table>
 <thead>
 <tr>
 <th>Module</th>
-<th>เนเธชเธ”เธ Merchant dropdown?</th>
+<th>แสดง Merchant dropdown?</th>
 <th>API (<code>POST /search</code>)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Select All</td>
-<td>เนเธชเธ”เธ</td>
+<td>แสดง</td>
 <td><code>merchantId=[merchantId]</code></td>
 </tr>
 <tr>
 <td>Merchant (2)</td>
-<td>เนเธชเธ”เธ</td>
-<td>เน€เธซเธกเธทเธญเธเธเธฑเธ</td>
+<td>แสดง</td>
+<td>เหมือนกัน</td>
 </tr>
 <tr>
 <td>Settings (3)</td>
-<td>เธเนเธญเธ</td>
-<td>เนเธกเนเธชเนเธ <code>merchantId</code></td>
+<td>ซ่อน</td>
+<td>ไม่ส่ง <code>merchantId</code></td>
 </tr>
 </tbody>
 </table>
-<p><strong>web-backend:</strong> <code>AjaxChillpayOperationLogsController</code> เธชเนเธ <code>apiModel.MerchantId = model.MerchantId</code> (array) โ€” เนเธกเนเนเธเน <code>refType</code>/<code>refId</code> เธชเธณเธซเธฃเธฑเธ filter เธฃเนเธฒเธเธเนเธฒเธญเธตเธเธ•เนเธญเนเธ</p>
-<h3 id="56-เน€เธเธฃเธตเธขเธเน€เธ—เธตเธขเธ-merchantid-เธเธฑเธ-payout">5.6 เน€เธเธฃเธตเธขเธเน€เธ—เธตเธขเธ MerchantId เธเธฑเธ PayOut</h3>
+<p><strong>web-backend:</strong> <code>AjaxChillpayOperationLogsController</code> ส่ง <code>apiModel.MerchantId = model.MerchantId</code> (array) — ไม่ใช้ <code>refType</code>/<code>refId</code> สำหรับ filter ร้านค้าอีกต่อไป</p>
+<h3 id="56-เปรียบเทียบ-merchantid-กับ-payout">5.6 เปรียบเทียบ MerchantId กับ PayOut</h3>
 <table>
 <thead>
 <tr>
-<th>เธซเธฑเธงเธเนเธญ</th>
+<th>หัวข้อ</th>
 <th>PayOut (<code>PayoutOperationLogs</code>)</th>
 <th>Chillpay (<code>ChillpayOperationLogs</code>)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>เธเธญเธฅเธฑเธกเธเน</td>
-<td><code>MerchantId bigint</code> เนเธเธ•เธฒเธฃเธฒเธ</td>
-<td><code>MerchantId bigint NULL</code> เนเธเธ•เธฒเธฃเธฒเธ</td>
+<td>คอลัมน์</td>
+<td><code>MerchantId bigint</code> ในตาราง</td>
+<td><code>MerchantId bigint NULL</code> ในตาราง</td>
 </tr>
 <tr>
 <td>Writer</td>
-<td>เนเธชเน <code>MerchantId</code> เธ•เธญเธ INSERT</td>
-<td>เนเธชเน <code>MerchantId</code> เธ•เธญเธ INSERT (Module Merchant)</td>
+<td>ใส่ <code>MerchantId</code> ตอน INSERT</td>
+<td>ใส่ <code>MerchantId</code> ตอน INSERT (Module Merchant)</td>
 </tr>
 <tr>
 <td>View join</td>
 <td><code>LEFT JOIN Merchants ON b.MerchantId = m.Id</code></td>
-<td>เน€เธซเธกเธทเธญเธเธเธฑเธ</td>
+<td>เหมือนกัน</td>
 </tr>
 <tr>
 <td>View style</td>
-<td><code>SELECT b.*</code> + <code>LogTypeText</code> + <code>RefTypeText</code> + โ€ฆ</td>
-<td>เน€เธซเธกเธทเธญเธเธเธฑเธ (+ <code>ModuleTypeText</code>, <code>MenuTypeText</code>)</td>
+<td><code>SELECT b.*</code> + <code>LogTypeText</code> + <code>RefTypeText</code> + …</td>
+<td>เหมือนกัน (+ <code>ModuleTypeText</code>, <code>MenuTypeText</code>)</td>
 </tr>
 <tr>
 <td>Search filter</td>
 <td><code>merchantId.Contains(m.MerchantId)</code></td>
-<td>เน€เธซเธกเธทเธญเธเธเธฑเธ</td>
+<td>เหมือนกัน</td>
 </tr>
 <tr>
 <td>Registry</td>
-<td><code>LogType</code> เน€เธเนเธเธเนเธงเธเน€เธฅเธ (1001, 2001, โ€ฆ)</td>
-<td>เนเธขเธ <code>ModuleType</code> + <code>MenuType</code> + <code>LogType</code></td>
+<td><code>LogType</code> เป็นช่วงเลข (1001, 2001, …)</td>
+<td>แยก <code>ModuleType</code> + <code>MenuType</code> + <code>LogType</code></td>
 </tr>
 <tr>
 <td>Ref</td>
-<td>เธกเธต RefType/RefId เธชเธณเธซเธฃเธฑเธ entity</td>
-<td>เธกเธต RefType/RefId <strong>เน€เธเธดเนเธก</strong> โ€” เนเธเน deep link / entity เนเธกเนเนเธเน filter เธฃเนเธฒเธ</td>
+<td>มี RefType/RefId สำหรับ entity</td>
+<td>มี RefType/RefId <strong>เพิ่ม</strong> — ใช้ deep link / entity ไม่ใช่ filter ร้าน</td>
 </tr>
 </tbody>
 </table>
     </article>
     <footer class="page-footer">
-      <a href="index.html" class="footer-link">โ เธเธฅเธฑเธเธ เธฒเธเธฃเธงเธก</a>
+      <a href="index.html" class="footer-link">← กลับภาพรวม</a>
     </footer>
   </main>
 

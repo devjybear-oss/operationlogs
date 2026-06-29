@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>API โ€” Chillpay Operation Logs</title>
+  <title>API — Chillpay Operation Logs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
 
 </head>
 <body>
-  <button class="sidebar-toggle" id="sidebarToggle" aria-label="เน€เธเธดเธ”เน€เธกเธเธน">โฐ</button>
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="เปิดเมนู">☰</button>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <aside class="sidebar" id="sidebar">
@@ -23,18 +23,18 @@
       </div>
     </div>
     <nav class="sidebar-nav">
-      <a class="nav-link" href="index.html"><span class="nav-icon">โ—</span><span class="nav-text"><strong>เธ เธฒเธเธฃเธงเธก</strong><small>Summary & Checklist</small></span></a>
-<a class="nav-link" href="registry.html"><span class="nav-icon">โ–ฃ</span><span class="nav-text"><strong>Registry</strong><small>ModuleType ยท MenuType ยท LogType</small></span></a>
-<a class="nav-link" href="ui.html"><span class="nav-icon">โ–ฆ</span><span class="nav-text"><strong>UI</strong><small>List ยท Detail ยท เธเธธเนเธก Logs</small></span></a>
-<a class="nav-link" href="search.html"><span class="nav-icon">โ•</span><span class="nav-text"><strong>Search</strong><small>เธเธฒเธฃเธเนเธเธซเธฒ & Filter</small></span></a>
-<a class="nav-link active" href="api.html"><span class="nav-icon">โก</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
-<a class="nav-link" href="database.html"><span class="nav-icon">โฌก</span><span class="nav-text"><strong>Database</strong><small>Schema ยท Index ยท SQL Script</small></span></a>
-<a class="nav-link" href="files.html"><span class="nav-icon">โ—</span><span class="nav-text"><strong>เนเธเธฅเนเธ—เธตเนเน€เธเธตเนเธขเธงเธเนเธญเธ</strong><small>Repos & Source files</small></span></a>
-<a class="nav-link" href="deploy.html"><span class="nav-icon">โ–ถ</span><span class="nav-text"><strong>Deploy</strong><small>เธฅเธณเธ”เธฑเธ deploy & Smoke test</small></span></a>
-<a class="nav-link" href="sync.html"><span class="nav-icon">โป</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
+      <a class="nav-link" href="index.html"><span class="nav-icon">◈</span><span class="nav-text"><strong>ภาพรวม</strong><small>Summary & Checklist</small></span></a>
+<a class="nav-link" href="registry.html"><span class="nav-icon">▣</span><span class="nav-text"><strong>Registry</strong><small>ModuleType · MenuType · LogType</small></span></a>
+<a class="nav-link" href="ui.html"><span class="nav-icon">▦</span><span class="nav-text"><strong>UI</strong><small>List · Detail · ปุ่ม Logs</small></span></a>
+<a class="nav-link" href="search.html"><span class="nav-icon">⌕</span><span class="nav-text"><strong>Search</strong><small>การค้นหา & Filter</small></span></a>
+<a class="nav-link active" href="api.html"><span class="nav-icon">⟡</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
+<a class="nav-link" href="database.html"><span class="nav-icon">⬡</span><span class="nav-text"><strong>Database</strong><small>Schema · Index · SQL Script</small></span></a>
+<a class="nav-link" href="files.html"><span class="nav-icon">◎</span><span class="nav-text"><strong>ไฟล์ที่เกี่ยวข้อง</strong><small>Repos & Source files</small></span></a>
+<a class="nav-link" href="deploy.html"><span class="nav-icon">▶</span><span class="nav-text"><strong>Deploy</strong><small>ลำดับ deploy & Smoke test</small></span></a>
+<a class="nav-link" href="sync.html"><span class="nav-icon">↻</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
     </nav>
     <div class="sidebar-footer">
-      <span>เธญเธฑเธเน€เธ”เธ• 2026-06-28</span>
+      <span>อัปเดต 2026-06-28</span>
       <span>Phase 1</span>
     </div>
   </aside>
@@ -54,68 +54,68 @@
 <tr>
 <th>Method</th>
 <th>Route</th>
-<th>เนเธเนเน€เธกเธทเนเธญ</th>
+<th>ใช้เมื่อ</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>POST</td>
 <td><code>/search</code></td>
-<td><strong>เธซเธเนเธฒ List</strong> โ€” filter Module / Menu / LogType / Merchant / เธงเธฑเธเธ—เธตเน (เนเธเนเธซเธฅเธฑเธ)</td>
+<td><strong>หน้า List</strong> — filter Module / Menu / LogType / Merchant / วันที่ (ใช้หลัก)</td>
 </tr>
 <tr>
 <td>POST</td>
 <td><code>/search/menu</code></td>
-<td>integration เธ—เธตเนเธชเนเธ <code>moduleType</code> + <code>menuType</code> เธเธนเนเน€เธ”เธตเธขเธง</td>
+<td>integration ที่ส่ง <code>moduleType</code> + <code>menuType</code> คู่เดียว</td>
 </tr>
 <tr>
 <td>GET</td>
 <td><code>/{id}/{system}/{by}</code></td>
-<td><strong>เธซเธเนเธฒ Detail</strong> โ€” เธญเนเธฒเธ log เธ•เธฒเธก id</td>
+<td><strong>หน้า Detail</strong> — อ่าน log ตาม id</td>
 </tr>
 <tr>
 <td>POST</td>
 <td><code>/add</code></td>
-<td><strong>Writer</strong> โ€” web-backend เธเธฑเธเธ—เธถเธ log เธซเธฅเธฑเธ business success</td>
+<td><strong>Writer</strong> — web-backend บันทึก log หลัง business success</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Search parameters เธซเธฅเธฑเธ</strong> (<code>POST /search</code>)</p>
+<p><strong>Search parameters หลัก</strong> (<code>POST /search</code>)</p>
 <table>
 <thead>
 <tr>
 <th>Parameter</th>
-<th>เธซเธกเธฒเธขเน€เธซเธ•เธธ</th>
+<th>หมายเหตุ</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>moduleType[]</code></td>
-<td>เธซเธกเธงเธ”เนเธซเธเน</td>
+<td>หมวดใหญ่</td>
 </tr>
 <tr>
 <td><code>menuType[]</code></td>
-<td>เน€เธกเธเธนเธขเนเธญเธข โ€” <strong>เนเธซเธกเนเนเธ UI</strong></td>
+<td>เมนูย่อย — <strong>ใหม่ใน UI</strong></td>
 </tr>
 <tr>
 <td><code>logType[]</code></td>
-<td>action (Create/Update/โ€ฆ)</td>
+<td>action (Create/Update/…)</td>
 </tr>
 <tr>
 <td><code>dataId</code></td>
-<td>entity id โ€” เธเธฒเธเธเธธเนเธก Logs</td>
+<td>entity id — จากปุ่ม Logs</td>
 </tr>
 <tr>
 <td><code>merchantId[]</code></td>
-<td><strong>Merchant filter</strong> โ€” เนเธเธ PayOut (<code>WHERE MerchantId IN (...)</code>)</td>
+<td><strong>Merchant filter</strong> — แบบ PayOut (<code>WHERE MerchantId IN (...)</code>)</td>
 </tr>
 <tr>
 <td><code>refType[]</code> + <code>refId</code></td>
-<td>filter เธ•เธฒเธก entity เธญเนเธฒเธเธญเธดเธ (integration โ€” เนเธกเนเนเธเน filter เธฃเนเธฒเธเธเธ List)</td>
+<td>filter ตาม entity อ้างอิง (integration — ไม่ใช่ filter ร้านบน List)</td>
 </tr>
 <tr>
 <td><code>addedDateFrom/To</code></td>
-<td>default เธงเธฑเธเธเธตเน</td>
+<td>default วันนี้</td>
 </tr>
 <tr>
 <td><code>searchText</code></td>
@@ -124,12 +124,12 @@
 </tbody>
 </table>
 <p><strong>Validation:</strong> <code>menuType / 100 == moduleType</code></p>
-<p><strong>Add parameters เธซเธฅเธฑเธ</strong> (<code>POST /add</code>)</p>
+<p><strong>Add parameters หลัก</strong> (<code>POST /add</code>)</p>
 <table>
 <thead>
 <tr>
 <th>Parameter</th>
-<th>เธซเธกเธฒเธขเน€เธซเธ•เธธ</th>
+<th>หมายเหตุ</th>
 </tr>
 </thead>
 <tbody>
@@ -139,25 +139,25 @@
 </tr>
 <tr>
 <td><code>dataId</code>, <code>refType</code>, <code>refId</code>, <code>ref2Type</code>, <code>ref2Id</code></td>
-<td>entity เธญเนเธฒเธเธญเธดเธ</td>
+<td>entity อ้างอิง</td>
 </tr>
 <tr>
 <td><strong><code>merchantId</code></strong></td>
-<td>id เธฃเนเธฒเธ โ€” Module Merchant (Writer เนเธชเน ยท API resolve เธ–เนเธฒเนเธกเนเธชเนเธ)</td>
+<td>id ร้าน — Module Merchant (Writer ใส่ · API resolve ถ้าไม่ส่ง)</td>
 </tr>
 <tr>
 <td><code>oldValue</code>, <code>newValue</code>, <code>message</code></td>
-<td>snapshot + เธเนเธญเธเธงเธฒเธก</td>
+<td>snapshot + ข้อความ</td>
 </tr>
 <tr>
 <td><code>requestSystem</code>, <code>requestBy</code></td>
-<td>เธเธนเนเน€เธเธตเธขเธ log</td>
+<td>ผู้เขียน log</td>
 </tr>
 </tbody>
 </table>
     </article>
     <footer class="page-footer">
-      <a href="index.html" class="footer-link">โ เธเธฅเธฑเธเธ เธฒเธเธฃเธงเธก</a>
+      <a href="index.html" class="footer-link">← กลับภาพรวม</a>
     </footer>
   </main>
 
