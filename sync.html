@@ -1,0 +1,189 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registry Sync โ€” Chillpay Operation Logs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+
+</head>
+<body>
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="เน€เธเธดเธ”เน€เธกเธเธน">โฐ</button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">CP</div>
+      <div>
+        <div class="brand-title">Operation Logs</div>
+        <div class="brand-sub">Chillpay Docs</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-link" href="index.html"><span class="nav-icon">โ—</span><span class="nav-text"><strong>เธ เธฒเธเธฃเธงเธก</strong><small>Summary & Checklist</small></span></a>
+<a class="nav-link" href="registry.html"><span class="nav-icon">โ–ฃ</span><span class="nav-text"><strong>Registry</strong><small>ModuleType ยท MenuType ยท LogType</small></span></a>
+<a class="nav-link" href="ui.html"><span class="nav-icon">โ–ฆ</span><span class="nav-text"><strong>UI</strong><small>List ยท Detail ยท เธเธธเนเธก Logs</small></span></a>
+<a class="nav-link" href="search.html"><span class="nav-icon">โ•</span><span class="nav-text"><strong>Search</strong><small>เธเธฒเธฃเธเนเธเธซเธฒ & Filter</small></span></a>
+<a class="nav-link" href="api.html"><span class="nav-icon">โก</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
+<a class="nav-link" href="database.html"><span class="nav-icon">โฌก</span><span class="nav-text"><strong>Database</strong><small>Schema ยท Index ยท SQL Script</small></span></a>
+<a class="nav-link" href="files.html"><span class="nav-icon">โ—</span><span class="nav-text"><strong>เนเธเธฅเนเธ—เธตเนเน€เธเธตเนเธขเธงเธเนเธญเธ</strong><small>Repos & Source files</small></span></a>
+<a class="nav-link" href="deploy.html"><span class="nav-icon">โ–ถ</span><span class="nav-text"><strong>Deploy</strong><small>เธฅเธณเธ”เธฑเธ deploy & Smoke test</small></span></a>
+<a class="nav-link active" href="sync.html"><span class="nav-icon">โป</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <span>เธญเธฑเธเน€เธ”เธ• 2026-06-28</span>
+      <span>Phase 1</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="page-header">
+      <p class="page-eyebrow">Chillpay Operation Logs</p>
+      <h1 class="page-title">Registry Sync</h1>
+      <p class="page-subtitle">Manual sync checklist</p>
+    </header>
+    
+    <article class="content prose">
+      <h2 id="10-registry-sync-manual">10. Registry Sync (Manual)</h2>
+<p>Registry เธเธฃเธฐเธเธฒเธข <strong>4 เธเธธเธ”</strong> โ€” sync เธกเธทเธญเธ—เธธเธเธเธฃเธฑเนเธเธ—เธตเนเน€เธเธดเนเธกเธซเธฃเธทเธญเนเธเน <code>ModuleType</code> / <code>MenuType</code> / <code>LogType</code> / <code>RefType</code></p>
+<h3 id="101-เนเธซเธฅเนเธเธญเนเธฒเธเธญเธดเธเธซเธฅเธฑเธ--เนเธเธฅเนเธ•เนเธเธเธเธฑเธเธเธญเธ-registry">10.1 เนเธซเธฅเนเธเธญเนเธฒเธเธญเธดเธเธซเธฅเธฑเธ โ€” เนเธเธฅเนเธ•เนเธเธเธเธฑเธเธเธญเธ Registry</h3>
+<p><strong>เธ•เนเธเธเธเธฑเธ:</strong> <code>operation-logs-api</code> โ’ <code>OperationLogConstants.cs</code></p>
+<p>เน€เธงเธฅเธฒเน€เธเธดเนเธกเธซเธฃเธทเธญเนเธเน <code>ModuleType</code> / <code>MenuType</code> / <code>LogType</code> / <code>RefType</code> <strong>เนเธซเนเนเธเนเธ—เธตเนเนเธเธฅเนเธเธตเนเธเนเธญเธ</strong> เนเธฅเนเธงเธเนเธญเธขเนเธเธญเธฑเธเธเธธเธ”เธญเธทเนเธเนเธซเนเธ•เธฃเธเธเธฑเธ โ€” API เนเธเน enum เธเธตเน validate เธ•เธญเธ <code>POST /add</code> เนเธฅเธฐ <code>POST /search</code> เธเนเธฒเธ—เธตเนเนเธกเนเธญเธขเธนเนเนเธ enum เธเธฐเธ–เธนเธ reject</p>
+<table>
+<thead>
+<tr>
+<th>Helper</th>
+<th>เนเธเนเน€เธกเธทเนเธญ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IsValidMenuType()</code></td>
+<td>เธ•เธฃเธงเธเธงเนเธฒ menuType เธกเธตเนเธ registry</td>
+</tr>
+<tr>
+<td><code>IsMenuTypeInModule()</code></td>
+<td>เธ•เธฃเธงเธเธงเนเธฒ menuType เธ•เธฃเธ moduleType</td>
+</tr>
+<tr>
+<td><code>IsValidAddRequest()</code></td>
+<td>validate เธเธฃเธเธ•เธญเธ add log</td>
+</tr>
+</tbody>
+</table>
+<p><code>ChillpayOperationLogRegistryConstants.cs</code> เนเธ web-backend เน€เธเนเธ <strong>เธชเธณเน€เธเธฒ</strong> เธชเธณเธซเธฃเธฑเธ writer เนเธฅเธฐ UI helper โ€” เธ•เนเธญเธเนเธซเนเธ•เธฑเธงเน€เธฅเธเธ•เธฃเธเธเธฑเธเธ•เนเธเธเธเธฑเธเนเธ API เน€เธชเธกเธญ</p>
+<h3 id="102-เธเธธเธ”เธ—เธตเนเธ•เนเธญเธ-sync">10.2 เธเธธเธ”เธ—เธตเนเธ•เนเธญเธ sync</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Repo / เธ—เธตเน</th>
+<th>เนเธเธฅเน</th>
+<th>เธ—เธณเธญเธฐเนเธฃ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>operation-logs-api</td>
+<td><code>OperationLogConstants.cs</code></td>
+<td><strong>เธ•เนเธเธเธเธฑเธ</strong> โ€” enum Module / Menu / LogType / RefType + validate + <code>AllModuleTypes</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>web-backend</td>
+<td><code>ChillpayOperationLogRegistryConstants.cs</code></td>
+<td>เธชเธณเน€เธเธฒ + <code>Get*Text</code> + <code>GetAllowedActions</code> + <code>DefaultAllowedActions</code> + <code>ResolveModuleTypes</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>web-backend</td>
+<td><code>js/constants/chillpay-operation-log-constants.js</code></td>
+<td>dropdown + <code>ChillpayOperationLogDefaultMenuActions</code> + <code>getChillpayOperationLogAllowedActions</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>SQL Server</td>
+<td><code>VW_ChillpayOperationLogs</code> (<code>docs/sql/ChillpayOperationLogs-View.sql</code>)</td>
+<td><code>CASE</code> เนเธ <code>ModuleTypeText</code>, <code>MenuTypeText</code>, <code>LogTypeText</code>, <code>RefTypeText</code>, <code>Ref2TypeText</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Allowed actions เธ•เนเธญเธ sync 3 เธเธธเธ”:</strong> <code>GetAllowedActions()</code> (C#) โ” <code>ChillpayOperationLog*MenuActions</code> + <code>ChillpayOperationLogDefaultMenuActions</code> (JS) โ” เธเธคเธ•เธดเธเธฃเธฃเธก dropdown เนเธ <code>ChillpayOperationLogs.cshtml</code></p>
+<h3 id="103-เธเธฑเนเธเธ•เธญเธเน€เธกเธทเนเธญเน€เธเธดเนเธก-menutype-เนเธซเธกเน">10.3 เธเธฑเนเธเธ•เธญเธเน€เธกเธทเนเธญเน€เธเธดเนเธก MenuType เนเธซเธกเน</h3>
+<p><strong>เธ•เธฑเธงเธญเธขเนเธฒเธ:</strong> เน€เธเธดเนเธกเน€เธกเธเธนเนเธซเธกเนเนเธ Module 3</p>
+<ol>
+<li><strong>เธ•เนเธเธเธเธฑเธ (API)</strong> โ€” เน€เธเธดเนเธกเนเธ <code>ChillpayOperationLogMenuType</code> (+ <code>ChillpayOperationLogRefType</code> เธ–เนเธฒเธกเธต entity เนเธซเธกเน) เนเธ <code>OperationLogConstants.cs</code></li>
+<li><strong>web-backend C#</strong> โ€” เน€เธเธดเนเธก <code>Menu*</code> / <code>Ref*</code> เนเธ <code>ChillpayOperationLogRegistryConstants.cs</code> เธเธฃเนเธญเธก <code>GetMenuTypeText</code>, <code>GetRefTypeText</code>, <code>GetAllowedActions</code></li>
+<li><strong>web-backend JS</strong> โ€” เน€เธเธดเนเธกเนเธ <code>ChillpayOperationLogMenuFilterByModule</code>, allowed actions เนเธ <code>*MenuActions</code> เนเธฅเธฐ <code>ChillpayOperationLogDefaultMenuActions</code> เธ–เนเธฒเนเธเน default</li>
+<li><strong>SQL View</strong> โ€” เน€เธเธดเนเธก <code>WHEN โ€ฆ THEN N'โ€ฆ'</code> เนเธ ยง7.4.3 เนเธฅเนเธงเธฃเธฑเธ <code>ChillpayOperationLogs-View.sql</code> เธเธ DB เธ—เธธเธ env</li>
+<li><strong>Writer + เธเธธเนเธก Logs</strong> (เธ–เนเธฒ implement) โ€” <code>ChillpayOperationLogWriter</code> / controller + <code>_ChillpayOperationLogButtonPartial</code></li>
+<li><strong>Deploy</strong> โ€” <code>operation-logs-api</code> เนเธฅเธฐ <code>web-backend</code> เนเธ PR/deploy เธเธธเธ”เน€เธ”เธตเธขเธงเธเธฑเธ</li>
+<li><strong>Smoke test</strong> โ€” Save โ’ row เนเธ DB โ’ List เน€เธซเนเธเธเธทเนเธญเน€เธกเธเธน โ’ Detail เนเธชเธ”เธ <code>MenuTypeText</code> เธ–เธนเธ</li>
+</ol>
+<h3 id="104-checklist-เธชเธณเธซเธฃเธฑเธ-pr">10.4 Checklist เธชเธณเธซเธฃเธฑเธ PR</h3>
+<pre><code>[ ] OperationLogConstants.cs โ€” MenuType (+ RefType เธ–เนเธฒเธกเธต) + AllModuleTypes
+[ ] ChillpayOperationLogRegistryConstants.cs โ€” const + Get*Text + GetAllowedActions + DefaultAllowedActions
+[ ] chillpay-operation-log-constants.js โ€” MenuFilter + *MenuActions + DefaultMenuActions
+[ ] ChillpayOperationLogs-View.sql โ€” CASE Module/Menu/Log/Ref/Ref2 (+ เธฃเธฑเธ SQL เธ—เธธเธ env)
+[ ] Writer / เธเธธเนเธก Logs (เธ–เนเธฒ implement เนเธฅเนเธง)
+[ ] Deploy API + web-backend เธเธฃเนเธญเธกเธเธฑเธ
+</code></pre>
+<h3 id="105-เธ–เนเธฒ-sync-เนเธกเนเธเธฃเธ--เธญเธฒเธเธฒเธฃเนเธฅเธฐเธงเธดเธเธตเนเธเน">10.5 เธ–เนเธฒ sync เนเธกเนเธเธฃเธ โ€” เธญเธฒเธเธฒเธฃเนเธฅเธฐเธงเธดเธเธตเนเธเน</h3>
+<table>
+<thead>
+<tr>
+<th>เธเธฒเธ”เธ—เธตเน</th>
+<th>เธญเธฒเธเธฒเธฃ</th>
+<th>เนเธเน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API enum</td>
+<td>Writer เน€เธฃเธตเธขเธ <code>/add</code> fail โ€” log เนเธกเนเน€เธเนเธฒ DB</td>
+<td>deploy API เธ—เธตเนเธกเธต enum เนเธซเธกเน เธซเธฃเธทเธญ rollback web-backend</td>
+</tr>
+<tr>
+<td>web-backend C#</td>
+<td>compile เธเนเธฒเธเนเธ”เน เนเธ•เนเธชเนเธเธเนเธฒเธเธดเธ” / writer เนเธเน constant เน€เธเนเธฒ</td>
+<td>เธญเธฑเธ constants เนเธซเนเธ•เธฃเธ API</td>
+</tr>
+<tr>
+<td>JS</td>
+<td>dropdown Menu เนเธกเนเธกเธตเน€เธกเธเธนเนเธซเธกเน / Log Type filter เธเธดเธ”</td>
+<td>เธญเธฑเธ <code>.js</code> + clear browser cache</td>
+</tr>
+<tr>
+<td>JS allowed actions</td>
+<td>Log Type dropdown เนเธชเธ”เธ action เน€เธเธดเธเธซเธฃเธทเธญเธเนเธญเธขเธเธงเนเธฒ C#</td>
+<td>เธญเธฑเธ <code>*MenuActions</code> / <code>DefaultMenuActions</code> เนเธซเนเธ•เธฃเธ <code>GetAllowedActions</code></td>
+</tr>
+<tr>
+<td>SQL View</td>
+<td>log เนเธ DB เนเธ”เน เนเธ•เน List/Detail เนเธชเธ”เธ <strong>เน€เธฅเธเธ”เธดเธ</strong> เนเธ—เธเธเธทเนเธญ</td>
+<td>เธฃเธฑเธ SQL เธญเธฑเธเน€เธ”เธ• View ยง7.4</td>
+</tr>
+</tbody>
+</table>
+<h3 id="106-เธเธฒเธฃเน€เธเธดเนเธก-module-เนเธซเธกเน">10.6 เธเธฒเธฃเน€เธเธดเนเธก Module เนเธซเธกเน</h3>
+<p>เน€เธกเธทเนเธญเน€เธเธดเนเธก <code>ChillpayOperationLogModuleType</code> เนเธ API:</p>
+<ol>
+<li>เน€เธเธดเนเธก enum เนเธ <code>OperationLogConstants.cs</code> เนเธฅเธฐเธญเธฑเธ <code>AllModuleTypes</code></li>
+<li>เธญเธฑเธ <code>AllModuleTypes</code> เนเธ <code>ChillpayOperationLogRegistryConstants.cs</code> (web-backend เนเธเน <code>ResolveModuleTypes</code> โ€” เนเธกเน hardcode list เนเธ controller เนเธฅเนเธง)</li>
+<li>เน€เธเธดเนเธกเนเธ <code>ChillpayOperationLogModuleFilter</code> เนเธฅเธฐ <code>ChillpayOperationLogMenuFilterByModule</code> (JS)</li>
+<li>เน€เธเธดเนเธก <code>CASE</code> เนเธ SQL View</li>
+</ol>
+<p><em>เน€เธญเธเธชเธฒเธฃเธเธเธฑเธเธเธตเนเธชเธฃเธธเธเธเธฒเธเธ—เธฑเนเธเธซเธกเธ”เนเธฅเธฐเธญเธเธดเธเธฒเธข Registry โ€” เธญเธฑเธเน€เธ”เธ• 2026-06-28</em></p>
+    </article>
+    <footer class="page-footer">
+      <a href="index.html" class="footer-link">โ เธเธฅเธฑเธเธ เธฒเธเธฃเธงเธก</a>
+    </footer>
+  </main>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

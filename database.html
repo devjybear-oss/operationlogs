@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Database — Chillpay Operation Logs</title>
+  <title>Database โ€” Chillpay Operation Logs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
 
 </head>
 <body>
-  <button class="sidebar-toggle" id="sidebarToggle" aria-label="เปิดเมนู">☰</button>
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="เน€เธเธดเธ”เน€เธกเธเธน">โฐ</button>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <aside class="sidebar" id="sidebar">
@@ -23,18 +23,18 @@
       </div>
     </div>
     <nav class="sidebar-nav">
-      <a class="nav-link" href="index.html"><span class="nav-icon">◈</span><span class="nav-text"><strong>ภาพรวม</strong><small>Summary & Checklist</small></span></a>
-<a class="nav-link" href="registry.html"><span class="nav-icon">▣</span><span class="nav-text"><strong>Registry</strong><small>ModuleType · MenuType · LogType</small></span></a>
-<a class="nav-link" href="ui.html"><span class="nav-icon">▦</span><span class="nav-text"><strong>UI</strong><small>List · Detail · ปุ่ม Logs</small></span></a>
-<a class="nav-link" href="search.html"><span class="nav-icon">⌕</span><span class="nav-text"><strong>Search</strong><small>การค้นหา & Filter</small></span></a>
-<a class="nav-link" href="api.html"><span class="nav-icon">⟡</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
-<a class="nav-link active" href="database.html"><span class="nav-icon">⬡</span><span class="nav-text"><strong>Database</strong><small>Schema · Index · SQL Script</small></span></a>
-<a class="nav-link" href="files.html"><span class="nav-icon">◎</span><span class="nav-text"><strong>ไฟล์ที่เกี่ยวข้อง</strong><small>Repos & Source files</small></span></a>
-<a class="nav-link" href="deploy.html"><span class="nav-icon">▶</span><span class="nav-text"><strong>Deploy</strong><small>ลำดับ deploy & Smoke test</small></span></a>
-<a class="nav-link" href="sync.html"><span class="nav-icon">↻</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
+      <a class="nav-link" href="index.html"><span class="nav-icon">โ—</span><span class="nav-text"><strong>เธ เธฒเธเธฃเธงเธก</strong><small>Summary & Checklist</small></span></a>
+<a class="nav-link" href="registry.html"><span class="nav-icon">โ–ฃ</span><span class="nav-text"><strong>Registry</strong><small>ModuleType ยท MenuType ยท LogType</small></span></a>
+<a class="nav-link" href="ui.html"><span class="nav-icon">โ–ฆ</span><span class="nav-text"><strong>UI</strong><small>List ยท Detail ยท เธเธธเนเธก Logs</small></span></a>
+<a class="nav-link" href="search.html"><span class="nav-icon">โ•</span><span class="nav-text"><strong>Search</strong><small>เธเธฒเธฃเธเนเธเธซเธฒ & Filter</small></span></a>
+<a class="nav-link" href="api.html"><span class="nav-icon">โก</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
+<a class="nav-link active" href="database.html"><span class="nav-icon">โฌก</span><span class="nav-text"><strong>Database</strong><small>Schema ยท Index ยท SQL Script</small></span></a>
+<a class="nav-link" href="files.html"><span class="nav-icon">โ—</span><span class="nav-text"><strong>เนเธเธฅเนเธ—เธตเนเน€เธเธตเนเธขเธงเธเนเธญเธ</strong><small>Repos & Source files</small></span></a>
+<a class="nav-link" href="deploy.html"><span class="nav-icon">โ–ถ</span><span class="nav-text"><strong>Deploy</strong><small>เธฅเธณเธ”เธฑเธ deploy & Smoke test</small></span></a>
+<a class="nav-link" href="sync.html"><span class="nav-icon">โป</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
     </nav>
     <div class="sidebar-footer">
-      <span>อัปเดต 2026-06-28</span>
+      <span>เธญเธฑเธเน€เธ”เธ• 2026-06-28</span>
       <span>Phase 1</span>
     </div>
   </aside>
@@ -43,148 +43,148 @@
     <header class="page-header">
       <p class="page-eyebrow">Chillpay Operation Logs</p>
       <h1 class="page-title">Database</h1>
-      <p class="page-subtitle">Schema · Index · SQL Script</p>
+      <p class="page-subtitle">Schema ยท Index ยท SQL Script</p>
     </header>
     
     <article class="content prose">
-      <h2 id="7-database--schema-index-view-และ-deploy-script">7. Database — Schema, Index, View และ Deploy Script</h2>
-<h3 id="71-ภาพรวม">7.1 ภาพรวม</h3>
+      <h2 id="7-database--schema-index-view-เนเธฅเธฐ-deploy-script">7. Database โ€” Schema, Index, View เนเธฅเธฐ Deploy Script</h2>
+<h3 id="71-เธ เธฒเธเธฃเธงเธก">7.1 เธ เธฒเธเธฃเธงเธก</h3>
 <table>
 <thead>
 <tr>
 <th>Object</th>
-<th>ชื่อ</th>
-<th>ใช้เมื่อ</th>
+<th>เธเธทเนเธญ</th>
+<th>เนเธเนเน€เธกเธทเนเธญ</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>ตาราง</strong></td>
+<td><strong>เธ•เธฒเธฃเธฒเธ</strong></td>
 <td><code>ChillpayOperationLogs</code></td>
-<td>API <strong>INSERT</strong> ตอน Writer เรียก <code>POST /add</code> — มีคอลัมน์ <strong><code>MerchantId</code></strong> แบบ PayOut</td>
+<td>API <strong>INSERT</strong> เธ•เธญเธ Writer เน€เธฃเธตเธขเธ <code>POST /add</code> โ€” เธกเธตเธเธญเธฅเธฑเธกเธเน <strong><code>MerchantId</code></strong> เนเธเธ PayOut</td>
 </tr>
 <tr>
 <td><strong>View</strong></td>
 <td><code>VW_ChillpayOperationLogs</code></td>
-<td>API <strong>SELECT</strong> ตอน Search / FindById — <code>LEFT JOIN Merchants</code> บน <code>b.MerchantId</code></td>
+<td>API <strong>SELECT</strong> เธ•เธญเธ Search / FindById โ€” <code>LEFT JOIN Merchants</code> เธเธ <code>b.MerchantId</code></td>
 </tr>
 <tr>
 <td><strong>Index</strong></td>
-<td>5 ตัว</td>
+<td>5 เธ•เธฑเธง</td>
 <td>Browse (Module+Menu), LogType, DataId, MerchantId, Ref (legacy)</td>
 </tr>
 </tbody>
 </table>
-<pre><code>Writer (web-backend)  →  INSERT ChillpayOperationLogs (รวม MerchantId)
-Admin List/Detail     →  SELECT VW_ChillpayOperationLogs
-                        →  filter ร้าน: WHERE MerchantId IN (...)
+<pre><code>Writer (web-backend)  โ’  INSERT ChillpayOperationLogs (เธฃเธงเธก MerchantId)
+Admin List/Detail     โ’  SELECT VW_ChillpayOperationLogs
+                        โ’  filter เธฃเนเธฒเธ: WHERE MerchantId IN (...)
 </code></pre>
-<p><strong>Prerequisite:</strong> ตาราง <code>[dbo].[Merchants]</code> ต้องมีอยู่แล้วใน DB เดียวกัน — View join เพื่อแสดง MerchantCode, CompanyName บนหน้า List</p>
-<h3 id="72-ตาราง-chillpayoperationlogs--คอลัมน์">7.2 ตาราง <code>ChillpayOperationLogs</code> — คอลัมน์</h3>
+<p><strong>Prerequisite:</strong> เธ•เธฒเธฃเธฒเธ <code>[dbo].[Merchants]</code> เธ•เนเธญเธเธกเธตเธญเธขเธนเนเนเธฅเนเธงเนเธ DB เน€เธ”เธตเธขเธงเธเธฑเธ โ€” View join เน€เธเธทเนเธญเนเธชเธ”เธ MerchantCode, CompanyName เธเธเธซเธเนเธฒ List</p>
+<h3 id="72-เธ•เธฒเธฃเธฒเธ-chillpayoperationlogs--เธเธญเธฅเธฑเธกเธเน">7.2 เธ•เธฒเธฃเธฒเธ <code>ChillpayOperationLogs</code> โ€” เธเธญเธฅเธฑเธกเธเน</h3>
 <table>
 <thead>
 <tr>
-<th>คอลัมน์</th>
-<th>ชนิด</th>
-<th>คำอธิบาย</th>
+<th>เธเธญเธฅเธฑเธกเธเน</th>
+<th>เธเธเธดเธ”</th>
+<th>เธเธณเธญเธเธดเธเธฒเธข</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>Id</strong></td>
 <td>bigint IDENTITY</td>
-<td>PK — log id (แสดงบนหน้า List/Detail)</td>
+<td>PK โ€” log id (เนเธชเธ”เธเธเธเธซเธเนเธฒ List/Detail)</td>
 </tr>
 <tr>
 <td><strong>ModuleType</strong></td>
 <td>int</td>
-<td>หมวดใหญ่ registry (§3.2) เช่น 2=Merchant, 3=Settings</td>
+<td>เธซเธกเธงเธ”เนเธซเธเน registry (ยง3.2) เน€เธเนเธ 2=Merchant, 3=Settings</td>
 </tr>
 <tr>
 <td><strong>MenuType</strong></td>
 <td>int</td>
-<td>เมนูย่อย (§3.3) เช่น 202=Merchant Fee</td>
+<td>เน€เธกเธเธนเธขเนเธญเธข (ยง3.3) เน€เธเนเธ 202=Merchant Fee</td>
 </tr>
 <tr>
 <td><strong>LogType</strong></td>
 <td>int</td>
-<td>action (§3.4) เช่น 1=Create, 2=Update, 5=Delete</td>
+<td>action (ยง3.4) เน€เธเนเธ 1=Create, 2=Update, 5=Delete</td>
 </tr>
 <tr>
 <td><strong>Message</strong></td>
 <td>nvarchar(500)</td>
-<td>ข้อความสรุป เช่น "Merchant fee updated"</td>
+<td>เธเนเธญเธเธงเธฒเธกเธชเธฃเธธเธ เน€เธเนเธ "Merchant fee updated"</td>
 </tr>
 <tr>
 <td><strong>OldValue</strong></td>
 <td>nvarchar(max)</td>
-<td>JSON snapshot ก่อน action — null ตอน Create</td>
+<td>JSON snapshot เธเนเธญเธ action โ€” null เธ•เธญเธ Create</td>
 </tr>
 <tr>
 <td><strong>NewValue</strong></td>
 <td>nvarchar(max)</td>
-<td>JSON snapshot หลัง action — null ตอน Delete</td>
+<td>JSON snapshot เธซเธฅเธฑเธ action โ€” null เธ•เธญเธ Delete</td>
 </tr>
 <tr>
 <td><strong>DataId</strong></td>
 <td>bigint</td>
-<td>id หลักของ entity ที่ถูก action (fee id, merchant id ฯลฯ)</td>
+<td>id เธซเธฅเธฑเธเธเธญเธ entity เธ—เธตเนเธ–เธนเธ action (fee id, merchant id เธฏเธฅเธฏ)</td>
 </tr>
 <tr>
 <td><strong>RefType</strong></td>
 <td>int</td>
-<td>ประเภท entity หลัก (§3.5) เช่น 10002=Merchant Fee</td>
+<td>เธเธฃเธฐเน€เธ เธ— entity เธซเธฅเธฑเธ (ยง3.5) เน€เธเนเธ 10002=Merchant Fee</td>
 </tr>
 <tr>
 <td><strong>RefId</strong></td>
 <td>bigint</td>
-<td>id ของ RefType</td>
+<td>id เธเธญเธ RefType</td>
 </tr>
 <tr>
 <td><strong>Ref2Type</strong></td>
 <td>int</td>
-<td>entity ที่เกี่ยวข้อง (มัก 10000=Merchant)</td>
+<td>entity เธ—เธตเนเน€เธเธตเนเธขเธงเธเนเธญเธ (เธกเธฑเธ 10000=Merchant)</td>
 </tr>
 <tr>
 <td><strong>Ref2Id</strong></td>
 <td>bigint</td>
-<td>id ของ Ref2 (มัก merchant id)</td>
+<td>id เธเธญเธ Ref2 (เธกเธฑเธ merchant id)</td>
 </tr>
 <tr>
 <td><strong>MerchantId</strong></td>
 <td>bigint</td>
-<td>id ร้านค้า — เก็บตอน INSERT (Module Merchant) · <code>NULL</code> สำหรับ Settings ฯลฯ</td>
+<td>id เธฃเนเธฒเธเธเนเธฒ โ€” เน€เธเนเธเธ•เธญเธ INSERT (Module Merchant) ยท <code>NULL</code> เธชเธณเธซเธฃเธฑเธ Settings เธฏเธฅเธฏ</td>
 </tr>
 <tr>
 <td><strong>RequestSystem</strong></td>
 <td>nvarchar(20)</td>
-<td>ระบบที่เขียน log: Admin, Backend, API, Job, MerchantApi</td>
+<td>เธฃเธฐเธเธเธ—เธตเนเน€เธเธตเธขเธ log: Admin, Backend, API, Job, MerchantApi</td>
 </tr>
 <tr>
 <td><strong>RequestBy</strong></td>
 <td>bigint</td>
-<td>user id ผู้กระทำ</td>
+<td>user id เธเธนเนเธเธฃเธฐเธ—เธณ</td>
 </tr>
 <tr>
 <td><strong>RequestByName</strong></td>
 <td>nvarchar(200)</td>
-<td>ชื่อแสดงผู้กระทำ (optional)</td>
+<td>เธเธทเนเธญเนเธชเธ”เธเธเธนเนเธเธฃเธฐเธ—เธณ (optional)</td>
 </tr>
 <tr>
 <td><strong>AddedDate</strong></td>
 <td>datetime</td>
-<td>วันเวลาบันทึก (default GETDATE())</td>
+<td>เธงเธฑเธเน€เธงเธฅเธฒเธเธฑเธเธ—เธถเธ (default GETDATE())</td>
 </tr>
 </tbody>
 </table>
-<h3 id="73-index-และ-view">7.3 Index และ View</h3>
+<h3 id="73-index-เนเธฅเธฐ-view">7.3 Index เนเธฅเธฐ View</h3>
 <p><strong>Index</strong></p>
 <table>
 <thead>
 <tr>
 <th>Index</th>
-<th>คอลัมน์</th>
-<th>รองรับ query</th>
+<th>เธเธญเธฅเธฑเธกเธเน</th>
+<th>เธฃเธญเธเธฃเธฑเธ query</th>
 </tr>
 </thead>
 <tbody>
@@ -196,31 +196,31 @@ Admin List/Detail     →  SELECT VW_ChillpayOperationLogs
 <tr>
 <td><code>IX_ChillpayOperationLogs_Module_Menu</code></td>
 <td>ModuleType, MenuType, AddedDate DESC</td>
-<td><strong>Browse หลัก</strong> — filter Module + Menu + เรียงวันที่</td>
+<td><strong>Browse เธซเธฅเธฑเธ</strong> โ€” filter Module + Menu + เน€เธฃเธตเธขเธเธงเธฑเธเธ—เธตเน</td>
 </tr>
 <tr>
 <td><code>IX_ChillpayOperationLogs_LogType</code></td>
 <td>LogType, AddedDate DESC</td>
-<td>filter Action (Create/Update/…)</td>
+<td>filter Action (Create/Update/โ€ฆ)</td>
 </tr>
 <tr>
 <td><code>IX_ChillpayOperationLogs_DataId</code></td>
 <td>DataId (filtered)</td>
-<td>ปุ่ม Logs / deep link — entity เดียว</td>
+<td>เธเธธเนเธก Logs / deep link โ€” entity เน€เธ”เธตเธขเธง</td>
 </tr>
 <tr>
 <td><code>IX_ChillpayOperationLogs_RefType_RefId</code></td>
 <td>RefType, RefId (filtered)</td>
-<td>Merchant filter แบบเดิม (<code>RefType=10000</code>)</td>
+<td>Merchant filter เนเธเธเน€เธ”เธดเธก (<code>RefType=10000</code>)</td>
 </tr>
 <tr>
 <td><code>IX_ChillpayOperationLogs_MerchantId</code></td>
 <td>MerchantId (filtered)</td>
-<td>Merchant filter ตรง — แบบเดียวกับ PayOut</td>
+<td>Merchant filter เธ•เธฃเธ โ€” เนเธเธเน€เธ”เธตเธขเธงเธเธฑเธ PayOut</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Query pattern ตัวอย่าง</strong></p>
+<p><strong>Query pattern เธ•เธฑเธงเธญเธขเนเธฒเธ</strong></p>
 <pre><code class="language-sql">WHERE ModuleType IN (2)
   AND MenuType IN (202)
   AND DataId = 501
@@ -230,82 +230,82 @@ Admin List/Detail     →  SELECT VW_ChillpayOperationLogs
 <table>
 <thead>
 <tr>
-<th>ส่วน</th>
-<th>คำอธิบาย</th>
+<th>เธชเนเธงเธ</th>
+<th>เธเธณเธญเธเธดเธเธฒเธข</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>คอลัมน์จากตาราง</td>
-<td><code>SELECT b.*</code> — ทุก column ของ <code>ChillpayOperationLogs</code> (แบบ PayOut)</td>
+<td>เธเธญเธฅเธฑเธกเธเนเธเธฒเธเธ•เธฒเธฃเธฒเธ</td>
+<td><code>SELECT b.*</code> โ€” เธ—เธธเธ column เธเธญเธ <code>ChillpayOperationLogs</code> (เนเธเธ PayOut)</td>
 </tr>
 <tr>
 <td><code>AddedDateText</code></td>
-<td><code>dd-MM-yyyy HH:mm:ss</code> (style 105 + 8 — แบบ PayOut)</td>
+<td><code>dd-MM-yyyy HH:mm:ss</code> (style 105 + 8 โ€” เนเธเธ PayOut)</td>
 </tr>
 <tr>
 <td><code>ModuleTypeText</code></td>
-<td>ชื่อ module จาก CASE</td>
+<td>เธเธทเนเธญ module เธเธฒเธ CASE</td>
 </tr>
 <tr>
 <td><code>MenuTypeText</code></td>
-<td>ชื่อเมนูจาก CASE (ตรง registry Module 1–14)</td>
+<td>เธเธทเนเธญเน€เธกเธเธนเธเธฒเธ CASE (เธ•เธฃเธ registry Module 1โ€“14)</td>
 </tr>
 <tr>
 <td><code>LogTypeText</code></td>
-<td>ชื่อ action จาก CASE (Create, Update, …)</td>
+<td>เธเธทเนเธญ action เธเธฒเธ CASE (Create, Update, โ€ฆ)</td>
 </tr>
 <tr>
 <td><code>RefTypeText</code> / <code>Ref2TypeText</code></td>
-<td>ชื่อ entity จาก CASE (แบบ PayOut)</td>
+<td>เธเธทเนเธญ entity เธเธฒเธ CASE (เนเธเธ PayOut)</td>
 </tr>
 <tr>
-<td><code>MerchantCode</code>, <code>CompanyName</code>, …</td>
-<td><code>LEFT JOIN Merchants</code> บน <code>b.MerchantId</code></td>
+<td><code>MerchantCode</code>, <code>CompanyName</code>, โ€ฆ</td>
+<td><code>LEFT JOIN Merchants</code> เธเธ <code>b.MerchantId</code></td>
 </tr>
 </tbody>
 </table>
-<p><strong>Index อนาคต (Phase 3 ถ้าช้า):</strong> <code>(Ref2Type, Ref2Id)</code> filtered, full-text บน Message</p>
+<p><strong>Index เธญเธเธฒเธเธ• (Phase 3 เธ–เนเธฒเธเนเธฒ):</strong> <code>(Ref2Type, Ref2Id)</code> filtered, full-text เธเธ Message</p>
 <h3 id="74-script">7.4 Script</h3>
 <p>Generate: <code>python docs/extract-sql.py</code></p>
 <table>
 <thead>
 <tr>
-<th>ลำดับ</th>
-<th>ไฟล์</th>
-<th>รันเมื่อ</th>
+<th>เธฅเธณเธ”เธฑเธ</th>
+<th>เนเธเธฅเน</th>
+<th>เธฃเธฑเธเน€เธกเธทเนเธญ</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>1</td>
 <td><a href="sql/ChillpayOperationLogs-Table.sql"><code>ChillpayOperationLogs-Table.sql</code></a></td>
-<td>สร้างตาราง + <code>MerchantId</code> + backfill (ครั้งแรก / migrate)</td>
+<td>เธชเธฃเนเธฒเธเธ•เธฒเธฃเธฒเธ + <code>MerchantId</code> + backfill (เธเธฃเธฑเนเธเนเธฃเธ / migrate)</td>
 </tr>
 <tr>
 <td>2</td>
 <td><a href="sql/ChillpayOperationLogs-Index.sql"><code>ChillpayOperationLogs-Index.sql</code></a></td>
-<td>สร้าง index บนตาราง</td>
+<td>เธชเธฃเนเธฒเธ index เธเธเธ•เธฒเธฃเธฒเธ</td>
 </tr>
 <tr>
 <td>3</td>
 <td><a href="sql/ChillpayOperationLogs-View.sql"><code>ChillpayOperationLogs-View.sql</code></a></td>
-<td>สร้าง/อัปเดต View <code>*Text</code> (รันบ่อยเมื่อเพิ่ม Menu/Ref)</td>
+<td>เธชเธฃเนเธฒเธ/เธญเธฑเธเน€เธ”เธ• View <code>*Text</code> (เธฃเธฑเธเธเนเธญเธขเน€เธกเธทเนเธญเน€เธเธดเนเธก Menu/Ref)</td>
 </tr>
 <tr>
-<td>—</td>
+<td>โ€”</td>
 <td><a href="sql/ChillpayOperationLogs-Deploy.sql"><code>ChillpayOperationLogs-Deploy.sql</code></a></td>
-<td>รวม 1+2+3 (ครั้งแรก deploy ทั้งชุด)</td>
+<td>เธฃเธงเธก 1+2+3 (เธเธฃเธฑเนเธเนเธฃเธ deploy เธ—เธฑเนเธเธเธธเธ”)</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p>ต้องมีตาราง <code>[dbo].[Merchants]</code> อยู่แล้วก่อนรัน View</p>
+<p>เธ•เนเธญเธเธกเธตเธ•เธฒเธฃเธฒเธ <code>[dbo].[Merchants]</code> เธญเธขเธนเนเนเธฅเนเธงเธเนเธญเธเธฃเธฑเธ View</p>
 </blockquote>
-<h4 id="741-ตาราง--chillpayoperationlogs-tablesql">7.4.1 ตาราง — <code>ChillpayOperationLogs-Table.sql</code></h4>
+<h4 id="741-เธ•เธฒเธฃเธฒเธ--chillpayoperationlogs-tablesql">7.4.1 เธ•เธฒเธฃเธฒเธ โ€” <code>ChillpayOperationLogs-Table.sql</code></h4>
 <pre><code class="language-sql">/*
-  Chillpay Operation Logs — Table + MerchantId migrate
-  เอกสาร: docs/Chillpay-Operation-Logs.md §7.4.1
+  Chillpay Operation Logs โ€” Table + MerchantId migrate
+  เน€เธญเธเธชเธฒเธฃ: docs/Chillpay-Operation-Logs.md ยง7.4.1
 */
 SET ANSI_NULLS ON;
 GO
@@ -343,7 +343,7 @@ BEGIN
 END
 GO
 
--- backfill MerchantId สำหรับ row เก่า (Module Merchant)
+-- backfill MerchantId เธชเธณเธซเธฃเธฑเธ row เน€เธเนเธฒ (Module Merchant)
 UPDATE [dbo].[ChillpayOperationLogs]
 SET [MerchantId] = COALESCE(
         CASE WHEN [RefType] = 10000 THEN [RefId] END,
@@ -354,11 +354,11 @@ WHERE [ModuleType] = 2
   AND [MerchantId] IS NULL;
 GO
 </code></pre>
-<h4 id="742-index--chillpayoperationlogs-indexsql">7.4.2 Index — <code>ChillpayOperationLogs-Index.sql</code></h4>
+<h4 id="742-index--chillpayoperationlogs-indexsql">7.4.2 Index โ€” <code>ChillpayOperationLogs-Index.sql</code></h4>
 <pre><code class="language-sql">/*
-  Chillpay Operation Logs — Indexes
-  เอกสาร: docs/Chillpay-Operation-Logs.md §7.4.2
-  ต้องรัน Table script ก่อน
+  Chillpay Operation Logs โ€” Indexes
+  เน€เธญเธเธชเธฒเธฃ: docs/Chillpay-Operation-Logs.md ยง7.4.2
+  เธ•เนเธญเธเธฃเธฑเธ Table script เธเนเธญเธ
 */
 SET ANSI_NULLS ON;
 GO
@@ -403,11 +403,11 @@ BEGIN
 END
 GO
 </code></pre>
-<h4 id="743-view--chillpayoperationlogs-viewsql">7.4.3 View — <code>ChillpayOperationLogs-View.sql</code></h4>
+<h4 id="743-view--chillpayoperationlogs-viewsql">7.4.3 View โ€” <code>ChillpayOperationLogs-View.sql</code></h4>
 <pre><code class="language-sql">/*
-  Chillpay Operation Logs — View VW_ChillpayOperationLogs
-  เอกสาร: docs/Chillpay-Operation-Logs.md §7.4.3
-  ต้องมีตาราง ChillpayOperationLogs + Merchants ก่อนรัน
+  Chillpay Operation Logs โ€” View VW_ChillpayOperationLogs
+  เน€เธญเธเธชเธฒเธฃ: docs/Chillpay-Operation-Logs.md ยง7.4.3
+  เธ•เนเธญเธเธกเธตเธ•เธฒเธฃเธฒเธ ChillpayOperationLogs + Merchants เธเนเธญเธเธฃเธฑเธ
 */
 SET ANSI_NULLS ON;
 GO
@@ -635,7 +635,7 @@ GO
 </code></pre>
     </article>
     <footer class="page-footer">
-      <a href="index.html" class="footer-link">← กลับภาพรวม</a>
+      <a href="index.html" class="footer-link">โ เธเธฅเธฑเธเธ เธฒเธเธฃเธงเธก</a>
     </footer>
   </main>
 

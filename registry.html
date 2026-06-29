@@ -1,0 +1,619 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registry โ€” Chillpay Operation Logs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+
+</head>
+<body>
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="เน€เธเธดเธ”เน€เธกเธเธน">โฐ</button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">CP</div>
+      <div>
+        <div class="brand-title">Operation Logs</div>
+        <div class="brand-sub">Chillpay Docs</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-link" href="index.html"><span class="nav-icon">โ—</span><span class="nav-text"><strong>เธ เธฒเธเธฃเธงเธก</strong><small>Summary & Checklist</small></span></a>
+<a class="nav-link active" href="registry.html"><span class="nav-icon">โ–ฃ</span><span class="nav-text"><strong>Registry</strong><small>ModuleType ยท MenuType ยท LogType</small></span></a>
+<a class="nav-link" href="ui.html"><span class="nav-icon">โ–ฆ</span><span class="nav-text"><strong>UI</strong><small>List ยท Detail ยท เธเธธเนเธก Logs</small></span></a>
+<a class="nav-link" href="search.html"><span class="nav-icon">โ•</span><span class="nav-text"><strong>Search</strong><small>เธเธฒเธฃเธเนเธเธซเธฒ & Filter</small></span></a>
+<a class="nav-link" href="api.html"><span class="nav-icon">โก</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
+<a class="nav-link" href="database.html"><span class="nav-icon">โฌก</span><span class="nav-text"><strong>Database</strong><small>Schema ยท Index ยท SQL Script</small></span></a>
+<a class="nav-link" href="files.html"><span class="nav-icon">โ—</span><span class="nav-text"><strong>เนเธเธฅเนเธ—เธตเนเน€เธเธตเนเธขเธงเธเนเธญเธ</strong><small>Repos & Source files</small></span></a>
+<a class="nav-link" href="deploy.html"><span class="nav-icon">โ–ถ</span><span class="nav-text"><strong>Deploy</strong><small>เธฅเธณเธ”เธฑเธ deploy & Smoke test</small></span></a>
+<a class="nav-link" href="sync.html"><span class="nav-icon">โป</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <span>เธญเธฑเธเน€เธ”เธ• 2026-06-28</span>
+      <span>Phase 1</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="page-header">
+      <p class="page-eyebrow">Chillpay Operation Logs</p>
+      <h1 class="page-title">Registry</h1>
+      <p class="page-subtitle">ModuleType ยท MenuType ยท LogType</p>
+    </header>
+    
+    <article class="content prose">
+      <h2 id="3-เธญเธเธดเธเธฒเธข-registry--moduletype-menutype-logtype">3. เธญเธเธดเธเธฒเธข Registry โ€” ModuleType, MenuType, LogType</h2>
+<h3 id="31-เธ เธฒเธเธฃเธงเธก-3-เธเธฑเนเธ">3.1 เธ เธฒเธเธฃเธงเธก 3 เธเธฑเนเธ</h3>
+<pre><code>ModuleType (1โ€“14)          โ เธซเธกเธงเธ”เนเธซเธเน = sidebar Admin (Merchant, Settings, โ€ฆ)
+    โ””โ”€โ”€ MenuType           โ เธซเธเนเธฒเธขเนเธญเธขเธ—เธตเนเน€เธเธตเธขเธ log เนเธ”เน (Fee, Route, Payment Channel, โ€ฆ)
+            โ””โ”€โ”€ LogType    โ action เธ—เธตเนเน€เธเธดเธ”เธเธถเนเธ (Create, Update, Delete, โ€ฆ)
+                    โ””โ”€โ”€ DataId + RefType/RefId (+ Ref2) + MerchantId  โ entity + เธฃเนเธฒเธเธเนเธฒ (Module Merchant)
+</code></pre>
+<p><strong>เธ—เธณเนเธกเนเธขเธ 3 เธเธฑเนเธ?</strong></p>
+<table>
+<thead>
+<tr>
+<th>เธเธฑเนเธ</th>
+<th>เธ•เธญเธเธเธณเธ–เธฒเธก</th>
+<th>เธ•เธฑเธงเธญเธขเนเธฒเธ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ModuleType</strong></td>
+<td>log เธเธตเนเธญเธขเธนเน <strong>เธซเธกเธงเธ”เนเธซเธ</strong> เธเธญเธ Admin?</td>
+<td>2 = Merchant</td>
+</tr>
+<tr>
+<td><strong>MenuType</strong></td>
+<td>log เธเธตเนเธกเธฒเธเธฒเธ <strong>เธซเธเนเธฒ/เน€เธกเธเธนเนเธซเธ</strong>?</td>
+<td>202 = Merchant Fee</td>
+</tr>
+<tr>
+<td><strong>LogType</strong></td>
+<td><strong>เธ—เธณเธญเธฐเนเธฃ</strong> เธเธฑเธ record เธเธฑเนเธ?</td>
+<td>2 = Update</td>
+</tr>
+</tbody>
+</table>
+<p>เนเธขเธเธเธฒเธ PayOut เธ—เธตเนเนเธเน LogType เน€เธเนเธเธเนเธงเธเน€เธฅเธเนเธ—เธ Menu โ€” เนเธเธ Chillpay map เธเธฑเธ sidebar Admin เนเธ”เนเธ•เธฃเธ</p>
+<h3 id="32-moduletype--เธซเธกเธงเธ”เนเธซเธเน-1-14">3.2 ModuleType โ€” เธซเธกเธงเธ”เนเธซเธเน (1โ€“14)</h3>
+<p><code>ModuleType</code> = เธฅเธณเธ”เธฑเธ module เธ•เธฒเธก sidebar Web Admin โ€” เธเธณเธซเธเธ”เนเธ enum <code>ChillpayOperationLogModuleType</code> (<code>OperationLogConstants.cs</code>)</p>
+<pre><code class="language-csharp">public enum ChillpayOperationLogModuleType
+{
+    User = 1,
+    Merchant = 2,
+    Settings = 3,
+    Transactions = 4,
+    Settlements = 5,
+    ManageTransaction = 6,
+    PayLink = 7,
+    Fraud = 8,
+    Etax = 9,
+    OddService = 10,
+    ChillAppPartner = 11,
+    Wallet = 12,
+    Recurring = 13,
+    Commission = 14,
+}
+</code></pre>
+<p><strong>เธเธเธซเธเนเธฒ List:</strong> dropdown <strong>Module</strong> โ€” เน€เธฅเธทเธญเธเธซเธกเธงเธ”เน€เธ”เธตเธขเธง เธซเธฃเธทเธญ Select All (เธเนเธเธ—เธธเธ module เธ—เธตเนเน€เธเธดเธ”เนเธเน)</p>
+<h3 id="33-menutype--เน€เธกเธเธนเธขเนเธญเธขเธ—เธตเนเน€เธเธตเธขเธ-log-เนเธ”เน">3.3 MenuType โ€” เน€เธกเธเธนเธขเนเธญเธขเธ—เธตเนเน€เธเธตเธขเธ log เนเธ”เน</h3>
+<p><code>MenuType</code> = เธซเธเนเธฒ Admin เธ—เธตเนเธกเธต operation log (create / update / delete เธฏเธฅเธฏ) โ€” เธเธณเธซเธเธ”เนเธ enum <code>ChillpayOperationLogMenuType</code> (<code>OperationLogConstants.cs</code>)</p>
+<pre><code class="language-csharp">public enum ChillpayOperationLogMenuType
+{
+    // Module 1 โ€” User
+    Account = 101,
+    Role = 102,
+
+    // Module 2 โ€” Merchant
+    Merchant = 200,
+    MerchantUser = 201,
+    MerchantFee = 202,
+    MerchantRoute = 203,
+    MerchantServiceFee = 204,
+    GenerateMerchantKeys = 205,
+    MerchantEmails = 206,
+
+    // Module 3 โ€” Settings
+    PaymentChannel = 300,
+    PaymentRoute = 301,
+    PaymentRouteInquiry = 302,
+    CreditCardConfig = 303,
+    SwitchPaymentRouteChannel = 305,
+    ChillPayMaintenance = 306,
+    BankMaintenance = 307,
+    BankPaymentApiSetting = 308,
+    SMSRoute = 309,
+    ExchangeRate = 310,
+    ExchangeRateLog = 311,
+
+    // Module 4 โ€” Transactions
+    Payment = 401,
+    Void = 402,
+    RefundOld = 403,
+    RefundTransaction = 404,
+    ApproveRefund = 405,
+    SettlementOld = 406,
+    PaymentSummaryOld = 407,
+    ImportMcc = 408,
+    InquiryTransaction = 409,
+    WarningTransaction = 410,
+
+    // Module 5 โ€” Settlements
+    SettlementDashboard = 501,
+    Settlement = 502,
+    SettlementUploadFile = 503,
+    SettlementMerchantTransfer = 504,
+    SettlementMerchantSetting = 505,
+    SettlementStatus = 506,
+    DownloadPaymentSummary = 507,
+
+    // Module 6 โ€” Manage Transaction
+    UpdateTransactionStatus = 601,
+    UpdateSettlementStatus = 602,
+    UpdateTransferDate = 603,
+
+    // Module 7 โ€” PayLink
+    PayLinkLink = 701,
+    PayLinkTransaction = 702,
+
+    // Module 8 โ€” Fraud
+    FraudCreditCardTransactions = 801,
+    FraudObserveConfiguration = 802,
+    FraudObserveTransactions = 803,
+    FraudAlertConfiguration = 804,
+    FraudAlertTransactions = 805,
+
+    // Module 9 โ€” Etax
+    EtaxMerchantProfile = 901,
+    EtaxEndUserProfile = 902,
+    EtaxSaleManage = 903,
+    EtaxUploadSettlement = 904,
+    EtaxUpdateSettlement = 905,
+    EtaxSettlementPayOut = 906,
+    EtaxInvoiceMerchant = 907,
+    EtaxInvoiceEndUser = 908,
+    EtaxInvoiceTransactions = 909,
+    EtaxPnd = 910,
+    EtaxInvoiceAbbTransactions = 911,
+    EtaxOutstandingInvoice = 912,
+    EtaxCancelInvoice = 913,
+    EtaxCreditNote = 914,
+    EtaxDebitNote = 915,
+    EtaxCreditNoteInvAbb = 916,
+
+    // Module 10 โ€” Odd Service
+    OddRoute = 1001,
+    OddMerchantRoute = 1002,
+    OddRegister = 1003,
+    OddBayConfigs = 1004,
+    OddBayCustomer = 1005,
+    OddScbConfigs = 1006,
+    OddScbCustomer = 1007,
+    OddKtbConfigs = 1008,
+
+    // Module 11 โ€” Chill App Partner
+    ChillAppMembers = 1101,
+    ChillAppTransactions = 1102,
+    ChillAppPartners = 1103,
+    ChillAppPayTransactions = 1104,
+    ChillAppSettlementPayTransactions = 1105,
+
+    // Module 12 โ€” Wallet
+    WalletMerchant = 1201,
+    WalletShopSendMoneyFee = 1202,
+    WalletTransaction = 1203,
+    WalletSettlementTransaction = 1204,
+    WalletSettlementReport = 1205,
+    WalletSettleVersion = 1206,
+
+    // Module 13 โ€” Recurring
+    RecurringMerchant = 1301,
+    RecurringSchedule = 1302,
+    RecurringTransactions = 1303,
+
+    // Module 14 โ€” Commission
+    CommissionReseller = 1401,
+    CommissionResellerPayout = 1402,
+    CommissionReports = 1403,
+    CommissionDownloadReports = 1404,
+}
+</code></pre>
+<p><strong>เธเธเธซเธเนเธฒ List:</strong> dropdown <strong>Menu</strong> โ€” เนเธชเธ”เธเน€เธกเธทเนเธญเน€เธฅเธทเธญเธ Module เนเธฅเนเธง; Select All = เนเธกเนเธชเนเธ <code>menuType</code> (เนเธ”เนเธ—เธธเธเน€เธกเธเธนเนเธ module)</p>
+<p><strong>เธเธธเนเธก Logs:</strong> เธชเนเธ <code>menuType</code> เธเธฃเธดเธ (เน€เธเนเธ 202) เนเธ—เธ LogMode เน€เธ”เธดเธก (เน€เธเนเธ mode 3) โ€” เนเธกเนเธชเธฑเธเธชเธ</p>
+<h3 id="34-logtype--action-เธเธฃเธฐเน€เธ เธ—เธเธฒเธฃเธเธฃเธฐเธ—เธณ">3.4 LogType โ€” Action (เธเธฃเธฐเน€เธ เธ—เธเธฒเธฃเธเธฃเธฐเธ—เธณ)</h3>
+<p><code>LogType</code> = <strong>action เธเธฅเธฒเธ</strong> เนเธเนเธฃเนเธงเธกเธ—เธธเธ module โ€” เนเธกเนเนเธเนเธเธทเนเธญเน€เธกเธเธน โ€” เธเธณเธซเธเธ”เนเธ enum <code>ChillpayOperationLogActionType</code> (<code>OperationLogConstants.cs</code>)</p>
+<pre><code class="language-csharp">public enum ChillpayOperationLogActionType
+{
+    Create = 1,
+    Update = 2,
+    Activate = 3,
+    Inactivate = 4,
+    Delete = 5,
+    Restore = 6,
+    Generate = 7,
+    UpdateStatus = 8,
+    Approve = 9,
+    Reject = 10,
+    Enable = 11,
+    Disable = 12,
+    Cancel = 13,
+    Refund = 14,
+    Void = 15,
+    Reprocess = 16,
+    Retry = 17,
+    Import = 19,
+    Upload = 20,
+    Login = 22,
+    Logout = 23,
+    ResetPassword = 24,
+    Assign = 25,
+    Unassign = 26,
+    Hold = 27,
+    Release = 28,
+    Offset = 29,
+    Transfer = 30,
+}
+</code></pre>
+<p><strong>เธเธเธซเธเนเธฒ List:</strong> dropdown <strong>Log Type</strong> โ€” filter เธ•เธฒเธก action; เธฃเธฒเธขเธเธฒเธฃเธ—เธตเนเนเธชเธ”เธเธเธถเนเธเธเธฑเธ Menu เธ—เธตเนเน€เธฅเธทเธญเธ (เนเธ•เนเธฅเธฐเน€เธกเธเธนเธญเธเธธเธเธฒเธ• action เนเธกเนเน€เธซเธกเธทเธญเธเธเธฑเธ เน€เธเนเธ Generate Keys เธกเธตเนเธเน action 7)</p>
+<p><strong>เธเธฒเธฃเธ•เธฑเธ”เธชเธดเธ LogType เธ•เธญเธ Update (Writer):</strong></p>
+<ol>
+<li>Serialize <code>beforeSnapshot</code> / <code>afterSnapshot</code> เน€เธ•เนเธก</li>
+<li><code>GetChangedFieldsJson</code> โ’ diff เน€เธเธเธฒเธฐ field เธ—เธตเนเน€เธเธฅเธตเนเธขเธ</li>
+<li><code>ChillpayMerchantOperationLogResolver.ResolveUpdateAction(menuType, diff)</code> โ’ เน€เธฅเธทเธญเธ Update / Activate / UpdateStatus</li>
+<li>เธเธฑเธเธ—เธถเธ log เธ”เนเธงเธข snapshot เน€เธ•เนเธกเนเธ OldValue/NewValue</li>
+</ol>
+<h3 id="35-dataid-reftype-refid--เธญเนเธฒเธเธญเธดเธ-entity">3.5 DataId, RefType, RefId โ€” เธญเนเธฒเธเธญเธดเธ entity</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>เธเธงเธฒเธกเธซเธกเธฒเธข</th>
+<th>เธ•เธฑเธงเธญเธขเนเธฒเธ (เนเธเน Fee id 501 เธเธญเธ merchant 100)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DataId</strong></td>
+<td>id เธซเธฅเธฑเธเธเธญเธ record เธ—เธตเนเธ–เธนเธ action</td>
+<td>501</td>
+</tr>
+<tr>
+<td><strong>RefType</strong></td>
+<td>เธเธฃเธฐเน€เธ เธ— entity เธซเธฅเธฑเธ</td>
+<td>10002 (Merchant Fee)</td>
+</tr>
+<tr>
+<td><strong>RefId</strong></td>
+<td>id เธเธญเธ entity เธซเธฅเธฑเธ</td>
+<td>501</td>
+</tr>
+<tr>
+<td><strong>Ref2Type / Ref2Id</strong></td>
+<td>entity เธ—เธตเนเน€เธเธตเนเธขเธงเธเนเธญเธ (เธกเธฑเธเน€เธเนเธ merchant)</td>
+<td>10000 / 100</td>
+</tr>
+<tr>
+<td><strong>MerchantId</strong></td>
+<td>id เธฃเนเธฒเธเธเนเธฒ โ€” เน€เธเนเธเนเธเธ•เธฒเธฃเธฒเธเธ•เธญเธ INSERT (เนเธเธ PayOut)</td>
+<td>100</td>
+</tr>
+</tbody>
+</table>
+<p><code>RefType</code> = เธเธฃเธฐเน€เธ เธ— <strong>entity</strong> (เนเธกเนเนเธเนเธซเธเนเธฒเน€เธกเธเธน) โ€” เธเธณเธซเธเธ”เนเธ enum <code>ChillpayOperationLogRefType</code> (<code>OperationLogConstants.cs</code>)</p>
+<p><strong>Merchant filter เธเธเธซเธเนเธฒ List:</strong> <code>merchantId=[100]</code> โ€” เธ”เธถเธ log เธ—เธธเธเน€เธกเธเธนเธเธญเธเธฃเนเธฒเธเธเธฑเนเธ (เนเธเน index <code>IX_ChillpayOperationLogs_MerchantId</code> ยท เนเธเธเน€เธ”เธตเธขเธงเธเธฑเธ PayOut <code>MerchantId.Contains</code>)</p>
+<pre><code class="language-csharp">public enum ChillpayOperationLogRefType
+{
+    Undefined = 0,
+
+    // Merchant (10000+)
+    Merchant = 10000,
+    MerchantUser = 10001,
+    MerchantFee = 10002,
+    MerchantRoute = 10003,
+    MerchantServiceFee = 10004,
+    MerchantEmail = 10005,
+
+    // Settings (20000+)
+    PaymentChannel = 20000,
+    PaymentRoute = 20001,
+    PaymentRouteInquiry = 20002,
+    CreditCardConfig = 20003,
+    BankPaymentApiSetting = 20004,
+    SMSRoute = 20005,
+    ExchangeRate = 20006,
+    ChillPayMaintenance = 20007,
+    BankMaintenance = 20008,
+    ExchangeRateLog = 20009,
+
+    // User (30000+)
+    AdminAccount = 30001,
+    AdminRole = 30002,
+
+    // Transactions (40000+)
+    PaymentTransaction = 40001,
+
+    // Settlements (50000+)
+    SettlementRecord = 50001,
+
+    // Manage Transaction (60000+)
+    ManagedTransaction = 60001,
+
+    // PayLink (70000+)
+    PayLinkRecord = 70001,
+
+    // Fraud (80000+)
+    FraudRecord = 80001,
+
+    // Etax (90000+)
+    EtaxRecord = 90001,
+
+    // Odd Service (100000+)
+    OddRecord = 100001,
+
+    // Chill App Partner (110000+)
+    ChillAppRecord = 110001,
+
+    // Wallet (120000+)
+    WalletRecord = 120001,
+
+    // Recurring (130000+)
+    RecurringRecord = 130001,
+
+    // Commission (140000+)
+    CommissionRecord = 140001,
+}
+</code></pre>
+<p><strong>Merchant filter เธเธเธซเธเนเธฒ List (เน€เธ”เธดเธก):</strong> ~~<code>refType=[10000], refId=merchantId</code>~~ โ’ เนเธเน <strong><code>merchantId=[merchantId]</code></strong> เนเธ—เธเนเธฅเนเธง (ยง5.5)</p>
+<h3 id="36-flow-เธเธฒเธฃเน€เธเธตเธขเธ-log">3.6 Flow เธเธฒเธฃเน€เธเธตเธขเธ Log</h3>
+<p><strong>เธเธ:</strong> เธเธฑเธเธ—เธถเธ Operation Log <strong>เธ•เนเธญเน€เธกเธทเนเธญเธฃเธฒเธขเธเธฒเธฃเธเธฑเนเธ success เน€เธ—เนเธฒเธเธฑเนเธ</strong> โ€” เน€เธฃเธตเธขเธ writer เธซเธฅเธฑเธ business action เธเนเธฒเธ (เน€เธเนเธ <code>CreateOrUpdateAsync</code> เธเธทเธ <code>Succeeded</code>)</p>
+<table>
+<thead>
+<tr>
+<th>เธชเธ–เธฒเธเธเธฒเธฃเธ“เน</th>
+<th>เน€เธเธตเธขเธ Log?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save / Create / Update / Delete <strong>เนเธกเนเธชเธณเน€เธฃเนเธ</strong></td>
+<td><strong>เนเธกเน</strong></td>
+</tr>
+<tr>
+<td>Business action <strong>เธชเธณเน€เธฃเนเธ</strong></td>
+<td><strong>เนเธเน</strong> โ€” เน€เธฃเธตเธขเธ <code>LogMerchantCreatedAsync</code>, <code>LogMerchantChangeAsync</code> เธฏเธฅเธฏ</td>
+</tr>
+<tr>
+<td>Business เธชเธณเน€เธฃเนเธ เนเธ•เนเน€เธฃเธตเธขเธ operation-logs-api <strong>เนเธกเนเธเนเธฒเธ</strong></td>
+<td>business เธขเธฑเธ success โ€” log เธญเธฒเธเนเธกเนเน€เธเนเธฒ DB (retry 1 เธเธฃเธฑเนเธ เนเธฅเนเธง warning)</td>
+</tr>
+</tbody>
+</table>
+<p>เนเธกเนเน€เธเธตเนเธขเธงเธเธฑเธเธเธธเนเธก <strong>Logs</strong> เธเธเธซเธเนเธฒ Detail โ€” เธเธธเนเธกเธเธฑเนเธเนเธเนเธญเนเธฒเธ log เธญเธขเนเธฒเธเน€เธ”เธตเธขเธง</p>
+<p><img alt="Flow เธเธฒเธฃเน€เธเธตเธขเธ Operation Log" src="images/flow-write-operation-log.png" /></p>
+<ul>
+<li><strong>LogAudit</strong> เนเธขเธเธ•เนเธฒเธเธซเธฒเธ โ€” เน€เธเนเธเน€เธเธเธฒเธฐ field เธ—เธตเนเน€เธเธฅเธตเนเธขเธ</li>
+</ul>
+<p><strong>เนเธเธฅเนเธซเธฅเธฑเธ</strong></p>
+<table>
+<thead>
+<tr>
+<th>เธเธ—เธเธฒเธ—</th>
+<th>เนเธเธฅเน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Controller</td>
+<td><code>MerchantController.cs</code> โ€” เน€เธฃเธตเธขเธ log เธซเธฅเธฑเธ save</td>
+</tr>
+<tr>
+<td>Helper</td>
+<td><code>BaseController.cs</code> โ€” <code>LogMerchantCreatedAsync</code>, <code>LogMerchantChangeAsync</code></td>
+</tr>
+<tr>
+<td>Writer</td>
+<td><code>ChillpayOperationLogWriter.cs</code> โ€” <code>WriteMerchantLogAsync</code> โ’ API</td>
+</tr>
+<tr>
+<td>API</td>
+<td><code>ChillpayOperationLogController.cs</code> โ€” <code>POST /add</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="37-เธ•เธฑเธงเธญเธขเนเธฒเธ--merchant-create">3.7 เธ•เธฑเธงเธญเธขเนเธฒเธ โ€” Merchant Create</h3>
+<p><strong>เธซเธเนเธฒ:</strong> Merchant Create โ’ เธเธ” Save (เน€เธเธเธฒเธฐเน€เธกเธทเนเธญ <code>CreateOrUpdateAsync</code> success)</p>
+<p><img alt="Flow Merchant Create โ€” Operation Log" src="images/flow-merchant-create-log.png" /></p>
+<p><strong>record เนเธเธ•เธฒเธฃเธฒเธ <code>ChillpayOperationLogs</code> (เธ•เธฑเธงเธญเธขเนเธฒเธ merchant id 100)</strong></p>
+<table>
+<thead>
+<tr>
+<th>เธเธญเธฅเธฑเธกเธเน</th>
+<th>เธเนเธฒ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ModuleType</td>
+<td>2 (Merchant)</td>
+</tr>
+<tr>
+<td>MenuType</td>
+<td>200 (Merchant)</td>
+</tr>
+<tr>
+<td>LogType</td>
+<td>1 (Create)</td>
+</tr>
+<tr>
+<td>DataId</td>
+<td>100</td>
+</tr>
+<tr>
+<td>RefType / RefId</td>
+<td>10000 / 100</td>
+</tr>
+<tr>
+<td>Ref2Type / Ref2Id</td>
+<td>10000 / 100</td>
+</tr>
+<tr>
+<td>MerchantId</td>
+<td>100</td>
+</tr>
+<tr>
+<td>OldValue</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td>NewValue</td>
+<td>JSON snapshot merchant เธ—เธฑเนเธเธเนเธญเธเธซเธฅเธฑเธเธชเธฃเนเธฒเธ</td>
+</tr>
+<tr>
+<td>Message</td>
+<td>Merchant created</td>
+</tr>
+<tr>
+<td>RequestSystem</td>
+<td>Admin</td>
+</tr>
+<tr>
+<td>RequestBy</td>
+<td>user id เธเธนเนเธชเธฃเนเธฒเธ</td>
+</tr>
+</tbody>
+</table>
+<h3 id="38-เธ•เธฑเธงเธญเธขเนเธฒเธ--merchant-update">3.8 เธ•เธฑเธงเธญเธขเนเธฒเธ โ€” Merchant Update</h3>
+<p><strong>เธซเธเนเธฒ:</strong> Merchant Update โ’ เนเธเนเธเนเธญเธกเธนเธฅ โ’ เธเธ” Save (เน€เธเธเธฒเธฐเน€เธกเธทเนเธญ <code>CreateOrUpdateAsync</code> success)</p>
+<p><img alt="Flow Merchant Update โ€” Operation Log" src="images/flow-merchant-update-log.png" /></p>
+<p><strong>record เนเธเธ•เธฒเธฃเธฒเธ (เธ•เธฑเธงเธญเธขเนเธฒเธ เนเธเน CompanyName เธเธญเธ merchant 100)</strong></p>
+<table>
+<thead>
+<tr>
+<th>เธเธญเธฅเธฑเธกเธเน</th>
+<th>เธเนเธฒ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ModuleType</td>
+<td>2</td>
+</tr>
+<tr>
+<td>MenuType</td>
+<td>200</td>
+</tr>
+<tr>
+<td>LogType</td>
+<td>2 (Update) โ€” เธซเธฃเธทเธญ 3/8 เธ–เนเธฒ resolver เน€เธซเนเธเธงเนเธฒเน€เธเธฅเธตเนเธขเธเนเธเน status</td>
+</tr>
+<tr>
+<td>DataId</td>
+<td>100</td>
+</tr>
+<tr>
+<td>RefType / RefId</td>
+<td>10000 / 100</td>
+</tr>
+<tr>
+<td>Ref2Type / Ref2Id</td>
+<td>10000 / 100</td>
+</tr>
+<tr>
+<td>MerchantId</td>
+<td>100</td>
+</tr>
+<tr>
+<td>OldValue</td>
+<td>JSON snapshot merchant <strong>เธเนเธญเธ</strong>เนเธเน</td>
+</tr>
+<tr>
+<td>NewValue</td>
+<td>JSON snapshot merchant <strong>เธซเธฅเธฑเธ</strong>เนเธเน</td>
+</tr>
+<tr>
+<td>Message</td>
+<td>Merchant updated</td>
+</tr>
+<tr>
+<td>RequestSystem</td>
+<td>Admin</td>
+</tr>
+</tbody>
+</table>
+<p><strong>เธญเนเธฒเธ log เธเธฅเธฑเธ:</strong> เธซเธเนเธฒ List filter Module=Merchant, Merchant=100 โ’ เธซเธฃเธทเธญเธเธ”เธเธธเนเธก <strong>Logs</strong> เธเธฒเธ Merchant Detail (<code>menuType=200</code>, <code>dataId=100</code>)</p>
+<h3 id="39-เธ•เธฑเธงเธญเธขเนเธฒเธ-record--merchant-fee-update">3.9 เธ•เธฑเธงเธญเธขเนเธฒเธ record โ€” Merchant Fee Update</h3>
+<p>เนเธเน Merchant Fee id <strong>501</strong> เธเธญเธ merchant <strong>100</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>เธเธญเธฅเธฑเธกเธเน</th>
+<th>เธเนเธฒ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ModuleType</td>
+<td>2</td>
+</tr>
+<tr>
+<td>MenuType</td>
+<td>202</td>
+</tr>
+<tr>
+<td>LogType</td>
+<td>2 (Update)</td>
+</tr>
+<tr>
+<td>DataId</td>
+<td>501</td>
+</tr>
+<tr>
+<td>RefType / RefId</td>
+<td>10002 / 501</td>
+</tr>
+<tr>
+<td>Ref2Type / Ref2Id</td>
+<td>10000 / 100</td>
+</tr>
+<tr>
+<td>MerchantId</td>
+<td>100</td>
+</tr>
+<tr>
+<td>OldValue</td>
+<td>JSON snapshot เน€เธ•เนเธกเธเนเธญเธเนเธเน</td>
+</tr>
+<tr>
+<td>NewValue</td>
+<td>JSON snapshot เน€เธ•เนเธกเธซเธฅเธฑเธเนเธเน</td>
+</tr>
+<tr>
+<td>Message</td>
+<td>Merchant fee updated</td>
+</tr>
+<tr>
+<td>RequestSystem</td>
+<td>Admin</td>
+</tr>
+<tr>
+<td>RequestBy</td>
+<td>user id</td>
+</tr>
+</tbody>
+</table>
+    </article>
+    <footer class="page-footer">
+      <a href="index.html" class="footer-link">โ เธเธฅเธฑเธเธ เธฒเธเธฃเธงเธก</a>
+    </footer>
+  </main>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
