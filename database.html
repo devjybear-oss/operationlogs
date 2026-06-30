@@ -1,0 +1,862 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Database — Chillpay Operation Logs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+
+</head>
+<body>
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="เปิดเมนู">☰</button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">CP</div>
+      <div>
+        <div class="brand-title">Operation Logs</div>
+        <div class="brand-sub">Chillpay Docs</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-link" href="index.html"><span class="nav-icon">◈</span><span class="nav-text"><strong>ภาพรวม</strong><small>Summary & Checklist</small></span></a>
+<a class="nav-link" href="registry.html"><span class="nav-icon">▣</span><span class="nav-text"><strong>Registry</strong><small>ModuleType · MenuType · LogType</small></span></a>
+<a class="nav-link" href="ui.html"><span class="nav-icon">▦</span><span class="nav-text"><strong>UI</strong><small>List · Detail</small></span></a>
+<a class="nav-link" href="api.html"><span class="nav-icon">⟡</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
+<a class="nav-link active" href="database.html"><span class="nav-icon">⬡</span><span class="nav-text"><strong>Database</strong><small>Schema · Writer · SQL Script</small></span></a>
+<a class="nav-link" href="files.html"><span class="nav-icon">◎</span><span class="nav-text"><strong>โปรเจคที่เกี่ยวข้อง</strong><small>operation-logs-api · web-backend</small></span></a>
+<a class="nav-link" href="sync.html"><span class="nav-icon">↻</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <span>อัปเดต 2026-06-29</span>
+      <span>Phase 1</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="page-header">
+      <p class="page-eyebrow">Chillpay Operation Logs</p>
+      <h1 class="page-title">Database</h1>
+      <p class="page-subtitle">Schema · Writer · SQL Script</p>
+    </header>
+    
+    <article class="content prose">
+      <h2 id="database--schema-index-view-และ-deploy-script">Database — Schema, Index, View และ Deploy Script</h2>
+<h3 id="ภาพรวม">ภาพรวม</h3>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>ชื่อ</th>
+<th>ใช้เมื่อ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ตาราง</strong></td>
+<td><code>ChillpayOperationLogs</code></td>
+<td>API <strong>INSERT</strong> ตอน Writer เรียก <code>POST /add</code> — มีคอลัมน์ <strong><code>MerchantId</code></strong> แบบ PayOut</td>
+</tr>
+<tr>
+<td><strong>View</strong></td>
+<td><code>VW_ChillpayOperationLogs</code></td>
+<td>API <strong>SELECT</strong> ตอน Search / FindById — <code>LEFT JOIN Merchants</code> บน <code>b.MerchantId</code></td>
+</tr>
+<tr>
+<td><strong>Index</strong></td>
+<td>5 ตัว</td>
+<td>Browse (Module+Menu), LogType, DataId, MerchantId · Ref (legacy)</td>
+</tr>
+</tbody>
+</table>
+<pre><code>Writer (web-backend)  →  INSERT ChillpayOperationLogs (รวม MerchantId)
+Admin List/Detail     →  SELECT VW_ChillpayOperationLogs
+                        →  filter ร้าน: WHERE MerchantId IN (...)
+</code></pre>
+<p><strong>Prerequisite:</strong> ตาราง <code>[dbo].[Merchants]</code> ต้องมีอยู่แล้วใน DB เดียวกัน — View join เพื่อแสดง MerchantCode, CompanyName บนหน้า List</p>
+<h3 id="นโยบาย-writer-phase-1">นโยบาย Writer (Phase 1)</h3>
+<p>สำหรับ <strong>web-backend Writer</strong> ตอน <code>POST /add</code> — อ้างอิงรูปแบบเก็บข้อมูลจาก <strong><code>ExchangeRateLogs</code></strong> แล้วขยายด้วย <strong>ModuleType / MenuType</strong> · <strong>ไม่ส่ง Ref*</strong> (<code>NULL</code> ใน DB)</p>
+<h4 id="map-จาก-exchangeratelogs--chillpayoperationlogs">Map จาก <code>ExchangeRateLogs</code> → <code>ChillpayOperationLogs</code></h4>
+<table>
+<thead>
+<tr>
+<th><code>ExchangeRateLogs</code></th>
+<th><code>ChillpayOperationLogs</code></th>
+<th>หมายเหตุ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Id</code></td>
+<td><code>Id</code></td>
+<td>IDENTITY</td>
+</tr>
+<tr>
+<td><code>LogType</code></td>
+<td><code>LogType</code></td>
+<td>registry กลาง — Delete ใช้ <strong>5</strong> (ไม่ใช่ 3 แบบตารางเดิม)</td>
+</tr>
+<tr>
+<td><code>Message</code></td>
+<td><code>Message</code></td>
+<td>เช่น "Exchange rate updated"</td>
+</tr>
+<tr>
+<td><code>ExchangeRateId</code></td>
+<td><strong><code>DataId</code></strong></td>
+<td>id record เดียวกัน</td>
+</tr>
+<tr>
+<td><code>OldValue</code></td>
+<td><code>OldValue</code></td>
+<td>JSON snapshot ก่อน action</td>
+</tr>
+<tr>
+<td><code>NewValue</code></td>
+<td><code>NewValue</code></td>
+<td>JSON snapshot หลัง action</td>
+</tr>
+<tr>
+<td><code>AddedDate</code></td>
+<td><code>AddedDate</code></td>
+<td>default <code>GETDATE()</code></td>
+</tr>
+<tr>
+<td><code>AddedBy</code></td>
+<td><strong><code>RequestBy</code></strong></td>
+<td>user id ผู้กระทำ</td>
+</tr>
+<tr>
+<td><em>(ไม่มี)</em></td>
+<td><strong><code>ModuleType</code></strong></td>
+<td><code>3</code> = Settings</td>
+</tr>
+<tr>
+<td><em>(ไม่มี)</em></td>
+<td><strong><code>MenuType</code></strong></td>
+<td><code>310</code> = Exchange Rate</td>
+</tr>
+<tr>
+<td><em>(ไม่มี)</em></td>
+<td><strong><code>RequestSystem</code></strong></td>
+<td><code>Admin</code></td>
+</tr>
+<tr>
+<td><em>(ไม่มี)</em></td>
+<td><strong><code>MerchantId</code></strong></td>
+<td><code>NULL</code> (นอก Module Merchant)</td>
+</tr>
+<tr>
+<td><em>(ไม่มี)</em></td>
+<td><strong><code>RefType</code> / <code>RefId</code> / <code>Ref2*</code></strong></td>
+<td><code>NULL</code> (Phase 1)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Writer</strong> (<code>WriteMerchantLogAsync</code> / <code>WriteSettingsLogAsync</code> / <code>LogSettings*Async</code>): ส่ง <code>moduleType</code>, <code>menuType</code>, <code>logType</code>, <strong><code>dataId</code></strong>, <code>oldValue</code>, <code>newValue</code>, <code>message</code>, <code>requestBy</code>, <code>requestSystem</code> · <strong><code>merchantId</code></strong> เมื่อ Module Merchant</p>
+<table>
+<thead>
+<tr>
+<th>ฟิลด์</th>
+<th>Writer ส่ง (Phase 1)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ModuleType / MenuType</strong></td>
+<td><strong>ใช่</strong> — registry</td>
+</tr>
+<tr>
+<td><strong>DataId</strong></td>
+<td><strong>ใช่</strong> — id record (เทียบ <code>ExchangeRateId</code>)</td>
+</tr>
+<tr>
+<td><strong>MerchantId</strong></td>
+<td>Module Merchant <strong>เท่านั้น</strong></td>
+</tr>
+<tr>
+<td><strong>RefType / RefId / Ref2*</strong></td>
+<td><strong>ไม่ส่ง</strong> (<code>NULL</code>)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>สถานการณ์</th>
+<th>MenuType</th>
+<th>DataId</th>
+<th>MerchantId</th>
+<th>Ref* ใน DB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>สร้าง / แก้ Merchant ร้าน 100</td>
+<td>200</td>
+<td>100</td>
+<td>100</td>
+<td><code>NULL</code></td>
+</tr>
+<tr>
+<td>แก้ Merchant Fee id 501 ร้าน 100</td>
+<td>202</td>
+<td>501</td>
+<td>100</td>
+<td><code>NULL</code></td>
+</tr>
+<tr>
+<td>แก้ Payment Channel (Settings)</td>
+<td>300</td>
+<td>7</td>
+<td><em>(ไม่ส่ง)</em></td>
+<td><code>NULL</code></td>
+</tr>
+<tr>
+<td>แก้ Exchange Rate id 7 (Settings)</td>
+<td>310</td>
+<td>7</td>
+<td><em>(ไม่ส่ง)</em></td>
+<td><code>NULL</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>กฎง่าย:</strong> <code>menuType</code> + <code>dataId</code> (+ <code>merchantId</code> ถ้า Module Merchant) — ชนิด entity อ่านจาก <strong>MenuType</strong> ไม่ต้องส่ง RefType แยก</p>
+</blockquote>
+<pre><code>แก้ Exchange Rate id 7 (เทียบ ExchangeRateLogs):
+  ModuleType = 3
+  MenuType   = 310
+  LogType    = 2 (Update)
+  Message    = Exchange rate updated
+  DataId     = 7          ← ExchangeRateId
+  OldValue   = { ... }
+  NewValue   = { ... }
+  RequestBy  = user id    ← AddedBy
+  RequestSystem = Admin
+  MerchantId = NULL
+  RefType / RefId / Ref2* = NULL
+</code></pre>
+<p><strong><code>POST /add</code> — web-backend ส่ง (Phase 1)</strong></p>
+<ul>
+<li><code>moduleType</code>, <code>menuType</code>, <code>logType</code></li>
+<li><strong><code>dataId</code></strong></li>
+<li><strong><code>merchantId</code></strong> (Module Merchant)</li>
+<li><code>oldValue</code>, <code>newValue</code>, <code>message</code>, <code>requestSystem</code>, <code>requestBy</code></li>
+</ul>
+<p><strong>ตัวอย่าง Merchant Fee Update</strong> (fee 501, ร้าน 100)</p>
+<table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>Writer ส่ง</th>
+<th>ใน DB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MenuType</td>
+<td>202</td>
+<td>202</td>
+</tr>
+<tr>
+<td>DataId</td>
+<td>501</td>
+<td>501</td>
+</tr>
+<tr>
+<td>MerchantId</td>
+<td>100</td>
+<td>100</td>
+</tr>
+</tbody>
+</table>
+<p><strong>ตัวอย่าง Exchange Rate Update</strong> (Settings — แทน <code>ExchangeRateLogs</code>)</p>
+<p>Writer: <strong>web-backend</strong> (<code>ExchangeRateController</code> → <code>LogSettings*Async</code>) หลัง admin-api CRUD สำเร็จ</p>
+<table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ใน DB</th>
+<th><code>ExchangeRateLogs</code> เดิม</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ModuleType / MenuType</td>
+<td>3 / 310</td>
+<td>—</td>
+</tr>
+<tr>
+<td>DataId</td>
+<td>7</td>
+<td><code>ExchangeRateId = 7</code></td>
+</tr>
+<tr>
+<td>LogType</td>
+<td>2 (Update)</td>
+<td>2 — Delete ใช้ <strong>5</strong></td>
+</tr>
+<tr>
+<td>OldValue / NewValue</td>
+<td>JSON เต็ม</td>
+<td>เหมือนกัน</td>
+</tr>
+<tr>
+<td>RequestBy</td>
+<td>user id</td>
+<td><code>AddedBy</code></td>
+</tr>
+<tr>
+<td>Ref* / MerchantId</td>
+<td><code>NULL</code></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>อ่าน log (แทน <code>/ExchangeRateLog</code>):</strong> List กลาง → Module <strong>Settings (3)</strong> · Menu <strong>Exchange Rate (310)</strong> · <strong>Data Id</strong> = exchange rate id</p>
+<p><strong>Detail:</strong> Data Id ลิงก์ไป <code>/ExchangeRate/Update/{dataId}</code></p>
+<p>Writer <strong>ส่ง <code>merchantId</code> เอง</strong> สำหรับ Module Merchant — <code>ResolveMerchantId()</code> เป็น fallback จาก <code>DataId</code> / <code>MenuType</code> เมื่อ Writer ไม่ส่ง</p>
+<h3 id="ตาราง-chillpayoperationlogs--คอลัมน์">ตาราง <code>ChillpayOperationLogs</code> — คอลัมน์</h3>
+<table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ชนิด</th>
+<th>คำอธิบาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Id</strong></td>
+<td>bigint IDENTITY</td>
+<td>PK — log id (แสดงบนหน้า List/Detail)</td>
+</tr>
+<tr>
+<td><strong>ModuleType</strong></td>
+<td>int</td>
+<td>หมวดใหญ่ registry (ModuleType) เช่น 2=Merchant, 3=Settings</td>
+</tr>
+<tr>
+<td><strong>MenuType</strong></td>
+<td>int</td>
+<td>เมนูย่อย (MenuType) เช่น 202=Merchant Fee</td>
+</tr>
+<tr>
+<td><strong>LogType</strong></td>
+<td>int</td>
+<td>action (LogType) เช่น 1=Create, 2=Update, 5=Delete</td>
+</tr>
+<tr>
+<td><strong>Message</strong></td>
+<td>nvarchar(500)</td>
+<td>ข้อความสรุป เช่น "Merchant fee updated"</td>
+</tr>
+<tr>
+<td><strong>OldValue</strong></td>
+<td>nvarchar(max)</td>
+<td>JSON snapshot ก่อน action — null ตอน Create</td>
+</tr>
+<tr>
+<td><strong>NewValue</strong></td>
+<td>nvarchar(max)</td>
+<td>JSON snapshot หลัง action — null ตอน Delete</td>
+</tr>
+<tr>
+<td><strong>DataId</strong></td>
+<td>bigint</td>
+<td>id ของ record ที่ถูก action — เทียบ <code>ExchangeRateId</code> · อ่านคู่ <strong>MenuType</strong></td>
+</tr>
+<tr>
+<td><strong>RefType</strong></td>
+<td>int</td>
+<td><em>(legacy / Phase 1 = <code>NULL</code>)</em> — ชนิด entity รุ่นก่อน</td>
+</tr>
+<tr>
+<td><strong>RefId</strong></td>
+<td>bigint</td>
+<td><em>(legacy / Phase 1 = <code>NULL</code>)</em></td>
+</tr>
+<tr>
+<td><strong>Ref2Type</strong></td>
+<td>int</td>
+<td><em>(legacy / Phase 1 = <code>NULL</code>)</em></td>
+</tr>
+<tr>
+<td><strong>Ref2Id</strong></td>
+<td>bigint</td>
+<td><em>(legacy / Phase 1 = <code>NULL</code>)</em></td>
+</tr>
+<tr>
+<td><strong>MerchantId</strong></td>
+<td>bigint</td>
+<td>id ร้านค้า — เก็บตอน INSERT แยกต่างหาก · ใช้ filter List แบบ PayOut · <code>NULL</code> นอก Module Merchant</td>
+</tr>
+<tr>
+<td><strong>RequestSystem</strong></td>
+<td>nvarchar(20)</td>
+<td>ระบบที่เขียน log: Admin, Backend, API, Job, MerchantApi</td>
+</tr>
+<tr>
+<td><strong>RequestBy</strong></td>
+<td>bigint</td>
+<td>user id ผู้กระทำ</td>
+</tr>
+<tr>
+<td><strong>RequestByName</strong></td>
+<td>nvarchar(200)</td>
+<td>ชื่อแสดงผู้กระทำ (optional)</td>
+</tr>
+<tr>
+<td><strong>AddedDate</strong></td>
+<td>datetime</td>
+<td>วันเวลาบันทึก (default GETDATE())</td>
+</tr>
+</tbody>
+</table>
+<p>คอลัมน์ <strong>Ref*</strong> ยังอยู่ใน schema (<code>nullable</code>) — Phase 1 Writer <strong>ไม่ populate</strong> · log เก่าที่มีค่าอาจยังแสดงใน View <code>*Text</code></p>
+<h3 id="index-และ-view">Index และ View</h3>
+<p><strong>Index</strong></p>
+<table>
+<thead>
+<tr>
+<th>Index</th>
+<th>คอลัมน์</th>
+<th>รองรับ query</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PK_ChillpayOperationLogs</code></td>
+<td>Id</td>
+<td>Detail by id</td>
+</tr>
+<tr>
+<td><code>IX_ChillpayOperationLogs_Module_Menu</code></td>
+<td>ModuleType, MenuType, AddedDate DESC</td>
+<td><strong>Browse หลัก</strong> — filter Module + Menu + เรียงวันที่</td>
+</tr>
+<tr>
+<td><code>IX_ChillpayOperationLogs_LogType</code></td>
+<td>LogType, AddedDate DESC</td>
+<td>filter Action (Create/Update/…)</td>
+</tr>
+<tr>
+<td><code>IX_ChillpayOperationLogs_DataId</code></td>
+<td>DataId (filtered)</td>
+<td>filter ตาม record id (API — UI ไม่ใช้ deep link)</td>
+</tr>
+<tr>
+<td><code>IX_ChillpayOperationLogs_RefType_RefId</code></td>
+<td>RefType, RefId (filtered)</td>
+<td><em>(legacy)</em> — log เก่า / integration</td>
+</tr>
+<tr>
+<td><code>IX_ChillpayOperationLogs_MerchantId</code></td>
+<td>MerchantId (filtered)</td>
+<td>Merchant filter ตรง — แบบเดียวกับ PayOut</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Query pattern ตัวอย่าง</strong></p>
+<pre><code class="language-sql">WHERE ModuleType IN (2)
+  AND MenuType IN (202)
+  AND DataId = 501
+  AND MerchantId = 100
+</code></pre>
+<p><strong>View <code>VW_ChillpayOperationLogs</code></strong></p>
+<table>
+<thead>
+<tr>
+<th>ส่วน</th>
+<th>คำอธิบาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>คอลัมน์จากตาราง</td>
+<td><code>SELECT b.*</code> — ทุก column ของ <code>ChillpayOperationLogs</code> (แบบ PayOut)</td>
+</tr>
+<tr>
+<td><code>AddedDateText</code></td>
+<td><code>dd-MM-yyyy HH:mm:ss</code> (style 105 + 8 — แบบ PayOut)</td>
+</tr>
+<tr>
+<td><code>ModuleTypeText</code></td>
+<td>ชื่อ module จาก CASE</td>
+</tr>
+<tr>
+<td><code>MenuTypeText</code></td>
+<td>ชื่อเมนูจาก CASE (ตรง registry Module 1–14)</td>
+</tr>
+<tr>
+<td><code>LogTypeText</code></td>
+<td>ชื่อ action จาก CASE (Create, Update, …)</td>
+</tr>
+<tr>
+<td><code>RefTypeText</code> / <code>Ref2TypeText</code></td>
+<td>ชื่อ entity จาก CASE — ว่างเมื่อ Ref* เป็น <code>NULL</code> (Phase 1)</td>
+</tr>
+<tr>
+<td><code>MerchantCode</code>, <code>CompanyName</code>, …</td>
+<td><code>LEFT JOIN Merchants</code> บน <code>b.MerchantId</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Index อนาคต (Phase 3 ถ้าช้า):</strong> <code>(Ref2Type, Ref2Id)</code> filtered, full-text บน Message</p>
+<h3 id="script">Script</h3>
+<p>Generate: <code>python docs/extract-sql.py</code></p>
+<table>
+<thead>
+<tr>
+<th>ลำดับ</th>
+<th>ไฟล์</th>
+<th>รันเมื่อ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="sql/ChillpayOperationLogs-Table.sql"><code>ChillpayOperationLogs-Table.sql</code></a></td>
+<td>สร้างตาราง + <code>MerchantId</code> + backfill (ครั้งแรก / migrate)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="sql/ChillpayOperationLogs-Index.sql"><code>ChillpayOperationLogs-Index.sql</code></a></td>
+<td>สร้าง index บนตาราง</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="sql/ChillpayOperationLogs-View.sql"><code>ChillpayOperationLogs-View.sql</code></a></td>
+<td>สร้าง/อัปเดต View <code>*Text</code> (รันบ่อยเมื่อเพิ่ม Menu/Module/Log)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>ต้องมีตาราง <code>[dbo].[Merchants]</code> อยู่แล้วก่อนรัน View</p>
+</blockquote>
+<h4 id="ตาราง--chillpayoperationlogs-tablesql">ตาราง — <code>ChillpayOperationLogs-Table.sql</code></h4>
+<pre><code class="language-sql">/*
+  Chillpay Operation Logs — Table + MerchantId migrate
+  เอกสาร: docs/Chillpay-Operation-Logs.md Table script
+*/
+SET ANSI_NULLS ON;
+GO
+SET QUOTED_IDENTIFIER ON;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'ChillpayOperationLogs')
+BEGIN
+    CREATE TABLE [dbo].[ChillpayOperationLogs](
+        [Id]              [bigint] IDENTITY(1,1) NOT NULL,
+        [ModuleType]      [int] NOT NULL,
+        [MenuType]        [int] NOT NULL,
+        [LogType]         [int] NOT NULL,
+        [Message]         [nvarchar](500) NULL,
+        [OldValue]        [nvarchar](max) NULL,
+        [NewValue]        [nvarchar](max) NULL,
+        [DataId]          [bigint] NULL,
+        [RefType]         [int] NULL,
+        [RefId]           [bigint] NULL,
+        [Ref2Type]        [int] NULL,
+        [Ref2Id]          [bigint] NULL,
+        [MerchantId]      [bigint] NULL,
+        [RequestSystem]   [nvarchar](20) NOT NULL,
+        [RequestBy]       [bigint] NOT NULL,
+        [RequestByName]   [nvarchar](200) NULL,
+        [AddedDate]       [datetime] NOT NULL CONSTRAINT [DF_ChillpayOperationLogs_AddedDate] DEFAULT (GETDATE()),
+        CONSTRAINT [PK_ChillpayOperationLogs] PRIMARY KEY CLUSTERED ([Id] ASC)
+    ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY];
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.ChillpayOperationLogs') AND name = 'MerchantId')
+BEGIN
+    ALTER TABLE [dbo].[ChillpayOperationLogs] ADD [MerchantId] [bigint] NULL;
+END
+GO
+
+-- backfill MerchantId สำหรับ row เก่า (Module Merchant)
+UPDATE [dbo].[ChillpayOperationLogs]
+SET [MerchantId] = COALESCE(
+        CASE WHEN [RefType] = 20000 THEN [RefId] END,
+        CASE WHEN [Ref2Type] = 20000 THEN [Ref2Id] END,
+        CASE WHEN [MenuType] = 200 THEN [DataId] END
+    )
+WHERE [ModuleType] = 2
+  AND [MerchantId] IS NULL;
+GO
+</code></pre>
+<h4 id="index--chillpayoperationlogs-indexsql">Index — <code>ChillpayOperationLogs-Index.sql</code></h4>
+<pre><code class="language-sql">/*
+  Chillpay Operation Logs — Indexes
+  เอกสาร: docs/Chillpay-Operation-Logs.md Index script
+  ต้องรัน Table script ก่อน
+*/
+SET ANSI_NULLS ON;
+GO
+SET QUOTED_IDENTIFIER ON;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChillpayOperationLogs_Module_Menu' AND object_id = OBJECT_ID('dbo.ChillpayOperationLogs'))
+BEGIN
+    CREATE NONCLUSTERED INDEX [IX_ChillpayOperationLogs_Module_Menu]
+        ON [dbo].[ChillpayOperationLogs]([ModuleType] ASC, [MenuType] ASC, [AddedDate] DESC);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChillpayOperationLogs_LogType' AND object_id = OBJECT_ID('dbo.ChillpayOperationLogs'))
+BEGIN
+    CREATE NONCLUSTERED INDEX [IX_ChillpayOperationLogs_LogType]
+        ON [dbo].[ChillpayOperationLogs]([LogType] ASC, [AddedDate] DESC);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChillpayOperationLogs_DataId' AND object_id = OBJECT_ID('dbo.ChillpayOperationLogs'))
+BEGIN
+    CREATE NONCLUSTERED INDEX [IX_ChillpayOperationLogs_DataId]
+        ON [dbo].[ChillpayOperationLogs]([DataId] ASC)
+        WHERE [DataId] IS NOT NULL;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChillpayOperationLogs_RefType_RefId' AND object_id = OBJECT_ID('dbo.ChillpayOperationLogs'))
+BEGIN
+    CREATE NONCLUSTERED INDEX [IX_ChillpayOperationLogs_RefType_RefId]
+        ON [dbo].[ChillpayOperationLogs]([RefType] ASC, [RefId] ASC)
+        WHERE [RefType] IS NOT NULL AND [RefId] IS NOT NULL;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChillpayOperationLogs_MerchantId' AND object_id = OBJECT_ID('dbo.ChillpayOperationLogs'))
+BEGIN
+    CREATE NONCLUSTERED INDEX [IX_ChillpayOperationLogs_MerchantId]
+        ON [dbo].[ChillpayOperationLogs]([MerchantId] ASC)
+        WHERE [MerchantId] IS NOT NULL;
+END
+GO
+</code></pre>
+<h4 id="view--chillpayoperationlogs-viewsql">View — <code>ChillpayOperationLogs-View.sql</code></h4>
+<pre><code class="language-sql">/*
+  Chillpay Operation Logs — View VW_ChillpayOperationLogs
+  เอกสาร: docs/Chillpay-Operation-Logs.md View script
+  ต้องมีตาราง ChillpayOperationLogs + Merchants ก่อนรัน
+*/
+SET ANSI_NULLS ON;
+GO
+SET QUOTED_IDENTIFIER ON;
+GO
+
+CREATE OR ALTER VIEW [dbo].[VW_ChillpayOperationLogs]
+AS
+SELECT b.*
+    , (CONVERT(varchar(10), b.[AddedDate], 105) + N' ' + CONVERT(varchar(8), b.[AddedDate], 8)) AS [AddedDateText]
+    , (CASE b.[ModuleType]
+        WHEN 1 THEN N'User'
+        WHEN 2 THEN N'Merchant'
+        WHEN 3 THEN N'Settings'
+        WHEN 4 THEN N'Transactions'
+        WHEN 5 THEN N'Settlements'
+        WHEN 6 THEN N'Manage Transaction'
+        WHEN 7 THEN N'PayLink'
+        WHEN 8 THEN N'Fraud'
+        WHEN 9 THEN N'Etax'
+        WHEN 10 THEN N'Odd Service'
+        WHEN 11 THEN N'Chill App Partner'
+        WHEN 12 THEN N'Wallet'
+        WHEN 13 THEN N'Recurring'
+        WHEN 14 THEN N'Commission'
+        ELSE CAST(b.[ModuleType] AS nvarchar(20))
+      END) AS [ModuleTypeText]
+    , (CASE b.[MenuType]
+        WHEN 101 THEN N'Account'
+        WHEN 102 THEN N'Role'
+        WHEN 200 THEN N'Merchant'
+        WHEN 201 THEN N'Merchant User'
+        WHEN 202 THEN N'Merchant Fee'
+        WHEN 203 THEN N'Merchant Route'
+        WHEN 204 THEN N'Merchant Service Fee'
+        WHEN 205 THEN N'Generate Merchant Keys'
+        WHEN 206 THEN N'Merchant Emails'
+        WHEN 300 THEN N'Payment Channel'
+        WHEN 301 THEN N'Payment Route'
+        WHEN 302 THEN N'Payment Route Inquiry'
+        WHEN 303 THEN N'Credit Card Config'
+        WHEN 305 THEN N'Switch Payment Route Channel'
+        WHEN 306 THEN N'ChillPay Maintenance'
+        WHEN 307 THEN N'Bank Maintenance'
+        WHEN 308 THEN N'Bank Payment Api Setting'
+        WHEN 309 THEN N'SMS Route'
+        WHEN 310 THEN N'Exchange Rate'
+        WHEN 311 THEN N'Exchange Rate Log'
+        WHEN 401 THEN N'Payment'
+        WHEN 402 THEN N'Void'
+        WHEN 403 THEN N'Refund (Old)'
+        WHEN 404 THEN N'Refund Transaction'
+        WHEN 405 THEN N'Approve Refund'
+        WHEN 406 THEN N'Settlement (Old)'
+        WHEN 407 THEN N'Payment Summary (Old)'
+        WHEN 408 THEN N'Import MCC'
+        WHEN 409 THEN N'Inquiry Transaction'
+        WHEN 410 THEN N'Warning Transaction'
+        WHEN 501 THEN N'Settlement Dashboard'
+        WHEN 502 THEN N'Settlement'
+        WHEN 503 THEN N'Upload File'
+        WHEN 504 THEN N'Merchant Transfer'
+        WHEN 505 THEN N'Merchant Setting'
+        WHEN 506 THEN N'Settlement Status'
+        WHEN 507 THEN N'Download Payment Summary'
+        WHEN 601 THEN N'Update Transaction Status'
+        WHEN 602 THEN N'Update Settlement Status'
+        WHEN 603 THEN N'Update Transfer Date'
+        WHEN 701 THEN N'PayLink Link'
+        WHEN 702 THEN N'PayLink Transaction'
+        WHEN 801 THEN N'CreditCard Transactions'
+        WHEN 802 THEN N'Observe Configuration'
+        WHEN 803 THEN N'Observe Transactions'
+        WHEN 804 THEN N'FraudAlert Configuration'
+        WHEN 805 THEN N'FraudAlert Transactions'
+        WHEN 901 THEN N'Etax Merchant Profile'
+        WHEN 902 THEN N'Etax EndUser Profile'
+        WHEN 903 THEN N'Sale Name Manage'
+        WHEN 904 THEN N'Upload Summary Settlement'
+        WHEN 905 THEN N'Update Summary Settlement'
+        WHEN 906 THEN N'Settlement PayOut'
+        WHEN 907 THEN N'Invoice Merchant'
+        WHEN 908 THEN N'Invoice EndUser'
+        WHEN 909 THEN N'Invoice Transaction'
+        WHEN 910 THEN N'PND'
+        WHEN 911 THEN N'Invoice ABB Transaction'
+        WHEN 912 THEN N'Outstanding Invoice'
+        WHEN 913 THEN N'Cancel Invoice'
+        WHEN 914 THEN N'Credit Note'
+        WHEN 915 THEN N'Debit Note'
+        WHEN 916 THEN N'CreditNote Invoice ABB'
+        WHEN 1001 THEN N'ODD Route'
+        WHEN 1002 THEN N'ODD Merchant Route'
+        WHEN 1003 THEN N'ODD Register'
+        WHEN 1004 THEN N'ODD BAY Configs'
+        WHEN 1005 THEN N'ODD BAY Customer'
+        WHEN 1006 THEN N'ODD SCB Configs'
+        WHEN 1007 THEN N'ODD SCB Customer'
+        WHEN 1008 THEN N'ODD KTB Configs'
+        WHEN 1101 THEN N'Chill App Members'
+        WHEN 1102 THEN N'Chill App Transactions'
+        WHEN 1103 THEN N'Chill App Partners'
+        WHEN 1104 THEN N'Chill App PayTransactions'
+        WHEN 1105 THEN N'Chill App Settlement PayTransactions'
+        WHEN 1201 THEN N'Wallet Merchant'
+        WHEN 1202 THEN N'Shop Send Money Fee'
+        WHEN 1203 THEN N'Wallet Transaction'
+        WHEN 1204 THEN N'Wallet Settlement Transaction'
+        WHEN 1205 THEN N'Wallet Settlement Report'
+        WHEN 1206 THEN N'Settle Version'
+        WHEN 1301 THEN N'Recurring Merchant'
+        WHEN 1302 THEN N'Recurring Schedule'
+        WHEN 1303 THEN N'Recurring Transactions'
+        WHEN 1401 THEN N'Commission Reseller'
+        WHEN 1402 THEN N'Commission Reseller Payout'
+        WHEN 1403 THEN N'Commission Reports'
+        WHEN 1404 THEN N'Commission Download Reports'
+        ELSE CAST(b.[MenuType] AS nvarchar(20))
+      END) AS [MenuTypeText]
+    , (CASE b.[LogType]
+        WHEN 1 THEN N'Create'
+        WHEN 2 THEN N'Update'
+        WHEN 3 THEN N'Activate'
+        WHEN 4 THEN N'Inactivate'
+        WHEN 5 THEN N'Delete'
+        WHEN 7 THEN N'Generate'
+        WHEN 8 THEN N'UpdateStatus'
+        WHEN 9 THEN N'Approve'
+        WHEN 10 THEN N'Reject'
+        ELSE CAST(b.[LogType] AS nvarchar(20))
+      END) AS [LogTypeText]
+    , (CASE WHEN b.[RefType] IS NULL THEN N''
+        ELSE CASE b.[RefType]
+            WHEN 0 THEN N'Undefined'
+            WHEN 20000 THEN N'Merchant'
+            WHEN 20001 THEN N'Merchant User'
+            WHEN 20002 THEN N'Merchant Fee'
+            WHEN 20003 THEN N'Merchant Route'
+            WHEN 20004 THEN N'Merchant Service Fee'
+            WHEN 20005 THEN N'Merchant Email'
+            WHEN 30000 THEN N'Payment Channel'
+            WHEN 30001 THEN N'Payment Route'
+            WHEN 30002 THEN N'Payment Route Inquiry'
+            WHEN 30003 THEN N'Credit Card Config'
+            WHEN 30004 THEN N'ChillPay Maintenance'
+            WHEN 30005 THEN N'Bank Maintenance'
+            WHEN 30006 THEN N'Bank Payment Api Setting'
+            WHEN 30007 THEN N'SMS Route'
+            WHEN 30008 THEN N'Exchange Rate'
+            WHEN 30009 THEN N'Exchange Rate Log'
+            WHEN 10001 THEN N'Account'
+            WHEN 10002 THEN N'Role'
+            WHEN 40000 THEN N'Payment Transaction'
+            WHEN 50000 THEN N'Settlement Record'
+            WHEN 60000 THEN N'Managed Transaction'
+            WHEN 70000 THEN N'PayLink Record'
+            WHEN 80000 THEN N'Fraud Record'
+            WHEN 90000 THEN N'Etax Record'
+            WHEN 100000 THEN N'Odd Record'
+            WHEN 110000 THEN N'Chill App Record'
+            WHEN 120000 THEN N'Wallet Record'
+            WHEN 130000 THEN N'Recurring Record'
+            WHEN 140000 THEN N'Commission Record'
+            ELSE CAST(b.[RefType] AS nvarchar(20))
+        END
+      END) AS [RefTypeText]
+    , (CASE WHEN b.[Ref2Type] IS NULL THEN N''
+        ELSE CASE b.[Ref2Type]
+            WHEN 0 THEN N'Undefined'
+            WHEN 20000 THEN N'Merchant'
+            WHEN 20001 THEN N'Merchant User'
+            WHEN 20002 THEN N'Merchant Fee'
+            WHEN 20003 THEN N'Merchant Route'
+            WHEN 20004 THEN N'Merchant Service Fee'
+            WHEN 20005 THEN N'Merchant Email'
+            WHEN 30000 THEN N'Payment Channel'
+            WHEN 30001 THEN N'Payment Route'
+            WHEN 30002 THEN N'Payment Route Inquiry'
+            WHEN 30003 THEN N'Credit Card Config'
+            WHEN 30004 THEN N'ChillPay Maintenance'
+            WHEN 30005 THEN N'Bank Maintenance'
+            WHEN 30006 THEN N'Bank Payment Api Setting'
+            WHEN 30007 THEN N'SMS Route'
+            WHEN 30008 THEN N'Exchange Rate'
+            WHEN 30009 THEN N'Exchange Rate Log'
+            WHEN 10001 THEN N'Account'
+            WHEN 10002 THEN N'Role'
+            WHEN 40000 THEN N'Payment Transaction'
+            WHEN 50000 THEN N'Settlement Record'
+            WHEN 60000 THEN N'Managed Transaction'
+            WHEN 70000 THEN N'PayLink Record'
+            WHEN 80000 THEN N'Fraud Record'
+            WHEN 90000 THEN N'Etax Record'
+            WHEN 100000 THEN N'Odd Record'
+            WHEN 110000 THEN N'Chill App Record'
+            WHEN 120000 THEN N'Wallet Record'
+            WHEN 130000 THEN N'Recurring Record'
+            WHEN 140000 THEN N'Commission Record'
+            ELSE CAST(b.[Ref2Type] AS nvarchar(20))
+        END
+      END) AS [Ref2TypeText]
+    , m.[MerchantCode], m.[ShortName], m.[CompanyName], m.[ShortNameEN]
+FROM [dbo].[ChillpayOperationLogs] AS b WITH (NOLOCK)
+LEFT OUTER JOIN [dbo].[Merchants] AS m WITH (NOLOCK) ON b.[MerchantId] = m.[Id];
+GO
+</code></pre>
+    </article>
+    <footer class="page-footer">
+      <a href="index.html" class="footer-link">← กลับภาพรวม</a>
+    </footer>
+  </main>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

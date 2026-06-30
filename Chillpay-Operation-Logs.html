@@ -1,0 +1,1766 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chillpay Operation Logs</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #1a1a2e;
+      --muted: #5c5c7a;
+      --border: #e2e8f0;
+      --code-bg: #f6f8fa;
+      --accent: #2563eb;
+      --blockquote-bg: #f0f7ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      line-height: 1.65;
+      color: var(--text);
+      background: var(--bg);
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+    h1 { font-size: 2rem; border-bottom: 2px solid var(--border); padding-bottom: .5rem; }
+    h2 { font-size: 1.5rem; margin-top: 2.5rem; border-bottom: 1px solid var(--border); padding-bottom: .35rem; }
+    h3 { font-size: 1.2rem; margin-top: 1.75rem; }
+    h4 { font-size: 1.05rem; margin-top: 1.25rem; }
+    blockquote {
+      margin: 1rem 0;
+      padding: .75rem 1rem;
+      background: var(--blockquote-bg);
+      border-left: 4px solid var(--accent);
+      color: var(--muted);
+    }
+    blockquote p { margin: 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: .92rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: .5rem .75rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #f8fafc; font-weight: 600; }
+    tr:nth-child(even) { background: #fafbfc; }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: .88em;
+      background: var(--code-bg);
+      padding: .15em .35em;
+      border-radius: 3px;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-size: .82rem;
+      line-height: 1.5;
+    }
+    pre code { background: none; padding: 0; }
+    pre.mermaid {
+      background: #fff;
+      border: 1px dashed var(--border);
+      text-align: center;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin: 1rem 0;
+    }
+    hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    ul, ol { padding-left: 1.5rem; }
+    li { margin: .25rem 0; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    em { color: var(--muted); }
+    .toc ul { list-style: none; padding-left: 0; }
+    .toc > ul > li { margin: .35rem 0; }
+    .toc ul ul { padding-left: 1.25rem; font-size: .95rem; }
+  </style>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({ startOnLoad: true, theme: "default" });
+  </script>
+</head>
+<body>
+<h1>Chillpay Operation Logs</h1>
+<blockquote>
+<p><strong>เอกสารอ้างอิงหลัก</strong> · รวม registry, UI, API, writer, <strong>SQL script (§7.4)</strong><br />
+<strong>สถานะ:</strong> Phase 1 code พร้อม — รอ deploy + smoke test<br />
+<strong>อัปเดต:</strong> 2026-06-28<br />
+<strong>ขอบเขต:</strong> Admin UI (web-backend) + Operation Logs API + Registry Module 1–14</p>
+</blockquote>
+<h2 id="สารบัญ">สารบัญ</h2>
+<ul>
+<li><a href="#1-summary">1. Summary</a></li>
+<li><a href="#2-checklist">2. Checklist</a></li>
+<li><a href="#3-อธิบาย-registry--moduletype-menutype-logtype">3. อธิบาย Registry — ModuleType, MenuType, LogType</a></li>
+<li><a href="#31-ภาพรวม-3-ชั้น">3.1 ภาพรวม 3 ชั้น</a></li>
+<li><a href="#32-moduletype--หมวดใหญ่-114">3.2 ModuleType</a></li>
+<li><a href="#33-menutype--เมนูย่อยที่เขียน-log-ได้">3.3 MenuType</a></li>
+<li><a href="#34-logtype--action-ประเภทการกระทำ">3.4 LogType</a></li>
+<li><a href="#35-dataid-reftype-refid--อ้างอิง-entity">3.5 DataId, RefType, RefId</a></li>
+<li><a href="#36-flow-การเขียน-log">3.6 Flow การเขียน Log</a></li>
+<li><a href="#37-ตัวอย่าง--merchant-create">3.7 ตัวอย่าง — Merchant Create</a></li>
+<li><a href="#38-ตัวอย่าง--merchant-update">3.8 ตัวอย่าง — Merchant Update</a></li>
+<li><a href="#39-ตัวอย่าง-record--merchant-fee-update">3.9 ตัวอย่าง record — Merchant Fee Update</a></li>
+<li><a href="#4-ui">4. UI</a></li>
+<li><a href="#41-หน้า-list--chillpay-operation-logs">4.1 หน้า List</a></li>
+<li><a href="#42-หน้า-detail--chillpay-operation-logs-detail">4.2 หน้า Detail</a></li>
+<li><a href="#43-ปุ่ม-logs-บนหน้า-detail--update">4.3 ปุ่ม Logs</a></li>
+<li><a href="#5-การค้นหา-search-design">5. การค้นหา (Search Design)</a></li>
+<li><a href="#51-flow">5.1 Flow</a></li>
+<li><a href="#52-สิ่งที่เลิกใช้-ux-เดิม">5.2 สิ่งที่เลิกใช้</a></li>
+<li><a href="#53-request-ตัวอย่าง--browse">5.3 Request — Browse</a></li>
+<li><a href="#54-request-ตัวอย่าง--จากปุ่ม-logs-deep-link">5.4 Request — deep link</a></li>
+<li><a href="#55-กฎ-merchant-filter">5.5 กฎ Merchant filter</a></li>
+<li><a href="#6-api-design">6. API Design</a></li>
+<li><a href="#7-database--schema-index-view-และ-deploy-script">7. Database</a></li>
+<li><a href="#71-ภาพรวม">7.1 ภาพรวม</a></li>
+<li><a href="#72-ตาราง-chillpayoperationlogs--คอลัมน์">7.2 ตาราง</a></li>
+<li><a href="#73-index-และ-view">7.3 Index และ View</a></li>
+<li><a href="#74-script">7.4 Script</a></li>
+<li><a href="#8-ไฟล์ที่เกี่ยวข้อง">8. ไฟล์ที่เกี่ยวข้อง</a></li>
+<li><a href="#9-deploy-และ-smoke-test">9. Deploy และ Smoke test</a></li>
+<li><a href="#91-ลำดับ-deploy">9.1 ลำดับ deploy</a></li>
+<li><a href="#92-smoke-test">9.2 Smoke test</a></li>
+<li><a href="#10-registry-sync-manual">10. Registry Sync (Manual)</a></li>
+<li><a href="#101-แหล่งอ้างอิงหลัก--ไฟล์ต้นฉบับของ-registry">10.1 แหล่งอ้างอิงหลัก</a></li>
+<li><a href="#102-จุดที่ต้อง-sync">10.2 จุดที่ต้อง sync</a></li>
+<li><a href="#103-ขั้นตอนเมื่อเพิ่ม-menutype-ใหม่">10.3 เพิ่ม MenuType ใหม่</a></li>
+<li><a href="#104-checklist-สำหรับ-pr">10.4 Checklist PR</a></li>
+<li><a href="#105-ถ้า-sync-ไม่ครบ--อาการและวิธีแก้">10.5 sync ไม่ครบ</a></li>
+</ul>
+<hr />
+<h2 id="1-summary">1. Summary</h2>
+<p>Chillpay Operation Logs เป็น <strong>registry กลาง</strong> สำหรับบันทึกการเปลี่ยนแปลงข้อมูลบน Web Admin แยกจาก PayOut โดยใช้โครงสร้าง <strong>ModuleType → MenuType → LogType (Action) + Ref</strong></p>
+<table>
+<thead>
+<tr>
+<th>หัวข้อ</th>
+<th>สถานะ / แนวทาง</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>โครงสร้าง Registry</td>
+<td><strong>คง</strong> Module / Menu / LogType / Ref — ไม่เลียนแบบ Payout ทั้งหมด</td>
+</tr>
+<tr>
+<td>หน้า List</td>
+<td>Browse ด้วย <strong>Module + Menu + Log Type + Merchant + วันที่</strong> — ลบ LogMode 2–9 แล้ว</td>
+</tr>
+<tr>
+<td>ปุ่ม <strong>Logs</strong> บน Detail</td>
+<td><strong>ใช้</strong> — deep link ไปหน้า List (ส่ง <code>menuType</code> + <code>dataId</code> โดยตรง ไม่ใช้ LogMode เดิม)</td>
+</tr>
+<tr>
+<td>OldValue / NewValue (Update)</td>
+<td><strong>snapshot JSON เต็ม</strong> — diff ใช้เฉพาะตัดสิน Action type</td>
+</tr>
+<tr>
+<td><strong>เมื่อไหร่เขียน Log</strong></td>
+<td><strong>เฉพาะเมื่อรายการนั้น success</strong> (Create/Update/Delete ผ่าน) — fail แล้วไม่เขียน</td>
+</tr>
+<tr>
+<td>API</td>
+<td><strong>Search หลัก</strong> <code>POST /search</code> (List) · <strong>Writer</strong> <code>POST /add</code> · <strong>Detail</strong> <code>GET /{id}</code> · <strong>Integration</strong> <code>POST /search/menu</code> — ดู §6</td>
+</tr>
+<tr>
+<td>Deploy</td>
+<td>⏳ รอ SQL + API + web-backend ทุก env</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-checklist">2. Checklist</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>งาน</th>
+<th>Repo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>API Search / Add / FindById (.NET 8)</td>
+<td>operation-logs-api</td>
+</tr>
+<tr>
+<td>2</td>
+<td>SQL <code>ChillpayOperationLogs</code> + view <code>VW_ChillpayOperationLogs</code> (script ใน §7.4)</td>
+<td>operation-logs-api</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Registry Module 1–14 (Merchant=2, Settings=3)</td>
+<td>operation-logs-api + web-backend</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Writer Merchant + Settings (บางเมนู)</td>
+<td>web-backend</td>
+</tr>
+<tr>
+<td>5</td>
+<td>หน้า List <code>ChillpayOperationLogs.cshtml</code></td>
+<td>web-backend</td>
+</tr>
+<tr>
+<td>6</td>
+<td>หน้า Detail <code>ChillpayOperationLogsDetail.cshtml</code></td>
+<td>web-backend</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Menu dropdown</strong> บนหน้า List</td>
+<td>web-backend</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>ปุ่ม Logs</strong> + <code>_ChillpayOperationLogButtonPartial</code> (~15 หน้า)</td>
+<td>web-backend</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Deep link <code>localStorage.ChillpayLogSearchData</code> (<code>menuType</code> + <code>dataId</code>)</td>
+<td>web-backend</td>
+</tr>
+<tr>
+<td>10</td>
+<td>OldValue/NewValue ตอน Update = snapshot เต็ม</td>
+<td>web-backend</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>AjaxChillpayOperationLogsController</code> ส่ง <code>DataId</code> ไป API</td>
+<td>web-backend</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-อธิบาย-registry--moduletype-menutype-logtype">3. อธิบาย Registry — ModuleType, MenuType, LogType</h2>
+<h3 id="31-ภาพรวม-3-ชั้น">3.1 ภาพรวม 3 ชั้น</h3>
+<pre><code>ModuleType (1–14)          ← หมวดใหญ่ = sidebar Admin (Merchant, Settings, …)
+    └── MenuType           ← หน้าย่อยที่เขียน log ได้ (Fee, Route, Payment Channel, …)
+            └── LogType    ← action ที่เกิดขึ้น (Create, Update, Delete, …)
+                    └── DataId + RefType/RefId (+ Ref2)  ← entity ที่ถูก action
+</code></pre>
+<p><strong>ทำไมแยก 3 ชั้น?</strong></p>
+<table>
+<thead>
+<tr>
+<th>ชั้น</th>
+<th>ตอบคำถาม</th>
+<th>ตัวอย่าง</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ModuleType</strong></td>
+<td>log นี้อยู่ <strong>หมวดไหน</strong> ของ Admin?</td>
+<td>2 = Merchant</td>
+</tr>
+<tr>
+<td><strong>MenuType</strong></td>
+<td>log นี้มาจาก <strong>หน้า/เมนูไหน</strong>?</td>
+<td>202 = Merchant Fee</td>
+</tr>
+<tr>
+<td><strong>LogType</strong></td>
+<td><strong>ทำอะไร</strong> กับ record นั้น?</td>
+<td>2 = Update</td>
+</tr>
+</tbody>
+</table>
+<p>แยกจาก PayOut ที่ใช้ LogType เป็นช่วงเลขแทน Menu — แบบ Chillpay map กับ sidebar Admin ได้ตรง</p>
+<hr />
+<h3 id="32-moduletype--หมวดใหญ่-1-14">3.2 ModuleType — หมวดใหญ่ (1–14)</h3>
+<p><code>ModuleType</code> = ลำดับ module ตาม sidebar Web Admin — กำหนดใน enum <code>ChillpayOperationLogModuleType</code> (<code>OperationLogConstants.cs</code>)</p>
+<pre><code class="language-csharp">public enum ChillpayOperationLogModuleType
+{
+    User = 1,
+    Merchant = 2,
+    Settings = 3,
+    Transactions = 4,
+    Settlements = 5,
+    ManageTransaction = 6,
+    PayLink = 7,
+    Fraud = 8,
+    Etax = 9,
+    OddService = 10,
+    ChillAppPartner = 11,
+    Wallet = 12,
+    Recurring = 13,
+    Commission = 14,
+}
+</code></pre>
+<p><strong>บนหน้า List:</strong> dropdown <strong>Module</strong> — เลือกหมวดเดียว หรือ Select All (ค้นทุก module ที่เปิดใช้)</p>
+<hr />
+<h3 id="33-menutype--เมนูย่อยที่เขียน-log-ได้">3.3 MenuType — เมนูย่อยที่เขียน log ได้</h3>
+<p><code>MenuType</code> = หน้า Admin ที่มี operation log (create / update / delete ฯลฯ) — กำหนดใน enum <code>ChillpayOperationLogMenuType</code> (<code>OperationLogConstants.cs</code>)</p>
+<pre><code class="language-csharp">public enum ChillpayOperationLogMenuType
+{
+    // Module 1 — User
+    Account = 101,
+    Role = 102,
+
+    // Module 2 — Merchant
+    Merchant = 200,
+    MerchantUser = 201,
+    MerchantFee = 202,
+    MerchantRoute = 203,
+    MerchantServiceFee = 204,
+    GenerateMerchantKeys = 205,
+    MerchantEmails = 206,
+
+    // Module 3 — Settings
+    PaymentChannel = 300,
+    PaymentRoute = 301,
+    PaymentRouteInquiry = 302,
+    CreditCardConfig = 303,
+    SwitchPaymentRouteChannel = 305,
+    ChillPayMaintenance = 306,
+    BankMaintenance = 307,
+    BankPaymentApiSetting = 308,
+    SMSRoute = 309,
+    ExchangeRate = 310,
+    ExchangeRateLog = 311,
+
+    // Module 4 — Transactions
+    Payment = 401,
+    Void = 402,
+    RefundOld = 403,
+    RefundTransaction = 404,
+    ApproveRefund = 405,
+    SettlementOld = 406,
+    PaymentSummaryOld = 407,
+    ImportMcc = 408,
+    InquiryTransaction = 409,
+    WarningTransaction = 410,
+
+    // Module 5 — Settlements
+    SettlementDashboard = 501,
+    Settlement = 502,
+    SettlementUploadFile = 503,
+    SettlementMerchantTransfer = 504,
+    SettlementMerchantSetting = 505,
+    SettlementStatus = 506,
+    DownloadPaymentSummary = 507,
+
+    // Module 6 — Manage Transaction
+    UpdateTransactionStatus = 601,
+    UpdateSettlementStatus = 602,
+    UpdateTransferDate = 603,
+
+    // Module 7 — PayLink
+    PayLinkLink = 701,
+    PayLinkTransaction = 702,
+
+    // Module 8 — Fraud
+    FraudCreditCardTransactions = 801,
+    FraudObserveConfiguration = 802,
+    FraudObserveTransactions = 803,
+    FraudAlertConfiguration = 804,
+    FraudAlertTransactions = 805,
+
+    // Module 9 — Etax
+    EtaxMerchantProfile = 901,
+    EtaxEndUserProfile = 902,
+    EtaxSaleManage = 903,
+    EtaxUploadSettlement = 904,
+    EtaxUpdateSettlement = 905,
+    EtaxSettlementPayOut = 906,
+    EtaxInvoiceMerchant = 907,
+    EtaxInvoiceEndUser = 908,
+    EtaxInvoiceTransactions = 909,
+    EtaxPnd = 910,
+    EtaxInvoiceAbbTransactions = 911,
+    EtaxOutstandingInvoice = 912,
+    EtaxCancelInvoice = 913,
+    EtaxCreditNote = 914,
+    EtaxDebitNote = 915,
+    EtaxCreditNoteInvAbb = 916,
+
+    // Module 10 — Odd Service
+    OddRoute = 1001,
+    OddMerchantRoute = 1002,
+    OddRegister = 1003,
+    OddBayConfigs = 1004,
+    OddBayCustomer = 1005,
+    OddScbConfigs = 1006,
+    OddScbCustomer = 1007,
+    OddKtbConfigs = 1008,
+
+    // Module 11 — Chill App Partner
+    ChillAppMembers = 1101,
+    ChillAppTransactions = 1102,
+    ChillAppPartners = 1103,
+    ChillAppPayTransactions = 1104,
+    ChillAppSettlementPayTransactions = 1105,
+
+    // Module 12 — Wallet
+    WalletMerchant = 1201,
+    WalletShopSendMoneyFee = 1202,
+    WalletTransaction = 1203,
+    WalletSettlementTransaction = 1204,
+    WalletSettlementReport = 1205,
+    WalletSettleVersion = 1206,
+
+    // Module 13 — Recurring
+    RecurringMerchant = 1301,
+    RecurringSchedule = 1302,
+    RecurringTransactions = 1303,
+
+    // Module 14 — Commission
+    CommissionReseller = 1401,
+    CommissionResellerPayout = 1402,
+    CommissionReports = 1403,
+    CommissionDownloadReports = 1404,
+}
+</code></pre>
+<p><strong>บนหน้า List:</strong> dropdown <strong>Menu</strong> — แสดงเมื่อเลือก Module แล้ว; Select All = ไม่ส่ง <code>menuType</code> (ได้ทุกเมนูใน module)</p>
+<p><strong>ปุ่ม Logs:</strong> ส่ง <code>menuType</code> จริง (เช่น 202) แทน LogMode เดิม (เช่น mode 3) — ไม่สับสน</p>
+<hr />
+<h3 id="34-logtype--action-ประเภทการกระทำ">3.4 LogType — Action (ประเภทการกระทำ)</h3>
+<p><code>LogType</code> = <strong>action กลาง</strong> ใช้ร่วมทุก module — ไม่ใช่ชื่อเมนู — กำหนดใน enum <code>ChillpayOperationLogActionType</code> (<code>OperationLogConstants.cs</code>)</p>
+<pre><code class="language-csharp">public enum ChillpayOperationLogActionType
+{
+    Create = 1,
+    Update = 2,
+    Activate = 3,
+    Inactivate = 4,
+    Delete = 5,
+    Restore = 6,
+    Generate = 7,
+    UpdateStatus = 8,
+    Approve = 9,
+    Reject = 10,
+    Enable = 11,
+    Disable = 12,
+    Cancel = 13,
+    Refund = 14,
+    Void = 15,
+    Reprocess = 16,
+    Retry = 17,
+    Import = 19,
+    Upload = 20,
+    Login = 22,
+    Logout = 23,
+    ResetPassword = 24,
+    Assign = 25,
+    Unassign = 26,
+    Hold = 27,
+    Release = 28,
+    Offset = 29,
+    Transfer = 30,
+}
+</code></pre>
+<p><strong>บนหน้า List:</strong> dropdown <strong>Log Type</strong> — filter ตาม action; รายการที่แสดงขึ้นกับ Menu ที่เลือก (แต่ละเมนูอนุญาต action ไม่เหมือนกัน เช่น Generate Keys มีแค่ action 7)</p>
+<p><strong>การตัดสิน LogType ตอน Update (Writer):</strong></p>
+<ol>
+<li>Serialize <code>beforeSnapshot</code> / <code>afterSnapshot</code> เต็ม</li>
+<li><code>GetChangedFieldsJson</code> → diff เฉพาะ field ที่เปลี่ยน</li>
+<li><code>ChillpayMerchantOperationLogResolver.ResolveUpdateAction(menuType, diff)</code> → เลือก Update / Activate / UpdateStatus</li>
+<li>บันทึก log ด้วย snapshot เต็มใน OldValue/NewValue</li>
+</ol>
+<hr />
+<h3 id="35-dataid-reftype-refid--อ้างอิง-entity">3.5 DataId, RefType, RefId — อ้างอิง entity</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>ความหมาย</th>
+<th>ตัวอย่าง (แก้ Fee id 501 ของ merchant 100)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DataId</strong></td>
+<td>id หลักของ record ที่ถูก action</td>
+<td>501</td>
+</tr>
+<tr>
+<td><strong>RefType</strong></td>
+<td>ประเภท entity หลัก</td>
+<td>10002 (Merchant Fee)</td>
+</tr>
+<tr>
+<td><strong>RefId</strong></td>
+<td>id ของ entity หลัก</td>
+<td>501</td>
+</tr>
+<tr>
+<td><strong>Ref2Type / Ref2Id</strong></td>
+<td>entity ที่เกี่ยวข้อง (มักเป็น merchant)</td>
+<td>10000 / 100</td>
+</tr>
+</tbody>
+</table>
+<p><code>RefType</code> = ประเภท <strong>entity</strong> (ไม่ใช่หน้าเมนู) — กำหนดใน enum <code>ChillpayOperationLogRefType</code> (<code>OperationLogConstants.cs</code>)</p>
+<pre><code class="language-csharp">public enum ChillpayOperationLogRefType
+{
+    Undefined = 0,
+
+    // Merchant (10000+)
+    Merchant = 10000,
+    MerchantUser = 10001,
+    MerchantFee = 10002,
+    MerchantRoute = 10003,
+    MerchantServiceFee = 10004,
+    MerchantEmail = 10005,
+
+    // Settings (20000+)
+    PaymentChannel = 20000,
+    PaymentRoute = 20001,
+    PaymentRouteInquiry = 20002,
+    CreditCardConfig = 20003,
+    BankPaymentApiSetting = 20004,
+    SMSRoute = 20005,
+    ExchangeRate = 20006,
+    ChillPayMaintenance = 20007,
+    BankMaintenance = 20008,
+    ExchangeRateLog = 20009,
+
+    // User (30000+)
+    AdminAccount = 30001,
+    AdminRole = 30002,
+
+    // Transactions (40000+)
+    PaymentTransaction = 40001,
+
+    // Settlements (50000+)
+    SettlementRecord = 50001,
+
+    // Manage Transaction (60000+)
+    ManagedTransaction = 60001,
+
+    // PayLink (70000+)
+    PayLinkRecord = 70001,
+
+    // Fraud (80000+)
+    FraudRecord = 80001,
+
+    // Etax (90000+)
+    EtaxRecord = 90001,
+
+    // Odd Service (100000+)
+    OddRecord = 100001,
+
+    // Chill App Partner (110000+)
+    ChillAppRecord = 110001,
+
+    // Wallet (120000+)
+    WalletRecord = 120001,
+
+    // Recurring (130000+)
+    RecurringRecord = 130001,
+
+    // Commission (140000+)
+    CommissionRecord = 140001,
+}
+</code></pre>
+<p><strong>Merchant filter บนหน้า List:</strong> <code>refType=[10000], refId=merchantId</code> — ดึง log ทุกเมนูของร้านนั้น</p>
+<hr />
+<h3 id="36-flow-การเขียน-log">3.6 Flow การเขียน Log</h3>
+<p><strong>กฎ:</strong> บันทึก Operation Log <strong>ต่อเมื่อรายการนั้น success เท่านั้น</strong> — เรียก writer หลัง business action ผ่าน (เช่น <code>CreateOrUpdateAsync</code> คืน <code>Succeeded</code>)</p>
+<table>
+<thead>
+<tr>
+<th>สถานการณ์</th>
+<th>เขียน Log?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save / Create / Update / Delete <strong>ไม่สำเร็จ</strong></td>
+<td><strong>ไม่</strong></td>
+</tr>
+<tr>
+<td>Business action <strong>สำเร็จ</strong></td>
+<td><strong>ใช่</strong> — เรียก <code>LogMerchantCreatedAsync</code>, <code>LogMerchantChangeAsync</code> ฯลฯ</td>
+</tr>
+<tr>
+<td>Business สำเร็จ แต่เรียก operation-logs-api <strong>ไม่ผ่าน</strong></td>
+<td>business ยัง success — log อาจไม่เข้า DB (retry 1 ครั้ง แล้ว warning)</td>
+</tr>
+</tbody>
+</table>
+<p>ไม่เกี่ยวกับปุ่ม <strong>Logs</strong> บนหน้า Detail — ปุ่มนั้นใช้อ่าน log อย่างเดียว</p>
+<p><img alt="Flow การเขียน Operation Log" src="images/flow-write-operation-log.png" /></p>
+<ul>
+<li><strong>LogAudit</strong> แยกต่างหาก — เก็บเฉพาะ field ที่เปลี่ยน</li>
+</ul>
+<p><strong>ไฟล์หลัก</strong></p>
+<table>
+<thead>
+<tr>
+<th>บทบาท</th>
+<th>ไฟล์</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Controller</td>
+<td><code>MerchantController.cs</code> — เรียก log หลัง save</td>
+</tr>
+<tr>
+<td>Helper</td>
+<td><code>BaseController.cs</code> — <code>LogMerchantCreatedAsync</code>, <code>LogMerchantChangeAsync</code></td>
+</tr>
+<tr>
+<td>Writer</td>
+<td><code>ChillpayOperationLogWriter.cs</code> — <code>WriteMerchantLogAsync</code> → API</td>
+</tr>
+<tr>
+<td>API</td>
+<td><code>ChillpayOperationLogController.cs</code> — <code>POST /add</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="37-ตัวอย่าง--merchant-create">3.7 ตัวอย่าง — Merchant Create</h3>
+<p><strong>หน้า:</strong> Merchant Create → กด Save (เฉพาะเมื่อ <code>CreateOrUpdateAsync</code> success)</p>
+<p><img alt="Flow Merchant Create — Operation Log" src="images/flow-merchant-create-log.png" /></p>
+<p><strong>record ในตาราง <code>ChillpayOperationLogs</code> (ตัวอย่าง merchant id 100)</strong></p>
+<table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ค่า</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ModuleType</td>
+<td>2 (Merchant)</td>
+</tr>
+<tr>
+<td>MenuType</td>
+<td>200 (Merchant)</td>
+</tr>
+<tr>
+<td>LogType</td>
+<td>1 (Create)</td>
+</tr>
+<tr>
+<td>DataId</td>
+<td>100</td>
+</tr>
+<tr>
+<td>RefType / RefId</td>
+<td>10000 / 100</td>
+</tr>
+<tr>
+<td>Ref2Type / Ref2Id</td>
+<td>10000 / 100</td>
+</tr>
+<tr>
+<td>OldValue</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td>NewValue</td>
+<td>JSON snapshot merchant ทั้งก้อนหลังสร้าง</td>
+</tr>
+<tr>
+<td>Message</td>
+<td>Merchant created</td>
+</tr>
+<tr>
+<td>RequestSystem</td>
+<td>Admin</td>
+</tr>
+<tr>
+<td>RequestBy</td>
+<td>user id ผู้สร้าง</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="38-ตัวอย่าง--merchant-update">3.8 ตัวอย่าง — Merchant Update</h3>
+<p><strong>หน้า:</strong> Merchant Update → แก้ข้อมูล → กด Save (เฉพาะเมื่อ <code>CreateOrUpdateAsync</code> success)</p>
+<p><img alt="Flow Merchant Update — Operation Log" src="images/flow-merchant-update-log.png" /></p>
+<p><strong>record ในตาราง (ตัวอย่าง แก้ CompanyName ของ merchant 100)</strong></p>
+<table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ค่า</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ModuleType</td>
+<td>2</td>
+</tr>
+<tr>
+<td>MenuType</td>
+<td>200</td>
+</tr>
+<tr>
+<td>LogType</td>
+<td>2 (Update) — หรือ 3/8 ถ้า resolver เห็นว่าเปลี่ยนแค่ status</td>
+</tr>
+<tr>
+<td>DataId</td>
+<td>100</td>
+</tr>
+<tr>
+<td>RefType / RefId</td>
+<td>10000 / 100</td>
+</tr>
+<tr>
+<td>Ref2Type / Ref2Id</td>
+<td>10000 / 100</td>
+</tr>
+<tr>
+<td>OldValue</td>
+<td>JSON snapshot merchant <strong>ก่อน</strong>แก้</td>
+</tr>
+<tr>
+<td>NewValue</td>
+<td>JSON snapshot merchant <strong>หลัง</strong>แก้</td>
+</tr>
+<tr>
+<td>Message</td>
+<td>Merchant updated</td>
+</tr>
+<tr>
+<td>RequestSystem</td>
+<td>Admin</td>
+</tr>
+</tbody>
+</table>
+<p><strong>อ่าน log กลับ:</strong> หน้า List filter Module=Merchant, Merchant=100 → หรือกดปุ่ม <strong>Logs</strong> จาก Merchant Detail (<code>menuType=200</code>, <code>dataId=100</code>)</p>
+<hr />
+<h3 id="39-ตัวอย่าง-record--merchant-fee-update">3.9 ตัวอย่าง record — Merchant Fee Update</h3>
+<p>แก้ Merchant Fee id <strong>501</strong> ของ merchant <strong>100</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ค่า</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ModuleType</td>
+<td>2</td>
+</tr>
+<tr>
+<td>MenuType</td>
+<td>202</td>
+</tr>
+<tr>
+<td>LogType</td>
+<td>2 (Update)</td>
+</tr>
+<tr>
+<td>DataId</td>
+<td>501</td>
+</tr>
+<tr>
+<td>RefType / RefId</td>
+<td>10002 / 501</td>
+</tr>
+<tr>
+<td>Ref2Type / Ref2Id</td>
+<td>10000 / 100</td>
+</tr>
+<tr>
+<td>OldValue</td>
+<td>JSON snapshot เต็มก่อนแก้</td>
+</tr>
+<tr>
+<td>NewValue</td>
+<td>JSON snapshot เต็มหลังแก้</td>
+</tr>
+<tr>
+<td>Message</td>
+<td>Merchant fee updated</td>
+</tr>
+<tr>
+<td>RequestSystem</td>
+<td>Admin</td>
+</tr>
+<tr>
+<td>RequestBy</td>
+<td>user id</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-ui">4. UI</h2>
+<h3 id="41-หน้า-list--chillpay-operation-logs">4.1 หน้า List — Chillpay Operation Logs</h3>
+<p><strong>Route:</strong> <code>GET /OperationLog/ChillpayOperationLogs</code></p>
+<p><img alt="หน้า List — Chillpay Operation Logs" src="images/chillpay-operation-logs-list.png" /></p>
+<p><strong>คอลัมน์ตาราง:</strong> Log Id (ลิงก์ Detail), Log Type, Message, Menu Type, Data Id, NewValue (ย่อ), Module, CompanyName, Added By, Adddate</p>
+<p><strong>พฤติกรรม Menu dropdown</strong></p>
+<table>
+<thead>
+<tr>
+<th>Module ที่เลือก</th>
+<th>Menu dropdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Select All (0)</td>
+<td>ซ่อน</td>
+</tr>
+<tr>
+<td>Merchant (2)</td>
+<td>Merchant, Fee, Route, Service Fee, Keys, Email, User</td>
+</tr>
+<tr>
+<td>Settings (3)</td>
+<td>Payment Channel, Route, Credit Card, …</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="42-หน้า-detail--chillpay-operation-logs-detail">4.2 หน้า Detail — Chillpay Operation Logs Detail</h3>
+<p><strong>Route:</strong> <code>GET /OperationLog/ChillpayOperationLogsDetail/{id}</code></p>
+<p><img alt="หน้า Detail — Chillpay Operation Logs Detail" src="images/chillpay-operation-logs-detail.png" /></p>
+<p>แสดง read-only: ID, Module, Menu Type, Merchant (ถ้า module 2), Log Type, Message, <strong>OldValue / NewValue</strong> (JSON เต็ม), Added System/Date/By, Data Id, Ref*</p>
+<hr />
+<h3 id="43-ปุ่ม-logs-บนหน้า-detail-/-update">4.3 ปุ่ม Logs บนหน้า Detail / Update</h3>
+<p><strong>Partial:</strong> <code>_ChillpayOperationLogButtonPartial.cshtml</code><br />
+<strong>ปุ่ม:</strong> <code>btn-info</code> + ไอคอน <code>fa-history</code> + ข้อความ <strong>Logs</strong></p>
+<p><img alt="ปุ่ม Logs บนหน้า Detail / Update" src="images/chillpay-operation-logs-button.png" /></p>
+<p><strong>หน้าที่มีปุ่ม (ตัวอย่าง):</strong></p>
+<table>
+<thead>
+<tr>
+<th>หน้า</th>
+<th>ModuleType</th>
+<th>MenuType</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Merchant Detail</td>
+<td>2</td>
+<td>200</td>
+</tr>
+<tr>
+<td>Merchant Fee Detail</td>
+<td>2</td>
+<td>202</td>
+</tr>
+<tr>
+<td>Merchant Route Detail</td>
+<td>2</td>
+<td>203</td>
+</tr>
+<tr>
+<td>Merchant Service Fee Detail</td>
+<td>2</td>
+<td>204</td>
+</tr>
+<tr>
+<td>Merchant Email Detail</td>
+<td>2</td>
+<td>206</td>
+</tr>
+<tr>
+<td>Merchant User Detail</td>
+<td>2</td>
+<td>201</td>
+</tr>
+<tr>
+<td>Generate Merchant Keys</td>
+<td>2</td>
+<td>205</td>
+</tr>
+<tr>
+<td>Payment Channel Update</td>
+<td>3</td>
+<td>300</td>
+</tr>
+<tr>
+<td>Payment Route View/Update</td>
+<td>3</td>
+<td>301</td>
+</tr>
+<tr>
+<td>Credit Card Config Update</td>
+<td>3</td>
+<td>303</td>
+</tr>
+<tr>
+<td>Bank Payment Api Detail</td>
+<td>3</td>
+<td>308</td>
+</tr>
+<tr>
+<td>Exchange Rate Update</td>
+<td>3</td>
+<td>310</td>
+</tr>
+<tr>
+<td>SMS Route Detail</td>
+<td>3</td>
+<td>309</td>
+</tr>
+<tr>
+<td>ChillPay Maintenance</td>
+<td>3</td>
+<td>306</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Flow deep link (ใหม่ — ไม่ใช้ LogMode):</strong></p>
+<pre class="mermaid">sequenceDiagram
+    participant User
+    participant Detail as Merchant Fee Detail
+    participant LS as localStorage
+    participant List as Operation Logs List
+    participant API as operation-logs-api
+
+    User-&gt;&gt;Detail: กดปุ่ม Logs
+    Detail-&gt;&gt;LS: ChillpayLogSearchData&lt;br/&gt;{moduleType:2, menuType:202, dataId:501, merchantId:100}
+    Detail-&gt;&gt;List: window.open (แท็บใหม่)
+    List-&gt;&gt;LS: อ่าน + ลบ (ใช้ครั้งเดียว)
+    List-&gt;&gt;List: ตั้ง Module, Menu, Merchant, dataId
+    List-&gt;&gt;API: POST /search
+    API--&gt;&gt;User: แสดง log ของ fee 501</pre>
+
+<p><strong>หมายเหตุ:</strong> เปลี่ยน Module / Menu / กด Search บนหน้า List จะ <strong>เคลียร์ dataId</strong> จาก deep link</p>
+<hr />
+<h2 id="5-การค้นหา-search-design">5. การค้นหา (Search Design)</h2>
+<h3 id="51-flow">5.1 Flow</h3>
+<pre class="mermaid">flowchart LR
+    UI[ChillpayOperationLogs.cshtml]
+    WB[AjaxChillpayOperationLogsController]
+    API[POST /search]
+    VIEW[VW_ChillpayOperationLogs]
+
+    UI --&gt;|POST Search| WB
+    WB --&gt; API --&gt; VIEW</pre>
+
+<h3 id="52-สิ่งที่เลิกใช้-ux-เดิม">5.2 สิ่งที่เลิกใช้ (UX เดิม)</h3>
+<table>
+<thead>
+<tr>
+<th>รายการ</th>
+<th>แทนที่ด้วย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dropdown <strong>Mode</strong> (LogMode 2–9)</td>
+<td><strong>Menu dropdown</strong></td>
+</tr>
+<tr>
+<td>ช่อง <strong>Id</strong> บนหน้า List</td>
+<td><strong>dataId</strong> จากปุ่ม Logs หรือ optional ในอนาคต</td>
+</tr>
+<tr>
+<td><code>GetMenuTypeByLogMode</code> mapping</td>
+<td>ส่ง <code>menuType</code> ตรงจากปุ่ม Logs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-request-ตัวอย่าง--browse">5.3 Request ตัวอย่าง — Browse</h3>
+<pre><code class="language-json">{
+  &quot;moduleType&quot;: [2],
+  &quot;menuType&quot;: [202],
+  &quot;logType&quot;: [2],
+  &quot;refType&quot;: [10000],
+  &quot;refId&quot;: 100,
+  &quot;addedDateFromTick&quot;: 638000000000000000,
+  &quot;addedDateToTick&quot;: 638000864000000000,
+  &quot;searchText&quot;: &quot;fee&quot;,
+  &quot;start&quot;: 0,
+  &quot;pageSize&quot;: 25,
+  &quot;orderBy&quot;: &quot;AddedDate&quot;,
+  &quot;orderDir&quot;: &quot;desc&quot;,
+  &quot;requestSystem&quot;: &quot;Admin&quot;,
+  &quot;requestBy&quot;: 42
+}
+</code></pre>
+<h3 id="54-request-ตัวอย่าง--จากปุ่ม-logs-deep-link">5.4 Request ตัวอย่าง — จากปุ่ม Logs (deep link)</h3>
+<pre><code class="language-json">{
+  &quot;moduleType&quot;: [2],
+  &quot;menuType&quot;: [202],
+  &quot;dataId&quot;: 501,
+  &quot;refType&quot;: [10000],
+  &quot;refId&quot;: 100,
+  &quot;addedDateFromTick&quot;: &quot;...&quot;,
+  &quot;addedDateToTick&quot;: &quot;...&quot;
+}
+</code></pre>
+<h3 id="55-กฎ-merchant-filter">5.5 กฎ Merchant filter</h3>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>แสดง Merchant dropdown?</th>
+<th>API</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Select All</td>
+<td>แสดง</td>
+<td><code>refType=[10000], refId=merchantId</code></td>
+</tr>
+<tr>
+<td>Merchant (2)</td>
+<td>แสดง</td>
+<td>เหมือนกัน</td>
+</tr>
+<tr>
+<td>Settings (3)</td>
+<td>ซ่อน</td>
+<td>ไม่ส่ง ref</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-api-design">6. API Design</h2>
+<p>Base path: <code>/api/v1/chillpayoperationlogs</code></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Route</th>
+<th>ใช้เมื่อ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/search</code></td>
+<td><strong>หน้า List</strong> — filter Module / Menu / LogType / Merchant / วันที่ (ใช้หลัก)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/search/menu</code></td>
+<td>integration ที่ส่ง <code>moduleType</code> + <code>menuType</code> คู่เดียว</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/{id}/{system}/{by}</code></td>
+<td><strong>หน้า Detail</strong> — อ่าน log ตาม id</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/add</code></td>
+<td><strong>Writer</strong> — web-backend บันทึก log หลัง business success</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Search parameters หลัก</strong> (<code>POST /search</code>)</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>หมายเหตุ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>moduleType[]</code></td>
+<td>หมวดใหญ่</td>
+</tr>
+<tr>
+<td><code>menuType[]</code></td>
+<td>เมนูย่อย — <strong>ใหม่ใน UI</strong></td>
+</tr>
+<tr>
+<td><code>logType[]</code></td>
+<td>action (Create/Update/…)</td>
+</tr>
+<tr>
+<td><code>dataId</code></td>
+<td>entity id — จากปุ่ม Logs</td>
+</tr>
+<tr>
+<td><code>refType[]</code> + <code>refId</code></td>
+<td>Merchant filter</td>
+</tr>
+<tr>
+<td><code>addedDateFrom/To</code></td>
+<td>default วันนี้</td>
+</tr>
+<tr>
+<td><code>searchText</code></td>
+<td>keyword (LIKE)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Validation:</strong> <code>menuType / 100 == moduleType</code></p>
+<hr />
+<h2 id="7-database--schema-index-view-และ-deploy-script">7. Database — Schema, Index, View และ Deploy Script</h2>
+<h3 id="71-ภาพรวม">7.1 ภาพรวม</h3>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>ชื่อ</th>
+<th>ใช้เมื่อ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ตาราง</strong></td>
+<td><code>ChillpayOperationLogs</code></td>
+<td>API <strong>INSERT</strong> ตอน Writer เรียก <code>POST /add</code></td>
+</tr>
+<tr>
+<td><strong>View</strong></td>
+<td><code>VW_ChillpayOperationLogs</code></td>
+<td>API <strong>SELECT</strong> ตอน Search / FindById — join <code>Merchants</code> + คอลัมน์ text</td>
+</tr>
+<tr>
+<td><strong>Index</strong></td>
+<td>4 ตัว</td>
+<td>รองรับ Browse (Module+Menu), LogType, DataId, Merchant filter</td>
+</tr>
+</tbody>
+</table>
+<pre><code>Writer (web-backend)  →  INSERT ChillpayOperationLogs
+Admin List/Detail     →  SELECT VW_ChillpayOperationLogs
+</code></pre>
+<p><strong>Prerequisite:</strong> ตาราง <code>[dbo].[Merchants]</code> ต้องมีอยู่แล้วใน DB เดียวกัน — View join เพื่อแสดง MerchantCode, CompanyName บนหน้า List</p>
+<h3 id="72-ตาราง-chillpayoperationlogs--คอลัมน์">7.2 ตาราง <code>ChillpayOperationLogs</code> — คอลัมน์</h3>
+<table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ชนิด</th>
+<th>คำอธิบาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Id</strong></td>
+<td>bigint IDENTITY</td>
+<td>PK — log id (แสดงบนหน้า List/Detail)</td>
+</tr>
+<tr>
+<td><strong>ModuleType</strong></td>
+<td>int</td>
+<td>หมวดใหญ่ registry (§3.2) เช่น 2=Merchant, 3=Settings</td>
+</tr>
+<tr>
+<td><strong>MenuType</strong></td>
+<td>int</td>
+<td>เมนูย่อย (§3.3) เช่น 202=Merchant Fee</td>
+</tr>
+<tr>
+<td><strong>LogType</strong></td>
+<td>int</td>
+<td>action (§3.4) เช่น 1=Create, 2=Update, 5=Delete</td>
+</tr>
+<tr>
+<td><strong>Message</strong></td>
+<td>nvarchar(500)</td>
+<td>ข้อความสรุป เช่น "Merchant fee updated"</td>
+</tr>
+<tr>
+<td><strong>OldValue</strong></td>
+<td>nvarchar(max)</td>
+<td>JSON snapshot ก่อน action — null ตอน Create</td>
+</tr>
+<tr>
+<td><strong>NewValue</strong></td>
+<td>nvarchar(max)</td>
+<td>JSON snapshot หลัง action — null ตอน Delete</td>
+</tr>
+<tr>
+<td><strong>DataId</strong></td>
+<td>bigint</td>
+<td>id หลักของ entity ที่ถูก action (fee id, merchant id ฯลฯ)</td>
+</tr>
+<tr>
+<td><strong>RefType</strong></td>
+<td>int</td>
+<td>ประเภท entity หลัก (§3.5) เช่น 10002=Merchant Fee</td>
+</tr>
+<tr>
+<td><strong>RefId</strong></td>
+<td>bigint</td>
+<td>id ของ RefType</td>
+</tr>
+<tr>
+<td><strong>Ref2Type</strong></td>
+<td>int</td>
+<td>entity ที่เกี่ยวข้อง (มัก 10000=Merchant)</td>
+</tr>
+<tr>
+<td><strong>Ref2Id</strong></td>
+<td>bigint</td>
+<td>id ของ Ref2 (มัก merchant id)</td>
+</tr>
+<tr>
+<td><strong>RequestSystem</strong></td>
+<td>nvarchar(20)</td>
+<td>ระบบที่เขียน log: Admin, Backend, API, Job, MerchantApi</td>
+</tr>
+<tr>
+<td><strong>RequestBy</strong></td>
+<td>bigint</td>
+<td>user id ผู้กระทำ</td>
+</tr>
+<tr>
+<td><strong>RequestByName</strong></td>
+<td>nvarchar(200)</td>
+<td>ชื่อแสดงผู้กระทำ (optional)</td>
+</tr>
+<tr>
+<td><strong>AddedDate</strong></td>
+<td>datetime</td>
+<td>วันเวลาบันทึก (default GETDATE())</td>
+</tr>
+</tbody>
+</table>
+<h3 id="73-index-และ-view">7.3 Index และ View</h3>
+<p><strong>Index</strong></p>
+<table>
+<thead>
+<tr>
+<th>Index</th>
+<th>คอลัมน์</th>
+<th>รองรับ query</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PK_ChillpayOperationLogs</code></td>
+<td>Id</td>
+<td>Detail by id</td>
+</tr>
+<tr>
+<td><code>IX_ChillpayOperationLogs_Module_Menu</code></td>
+<td>ModuleType, MenuType, AddedDate DESC</td>
+<td><strong>Browse หลัก</strong> — filter Module + Menu + เรียงวันที่</td>
+</tr>
+<tr>
+<td><code>IX_ChillpayOperationLogs_LogType</code></td>
+<td>LogType, AddedDate DESC</td>
+<td>filter Action (Create/Update/…)</td>
+</tr>
+<tr>
+<td><code>IX_ChillpayOperationLogs_DataId</code></td>
+<td>DataId (filtered)</td>
+<td>ปุ่ม Logs / deep link — entity เดียว</td>
+</tr>
+<tr>
+<td><code>IX_ChillpayOperationLogs_RefType_RefId</code></td>
+<td>RefType, RefId (filtered)</td>
+<td>Merchant filter (<code>RefType=10000</code>)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Query pattern ตัวอย่าง</strong></p>
+<pre><code class="language-sql">WHERE ModuleType IN (2)
+  AND MenuType IN (202)
+  AND DataId = 501
+  AND (Ref2Type = 10000 AND Ref2Id = 100)
+</code></pre>
+<p><strong>View <code>VW_ChillpayOperationLogs</code></strong></p>
+<table>
+<thead>
+<tr>
+<th>ส่วน</th>
+<th>คำอธิบาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>คอลัมน์จากตาราง</td>
+<td>ส่งตรงทุก column ของ <code>ChillpayOperationLogs</code></td>
+</tr>
+<tr>
+<td><code>AddedDateText</code></td>
+<td>วันที่ format <code>yyyy-MM-dd HH:mm:ss</code> สำหรับ UI</td>
+</tr>
+<tr>
+<td><code>ModuleTypeText</code></td>
+<td>ชื่อ module จาก CASE (User, Merchant, Settings, …)</td>
+</tr>
+<tr>
+<td><code>MenuTypeText</code></td>
+<td>ชื่อเมนูจาก CASE (ตรง registry Module 1–14)</td>
+</tr>
+<tr>
+<td><code>LogTypeText</code></td>
+<td>ชื่อ action (Create, Update, Activate, …)</td>
+</tr>
+<tr>
+<td><code>MerchantId</code></td>
+<td>resolve จาก Ref/Ref2/DataId เมื่อ ModuleType=2</td>
+</tr>
+<tr>
+<td><code>MerchantCode</code>, <code>CompanyName</code>, …</td>
+<td>join จาก <code>[dbo].[Merchants]</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Index อนาคต (Phase 3 ถ้าช้า):</strong> <code>(Ref2Type, Ref2Id)</code> filtered, full-text บน Message</p>
+<h3 id="74-script">7.4 Script</h3>
+<pre><code class="language-sql">/*
+  Chillpay Operation Logs — Deploy Script
+  เอกสาร: docs/Chillpay-Operation-Logs.md §7.4
+  รันบน SQL Server — ต้องมีตาราง [dbo].[Merchants] อยู่แล้ว
+*/
+SET ANSI_NULLS ON;
+GO
+SET QUOTED_IDENTIFIER ON;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'ChillpayOperationLogs')
+BEGIN
+    CREATE TABLE [dbo].[ChillpayOperationLogs](
+        [Id]              [bigint] IDENTITY(1,1) NOT NULL,
+        [ModuleType]      [int] NOT NULL,
+        [MenuType]        [int] NOT NULL,
+        [LogType]         [int] NOT NULL,
+        [Message]         [nvarchar](500) NULL,
+        [OldValue]        [nvarchar](max) NULL,
+        [NewValue]        [nvarchar](max) NULL,
+        [DataId]          [bigint] NULL,
+        [RefType]         [int] NULL,
+        [RefId]           [bigint] NULL,
+        [Ref2Type]        [int] NULL,
+        [Ref2Id]          [bigint] NULL,
+        [RequestSystem]   [nvarchar](20) NOT NULL,
+        [RequestBy]       [bigint] NOT NULL,
+        [RequestByName]   [nvarchar](200) NULL,
+        [AddedDate]       [datetime] NOT NULL CONSTRAINT [DF_ChillpayOperationLogs_AddedDate] DEFAULT (GETDATE()),
+        CONSTRAINT [PK_ChillpayOperationLogs] PRIMARY KEY CLUSTERED ([Id] ASC)
+    ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY];
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChillpayOperationLogs_Module_Menu' AND object_id = OBJECT_ID('dbo.ChillpayOperationLogs'))
+BEGIN
+    CREATE NONCLUSTERED INDEX [IX_ChillpayOperationLogs_Module_Menu]
+        ON [dbo].[ChillpayOperationLogs]([ModuleType] ASC, [MenuType] ASC, [AddedDate] DESC);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChillpayOperationLogs_LogType' AND object_id = OBJECT_ID('dbo.ChillpayOperationLogs'))
+BEGIN
+    CREATE NONCLUSTERED INDEX [IX_ChillpayOperationLogs_LogType]
+        ON [dbo].[ChillpayOperationLogs]([LogType] ASC, [AddedDate] DESC);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChillpayOperationLogs_DataId' AND object_id = OBJECT_ID('dbo.ChillpayOperationLogs'))
+BEGIN
+    CREATE NONCLUSTERED INDEX [IX_ChillpayOperationLogs_DataId]
+        ON [dbo].[ChillpayOperationLogs]([DataId] ASC)
+        WHERE [DataId] IS NOT NULL;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChillpayOperationLogs_RefType_RefId' AND object_id = OBJECT_ID('dbo.ChillpayOperationLogs'))
+BEGIN
+    CREATE NONCLUSTERED INDEX [IX_ChillpayOperationLogs_RefType_RefId]
+        ON [dbo].[ChillpayOperationLogs]([RefType] ASC, [RefId] ASC)
+        WHERE [RefType] IS NOT NULL AND [RefId] IS NOT NULL;
+END
+GO
+
+CREATE OR ALTER VIEW [dbo].[VW_ChillpayOperationLogs]
+AS
+SELECT
+    b.[Id],
+    b.[ModuleType],
+    b.[MenuType],
+    b.[LogType],
+    b.[Message],
+    b.[OldValue],
+    b.[NewValue],
+    b.[DataId],
+    b.[RefType],
+    b.[RefId],
+    b.[Ref2Type],
+    b.[Ref2Id],
+    b.[RequestSystem],
+    b.[RequestBy],
+    b.[RequestByName],
+    b.[AddedDate],
+    CONVERT(varchar(19), b.[AddedDate], 120) AS [AddedDateText],
+    CASE b.[ModuleType]
+        WHEN 1 THEN N'User'
+        WHEN 2 THEN N'Merchant'
+        WHEN 3 THEN N'Settings'
+        WHEN 4 THEN N'Transactions'
+        WHEN 5 THEN N'Settlements'
+        WHEN 6 THEN N'Manage Transaction'
+        WHEN 7 THEN N'PayLink'
+        WHEN 8 THEN N'Fraud'
+        WHEN 9 THEN N'Etax'
+        WHEN 10 THEN N'Odd Service'
+        WHEN 11 THEN N'Chill App Partner'
+        WHEN 12 THEN N'Wallet'
+        WHEN 13 THEN N'Recurring'
+        WHEN 14 THEN N'Commission'
+        ELSE CAST(b.[ModuleType] AS nvarchar(20))
+    END AS [ModuleTypeText],
+    CASE b.[MenuType]
+        WHEN 101 THEN N'Account'
+        WHEN 102 THEN N'Role'
+        WHEN 200 THEN N'Merchant'
+        WHEN 201 THEN N'Merchant User'
+        WHEN 202 THEN N'Merchant Fee'
+        WHEN 203 THEN N'Merchant Route'
+        WHEN 204 THEN N'Merchant Service Fee'
+        WHEN 205 THEN N'Generate Merchant Keys'
+        WHEN 206 THEN N'Merchant Emails'
+        WHEN 300 THEN N'Payment Channel'
+        WHEN 301 THEN N'Payment Route'
+        WHEN 302 THEN N'Payment Route Inquiry'
+        WHEN 303 THEN N'Credit Card Config'
+        WHEN 305 THEN N'Switch Payment Route Channel'
+        WHEN 306 THEN N'ChillPay Maintenance'
+        WHEN 307 THEN N'Bank Maintenance'
+        WHEN 308 THEN N'Bank Payment Api Setting'
+        WHEN 309 THEN N'SMS Route'
+        WHEN 310 THEN N'Exchange Rate'
+        WHEN 311 THEN N'Exchange Rate Log'
+        WHEN 401 THEN N'Payment'
+        WHEN 402 THEN N'Void'
+        WHEN 403 THEN N'Refund (Old)'
+        WHEN 404 THEN N'Refund Transaction'
+        WHEN 405 THEN N'Approve Refund'
+        WHEN 406 THEN N'Settlement (Old)'
+        WHEN 407 THEN N'Payment Summary (Old)'
+        WHEN 408 THEN N'Import MCC'
+        WHEN 409 THEN N'Inquiry Transaction'
+        WHEN 410 THEN N'Warning Transaction'
+        WHEN 501 THEN N'Settlement Dashboard'
+        WHEN 502 THEN N'Settlement'
+        WHEN 503 THEN N'Upload File'
+        WHEN 504 THEN N'Merchant Transfer'
+        WHEN 505 THEN N'Merchant Setting'
+        WHEN 506 THEN N'Settlement Status'
+        WHEN 507 THEN N'Download Payment Summary'
+        WHEN 601 THEN N'Update Transaction Status'
+        WHEN 602 THEN N'Update Settlement Status'
+        WHEN 603 THEN N'Update Transfer Date'
+        WHEN 701 THEN N'PayLink Link'
+        WHEN 702 THEN N'PayLink Transaction'
+        WHEN 801 THEN N'CreditCard Transactions'
+        WHEN 802 THEN N'Observe Configuration'
+        WHEN 803 THEN N'Observe Transactions'
+        WHEN 804 THEN N'FraudAlert Configuration'
+        WHEN 805 THEN N'FraudAlert Transactions'
+        WHEN 901 THEN N'Etax Merchant Profile'
+        WHEN 902 THEN N'Etax EndUser Profile'
+        WHEN 903 THEN N'Sale Name Manage'
+        WHEN 904 THEN N'Upload Summary Settlement'
+        WHEN 905 THEN N'Update Summary Settlement'
+        WHEN 906 THEN N'Settlement PayOut'
+        WHEN 907 THEN N'Invoice Merchant'
+        WHEN 908 THEN N'Invoice EndUser'
+        WHEN 909 THEN N'Invoice Transaction'
+        WHEN 910 THEN N'PND'
+        WHEN 911 THEN N'Invoice ABB Transaction'
+        WHEN 912 THEN N'Outstanding Invoice'
+        WHEN 913 THEN N'Cancel Invoice'
+        WHEN 914 THEN N'Credit Note'
+        WHEN 915 THEN N'Debit Note'
+        WHEN 916 THEN N'CreditNote Invoice ABB'
+        WHEN 1001 THEN N'ODD Route'
+        WHEN 1002 THEN N'ODD Merchant Route'
+        WHEN 1003 THEN N'ODD Register'
+        WHEN 1004 THEN N'ODD BAY Configs'
+        WHEN 1005 THEN N'ODD BAY Customer'
+        WHEN 1006 THEN N'ODD SCB Configs'
+        WHEN 1007 THEN N'ODD SCB Customer'
+        WHEN 1008 THEN N'ODD KTB Configs'
+        WHEN 1101 THEN N'Chill App Members'
+        WHEN 1102 THEN N'Chill App Transactions'
+        WHEN 1103 THEN N'Chill App Partners'
+        WHEN 1104 THEN N'Chill App PayTransactions'
+        WHEN 1105 THEN N'Chill App Settlement PayTransactions'
+        WHEN 1201 THEN N'Wallet Merchant'
+        WHEN 1202 THEN N'Shop Send Money Fee'
+        WHEN 1203 THEN N'Wallet Transaction'
+        WHEN 1204 THEN N'Wallet Settlement Transaction'
+        WHEN 1205 THEN N'Wallet Settlement Report'
+        WHEN 1206 THEN N'Settle Version'
+        WHEN 1301 THEN N'Recurring Merchant'
+        WHEN 1302 THEN N'Recurring Schedule'
+        WHEN 1303 THEN N'Recurring Transactions'
+        WHEN 1401 THEN N'Commission Reseller'
+        WHEN 1402 THEN N'Commission Reseller Payout'
+        WHEN 1403 THEN N'Commission Reports'
+        WHEN 1404 THEN N'Commission Download Reports'
+        ELSE CAST(b.[MenuType] AS nvarchar(20))
+    END AS [MenuTypeText],
+    CASE b.[LogType]
+        WHEN 1 THEN N'Create'
+        WHEN 2 THEN N'Update'
+        WHEN 3 THEN N'Activate'
+        WHEN 4 THEN N'Inactivate'
+        WHEN 5 THEN N'Delete'
+        WHEN 6 THEN N'Restore'
+        WHEN 7 THEN N'Generate'
+        WHEN 8 THEN N'UpdateStatus'
+        WHEN 9 THEN N'Approve'
+        WHEN 10 THEN N'Reject'
+        ELSE CAST(b.[LogType] AS nvarchar(20))
+    END AS [LogTypeText],
+    resolved.[MerchantId],
+    merch.[MerchantCode],
+    merch.[ShortName],
+    merch.[CompanyName],
+    merch.[ShortNameEN]
+FROM [dbo].[ChillpayOperationLogs] b
+CROSS APPLY (
+    SELECT
+        CASE
+            WHEN b.[ModuleType] = 2 THEN
+                COALESCE(
+                    CASE WHEN b.[RefType] = 10000 THEN b.[RefId] END,
+                    CASE WHEN b.[Ref2Type] = 10000 THEN b.[Ref2Id] END,
+                    CASE WHEN b.[MenuType] = 200 THEN b.[DataId] END
+                )
+            ELSE NULL
+        END AS [MerchantId]
+) resolved
+LEFT JOIN [dbo].[Merchants] merch WITH (NOLOCK)
+    ON merch.[Id] = resolved.[MerchantId];
+GO
+</code></pre>
+<hr />
+<h2 id="8-ไฟล์ที่เกี่ยวข้อง">8. ไฟล์ที่เกี่ยวข้อง</h2>
+<table>
+<thead>
+<tr>
+<th>Repo</th>
+<th>ไฟล์</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>operation-logs-api</td>
+<td><code>OperationLogConstants.cs</code>, <code>ChillpayOperationLogRepository.cs</code>, <strong>SQL script §7.4</strong></td>
+</tr>
+<tr>
+<td>web-backend</td>
+<td><code>ChillpayOperationLogs.cshtml</code>, <code>ChillpayOperationLogsDetail.cshtml</code></td>
+</tr>
+<tr>
+<td>web-backend</td>
+<td><code>chillpay-operation-log-constants.js</code>, <code>AjaxChillpayOperationLogsController.cs</code></td>
+</tr>
+<tr>
+<td>web-backend</td>
+<td><code>ChillpayOperationLogWriter.cs</code>, <code>BaseController.cs</code></td>
+</tr>
+<tr>
+<td>web-backend</td>
+<td><code>_ChillpayOperationLogButtonPartial.cshtml</code>, <code>ChillpayOperationLogButtonModel.cs</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-deploy-และ-smoke-test">9. Deploy และ Smoke test</h2>
+<h3 id="91-ลำดับ-deploy">9.1 ลำดับ deploy</h3>
+<table>
+<thead>
+<tr>
+<th>ลำดับ</th>
+<th>งาน</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>รัน SQL §7.4 (<code>ChillpayOperationLogs</code> + <code>VW_ChillpayOperationLogs</code>) ทุก env</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Deploy <code>operation-logs-api</code> ทุก env</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Deploy <code>web-backend</code> + ตรวจ <code>OperationLogsApiUrl</code> ใน AppSettings</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Smoke test ตาม §9.2</td>
+</tr>
+</tbody>
+</table>
+<h3 id="92-smoke-test">9.2 Smoke test</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>ขั้นตอน</th>
+<th>ผลที่คาดหวัง</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Save ข้อมูลบนหน้า Merchant/Settings ที่มี writer</td>
+<td>มี row ใหม่ใน <code>ChillpayOperationLogs</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>เปิดหน้า List — filter Module + Menu + วันที่</td>
+<td>เห็น log ที่เพิ่ง save</td>
+</tr>
+<tr>
+<td>3</td>
+<td>กด Log Id → Detail</td>
+<td>แสดง OldValue/NewValue, MenuTypeText ถูกต้อง</td>
+</tr>
+<tr>
+<td>4</td>
+<td>จากหน้า Detail กดปุ่ม <strong>Logs</strong></td>
+<td>เปิด List แท็บใหม่ filter ตาม <code>menuType</code> + <code>dataId</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>เปลี่ยน Module/Menu แล้ว Search ใหม่</td>
+<td>deep link <code>dataId</code> ถูกเคลียร์</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-registry-sync-manual">10. Registry Sync (Manual)</h2>
+<p>Registry กระจาย <strong>4 จุด</strong> — sync มือทุกครั้งที่เพิ่มหรือแก้ <code>ModuleType</code> / <code>MenuType</code> / <code>LogType</code> / <code>RefType</code></p>
+<h3 id="101-แหล่งอ้างอิงหลัก--ไฟล์ต้นฉบับของ-registry">10.1 แหล่งอ้างอิงหลัก — ไฟล์ต้นฉบับของ Registry</h3>
+<p><strong>ต้นฉบับ:</strong> <code>operation-logs-api</code> → <code>OperationLogConstants.cs</code></p>
+<p>เวลาเพิ่มหรือแก้ <code>ModuleType</code> / <code>MenuType</code> / <code>LogType</code> / <code>RefType</code> <strong>ให้แก้ที่ไฟล์นี้ก่อน</strong> แล้วค่อยไปอัปจุดอื่นให้ตรงกัน — API ใช้ enum นี้ validate ตอน <code>POST /add</code> และ <code>POST /search</code> ค่าที่ไม่อยู่ใน enum จะถูก reject</p>
+<table>
+<thead>
+<tr>
+<th>Helper</th>
+<th>ใช้เมื่อ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IsValidMenuType()</code></td>
+<td>ตรวจว่า menuType มีใน registry</td>
+</tr>
+<tr>
+<td><code>IsMenuTypeInModule()</code></td>
+<td>ตรวจว่า menuType ตรง moduleType</td>
+</tr>
+<tr>
+<td><code>IsValidAddRequest()</code></td>
+<td>validate ครบตอน add log</td>
+</tr>
+</tbody>
+</table>
+<p><code>ChillpayOperationLogRegistryConstants.cs</code> ใน web-backend เป็น <strong>สำเนา</strong> สำหรับ writer และ UI helper — ต้องให้ตัวเลขตรงกับต้นฉบับใน API เสมอ</p>
+<h3 id="102-จุดที่ต้อง-sync">10.2 จุดที่ต้อง sync</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Repo / ที่</th>
+<th>ไฟล์</th>
+<th>ทำอะไร</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>operation-logs-api</td>
+<td><code>OperationLogConstants.cs</code></td>
+<td><strong>ต้นฉบับ</strong> — enum Module / Menu / LogType / RefType + validate</td>
+</tr>
+<tr>
+<td>2</td>
+<td>web-backend</td>
+<td><code>ChillpayOperationLogRegistryConstants.cs</code></td>
+<td>สำเนา + <code>GetMenuTypeText</code> + <code>GetAllowedActions</code> + <code>GetRefTypeText</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>web-backend</td>
+<td><code>js/constants/chillpay-operation-log-constants.js</code></td>
+<td>dropdown Module / Menu / Log Type บนหน้า List + deep link</td>
+</tr>
+<tr>
+<td>4</td>
+<td>SQL Server</td>
+<td><code>VW_ChillpayOperationLogs</code> (§7.4)</td>
+<td><code>CASE</code> ใน <code>ModuleTypeText</code>, <code>MenuTypeText</code>, <code>LogTypeText</code>, <code>RefTypeText</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="103-ขั้นตอนเมื่อเพิ่ม-menutype-ใหม่">10.3 ขั้นตอนเมื่อเพิ่ม MenuType ใหม่</h3>
+<p><strong>ตัวอย่าง:</strong> เพิ่มเมนูใหม่ใน Module 3</p>
+<ol>
+<li><strong>ต้นฉบับ (API)</strong> — เพิ่มใน <code>ChillpayOperationLogMenuType</code> (+ <code>ChillpayOperationLogRefType</code> ถ้ามี entity ใหม่) ใน <code>OperationLogConstants.cs</code></li>
+<li><strong>web-backend C#</strong> — เพิ่ม <code>Menu*</code> / <code>Ref*</code> ใน <code>ChillpayOperationLogRegistryConstants.cs</code> พร้อม <code>GetMenuTypeText</code>, <code>GetRefTypeText</code>, <code>GetAllowedActions</code></li>
+<li><strong>web-backend JS</strong> — เพิ่มใน <code>ChillpayOperationLogMenuFilterByModule</code> และ allowed actions ใน <code>chillpay-operation-log-constants.js</code></li>
+<li><strong>SQL View</strong> — เพิ่ม <code>WHEN … THEN N'…'</code> ใน §7.4 แล้วรันบน DB ทุก env</li>
+<li><strong>Writer + ปุ่ม Logs</strong> (ถ้า implement) — <code>ChillpayOperationLogWriter</code> / controller + <code>_ChillpayOperationLogButtonPartial</code></li>
+<li><strong>Deploy</strong> — <code>operation-logs-api</code> และ <code>web-backend</code> ใน PR/deploy ชุดเดียวกัน</li>
+<li><strong>Smoke test</strong> — Save → row ใน DB → List เห็นชื่อเมนู → Detail แสดง <code>MenuTypeText</code> ถูก</li>
+</ol>
+<h3 id="104-checklist-สำหรับ-pr">10.4 Checklist สำหรับ PR</h3>
+<pre><code>[ ] OperationLogConstants.cs — MenuType (+ RefType ถ้ามี)
+[ ] ChillpayOperationLogRegistryConstants.cs — const + Get*Text + GetAllowedActions
+[ ] chillpay-operation-log-constants.js — MenuFilter + allowed actions
+[ ] VW_ChillpayOperationLogs — CASE ใน §7.4 (+ รัน SQL ทุก env)
+[ ] Writer / ปุ่ม Logs (ถ้า implement แล้ว)
+[ ] Deploy API + web-backend พร้อมกัน
+</code></pre>
+<h3 id="105-ถ้า-sync-ไม่ครบ--อาการและวิธีแก้">10.5 ถ้า sync ไม่ครบ — อาการและวิธีแก้</h3>
+<table>
+<thead>
+<tr>
+<th>ขาดที่</th>
+<th>อาการ</th>
+<th>แก้</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API enum</td>
+<td>Writer เรียก <code>/add</code> fail — log ไม่เข้า DB</td>
+<td>deploy API ที่มี enum ใหม่ หรือ rollback web-backend</td>
+</tr>
+<tr>
+<td>web-backend C#</td>
+<td>compile ผ่านได้ แต่ส่งค่าผิด / writer ใช้ constant เก่า</td>
+<td>อัป constants ให้ตรง API</td>
+</tr>
+<tr>
+<td>JS</td>
+<td>dropdown Menu ไม่มีเมนูใหม่ / Log Type filter ผิด</td>
+<td>อัป <code>.js</code> + clear browser cache</td>
+</tr>
+<tr>
+<td>SQL View</td>
+<td>log ใน DB ได้ แต่ List/Detail แสดง <strong>เลขดิบ</strong> แทนชื่อ</td>
+<td>รัน SQL อัปเดต View §7.4</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>เอกสารฉบับนี้สรุปงานทั้งหมดและอธิบาย Registry — อัปเดต 2026-06-28</em></p>
+</body>
+</html>
