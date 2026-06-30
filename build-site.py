@@ -38,19 +38,10 @@ PAGES = [
         "id": "ui",
         "file": "ui.html",
         "nav": "UI",
-        "subtitle": "List · Detail · ปุ่ม Logs",
+        "subtitle": "List · Detail",
         "icon": "▦",
         "sections": [4],
-        "mermaid": True,
-    },
-    {
-        "id": "search",
-        "file": "search.html",
-        "nav": "Search",
-        "subtitle": "การค้นหา & Filter",
-        "icon": "⌕",
-        "sections": [5],
-        "mermaid": True,
+        "mermaid": False,
     },
     {
         "id": "api",
@@ -65,7 +56,7 @@ PAGES = [
         "id": "database",
         "file": "database.html",
         "nav": "Database",
-        "subtitle": "Schema · Index · SQL Script",
+        "subtitle": "Schema · Writer · SQL Script",
         "icon": "⬡",
         "sections": [7],
         "mermaid": False,
@@ -73,19 +64,10 @@ PAGES = [
     {
         "id": "files",
         "file": "files.html",
-        "nav": "ไฟล์ที่เกี่ยวข้อง",
-        "subtitle": "Repos & Source files",
+        "nav": "โปรเจคที่เกี่ยวข้อง",
+        "subtitle": "operation-logs-api · web-backend",
         "icon": "◎",
         "sections": [8],
-        "mermaid": False,
-    },
-    {
-        "id": "deploy",
-        "file": "deploy.html",
-        "nav": "Deploy",
-        "subtitle": "ลำดับ deploy & Smoke test",
-        "icon": "▶",
-        "sections": [9],
         "mermaid": False,
     },
     {
@@ -94,7 +76,7 @@ PAGES = [
         "nav": "Registry Sync",
         "subtitle": "Manual sync checklist",
         "icon": "↻",
-        "sections": [10],
+        "sections": [9],
         "mermaid": False,
     },
 ]
@@ -141,6 +123,16 @@ def md_to_html(md_chunk: str) -> str:
 
 
 def parse_sections(md_text: str) -> tuple[str, dict[int, str]]:
+    section_by_title = {
+        "Summary": 1,
+        "Checklist": 2,
+        "อธิบาย Registry — ModuleType, MenuType, LogType": 3,
+        "UI": 4,
+        "API Design": 6,
+        "Database — Schema, Index, View และ Deploy Script": 7,
+        "โปรเจคที่เกี่ยวข้อง": 8,
+        "Registry Sync (Manual)": 9,
+    }
     md_text = re.sub(r"## สารบัญ[\s\S]*?---\n", "", md_text, count=1)
     md_text = re.sub(r"\n---\n", "\n", md_text)
 
@@ -160,9 +152,10 @@ def parse_sections(md_text: str) -> tuple[str, dict[int, str]]:
         title_m = re.match(r"## (.+)", part)
         if not title_m:
             continue
-        num_m = re.match(r"(\d+)", title_m.group(1))
-        if num_m:
-            sections[int(num_m.group(1))] = part
+        title = title_m.group(1).strip()
+        section_id = section_by_title.get(title)
+        if section_id is not None:
+            sections[section_id] = part
 
     if footer:
         sections[99] = footer
@@ -246,7 +239,7 @@ def render_page(page: dict, header: str, sections: dict[int, str]) -> str:
       {nav}
     </nav>
     <div class="sidebar-footer">
-      <span>อัปเดต 2026-06-28</span>
+      <span>อัปเดต 2026-06-29</span>
       <span>Phase 1</span>
     </div>
   </aside>
@@ -402,7 +395,9 @@ body {
 .main {
   margin-left: var(--sidebar-w);
   min-height: 100vh;
-  padding: 2.5rem 3rem 4rem;
+  width: calc(100% - var(--sidebar-w));
+  box-sizing: border-box;
+  padding: 2rem 2.5rem 3rem;
 }
 
 .page-header {
@@ -435,16 +430,18 @@ body {
 }
 
 .content {
-  max-width: 860px;
+  width: 100%;
+  max-width: none;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 2rem 2.25rem;
+  padding: 2rem 2.5rem;
   box-shadow: var(--shadow);
 }
 
 .page-footer {
-  max-width: 860px;
+  width: 100%;
+  max-width: none;
   margin-top: 1.5rem;
 }
 
@@ -568,9 +565,10 @@ body {
 /* Index nav cards */
 .nav-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 12px;
-  max-width: 860px;
+  width: 100%;
+  max-width: none;
   margin-bottom: 1.5rem;
 }
 
@@ -631,7 +629,7 @@ body {
   .sidebar.open { transform: translateX(0); }
   .sidebar-overlay.open { display: block; }
   .sidebar-toggle { display: grid; place-items: center; }
-  .main { margin-left: 0; padding: 5rem 1.25rem 3rem; }
+  .main { margin-left: 0; width: 100%; padding: 5rem 1.25rem 3rem; }
   .content { padding: 1.25rem 1rem; }
   .page-title { font-size: 1.75rem; }
 }

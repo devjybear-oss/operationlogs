@@ -1,7 +1,7 @@
 /* Chillpay Operation Logs — Full deploy (Table + Index + View) */
 /*
   Chillpay Operation Logs — Table + MerchantId migrate
-  เอกสาร: docs/Chillpay-Operation-Logs.md §7.4.1
+  เอกสาร: docs/Chillpay-Operation-Logs.md Table script
 */
 SET ANSI_NULLS ON;
 GO
@@ -42,8 +42,8 @@ GO
 -- backfill MerchantId สำหรับ row เก่า (Module Merchant)
 UPDATE [dbo].[ChillpayOperationLogs]
 SET [MerchantId] = COALESCE(
-        CASE WHEN [RefType] = 10000 THEN [RefId] END,
-        CASE WHEN [Ref2Type] = 10000 THEN [Ref2Id] END,
+        CASE WHEN [RefType] = 20000 THEN [RefId] END,
+        CASE WHEN [Ref2Type] = 20000 THEN [Ref2Id] END,
         CASE WHEN [MenuType] = 200 THEN [DataId] END
     )
 WHERE [ModuleType] = 2
@@ -52,7 +52,7 @@ GO
 
 /*
   Chillpay Operation Logs — Indexes
-  เอกสาร: docs/Chillpay-Operation-Logs.md §7.4.2
+  เอกสาร: docs/Chillpay-Operation-Logs.md Index script
   ต้องรัน Table script ก่อน
 */
 SET ANSI_NULLS ON;
@@ -100,7 +100,7 @@ GO
 
 /*
   Chillpay Operation Logs — View VW_ChillpayOperationLogs
-  เอกสาร: docs/Chillpay-Operation-Logs.md §7.4.3
+  เอกสาร: docs/Chillpay-Operation-Logs.md View script
   ต้องมีตาราง ChillpayOperationLogs + Merchants ก่อนรัน
 */
 SET ANSI_NULLS ON;
@@ -227,98 +227,79 @@ SELECT b.*
         WHEN 3 THEN N'Activate'
         WHEN 4 THEN N'Inactivate'
         WHEN 5 THEN N'Delete'
-        WHEN 6 THEN N'Restore'
         WHEN 7 THEN N'Generate'
         WHEN 8 THEN N'UpdateStatus'
         WHEN 9 THEN N'Approve'
         WHEN 10 THEN N'Reject'
-        WHEN 11 THEN N'Enable'
-        WHEN 12 THEN N'Disable'
-        WHEN 13 THEN N'Cancel'
-        WHEN 14 THEN N'Refund'
-        WHEN 15 THEN N'Void'
-        WHEN 16 THEN N'Reprocess'
-        WHEN 17 THEN N'Retry'
-        WHEN 19 THEN N'Import'
-        WHEN 20 THEN N'Upload'
-        WHEN 22 THEN N'Login'
-        WHEN 23 THEN N'Logout'
-        WHEN 24 THEN N'ResetPassword'
-        WHEN 25 THEN N'Assign'
-        WHEN 26 THEN N'Unassign'
-        WHEN 27 THEN N'Hold'
-        WHEN 28 THEN N'Release'
-        WHEN 29 THEN N'Offset'
-        WHEN 30 THEN N'Transfer'
         ELSE CAST(b.[LogType] AS nvarchar(20))
       END) AS [LogTypeText]
     , (CASE WHEN b.[RefType] IS NULL THEN N''
         ELSE CASE b.[RefType]
             WHEN 0 THEN N'Undefined'
-            WHEN 10000 THEN N'Merchant'
-            WHEN 10001 THEN N'Merchant User'
-            WHEN 10002 THEN N'Merchant Fee'
-            WHEN 10003 THEN N'Merchant Route'
-            WHEN 10004 THEN N'Merchant Service Fee'
-            WHEN 10005 THEN N'Merchant Email'
-            WHEN 20000 THEN N'Payment Channel'
-            WHEN 20001 THEN N'Payment Route'
-            WHEN 20002 THEN N'Payment Route Inquiry'
-            WHEN 20003 THEN N'Credit Card Config'
-            WHEN 20004 THEN N'Bank Payment Api Setting'
-            WHEN 20005 THEN N'SMS Route'
-            WHEN 20006 THEN N'Exchange Rate'
-            WHEN 20007 THEN N'ChillPay Maintenance'
-            WHEN 20008 THEN N'Bank Maintenance'
-            WHEN 20009 THEN N'Exchange Rate Log'
-            WHEN 30001 THEN N'Account'
-            WHEN 30002 THEN N'Role'
-            WHEN 40001 THEN N'Payment Transaction'
-            WHEN 50001 THEN N'Settlement Record'
-            WHEN 60001 THEN N'Managed Transaction'
-            WHEN 70001 THEN N'PayLink Record'
-            WHEN 80001 THEN N'Fraud Record'
-            WHEN 90001 THEN N'Etax Record'
-            WHEN 100001 THEN N'Odd Record'
-            WHEN 110001 THEN N'Chill App Record'
-            WHEN 120001 THEN N'Wallet Record'
-            WHEN 130001 THEN N'Recurring Record'
-            WHEN 140001 THEN N'Commission Record'
+            WHEN 20000 THEN N'Merchant'
+            WHEN 20001 THEN N'Merchant User'
+            WHEN 20002 THEN N'Merchant Fee'
+            WHEN 20003 THEN N'Merchant Route'
+            WHEN 20004 THEN N'Merchant Service Fee'
+            WHEN 20005 THEN N'Merchant Email'
+            WHEN 30000 THEN N'Payment Channel'
+            WHEN 30001 THEN N'Payment Route'
+            WHEN 30002 THEN N'Payment Route Inquiry'
+            WHEN 30003 THEN N'Credit Card Config'
+            WHEN 30004 THEN N'ChillPay Maintenance'
+            WHEN 30005 THEN N'Bank Maintenance'
+            WHEN 30006 THEN N'Bank Payment Api Setting'
+            WHEN 30007 THEN N'SMS Route'
+            WHEN 30008 THEN N'Exchange Rate'
+            WHEN 30009 THEN N'Exchange Rate Log'
+            WHEN 10001 THEN N'Account'
+            WHEN 10002 THEN N'Role'
+            WHEN 40000 THEN N'Payment Transaction'
+            WHEN 50000 THEN N'Settlement Record'
+            WHEN 60000 THEN N'Managed Transaction'
+            WHEN 70000 THEN N'PayLink Record'
+            WHEN 80000 THEN N'Fraud Record'
+            WHEN 90000 THEN N'Etax Record'
+            WHEN 100000 THEN N'Odd Record'
+            WHEN 110000 THEN N'Chill App Record'
+            WHEN 120000 THEN N'Wallet Record'
+            WHEN 130000 THEN N'Recurring Record'
+            WHEN 140000 THEN N'Commission Record'
             ELSE CAST(b.[RefType] AS nvarchar(20))
         END
       END) AS [RefTypeText]
     , (CASE WHEN b.[Ref2Type] IS NULL THEN N''
         ELSE CASE b.[Ref2Type]
             WHEN 0 THEN N'Undefined'
-            WHEN 10000 THEN N'Merchant'
-            WHEN 10001 THEN N'Merchant User'
-            WHEN 10002 THEN N'Merchant Fee'
-            WHEN 10003 THEN N'Merchant Route'
-            WHEN 10004 THEN N'Merchant Service Fee'
-            WHEN 10005 THEN N'Merchant Email'
-            WHEN 20000 THEN N'Payment Channel'
-            WHEN 20001 THEN N'Payment Route'
-            WHEN 20002 THEN N'Payment Route Inquiry'
-            WHEN 20003 THEN N'Credit Card Config'
-            WHEN 20004 THEN N'Bank Payment Api Setting'
-            WHEN 20005 THEN N'SMS Route'
-            WHEN 20006 THEN N'Exchange Rate'
-            WHEN 20007 THEN N'ChillPay Maintenance'
-            WHEN 20008 THEN N'Bank Maintenance'
-            WHEN 20009 THEN N'Exchange Rate Log'
-            WHEN 30001 THEN N'Account'
-            WHEN 30002 THEN N'Role'
-            WHEN 40001 THEN N'Payment Transaction'
-            WHEN 50001 THEN N'Settlement Record'
-            WHEN 60001 THEN N'Managed Transaction'
-            WHEN 70001 THEN N'PayLink Record'
-            WHEN 80001 THEN N'Fraud Record'
-            WHEN 90001 THEN N'Etax Record'
-            WHEN 100001 THEN N'Odd Record'
-            WHEN 110001 THEN N'Chill App Record'
-            WHEN 120001 THEN N'Wallet Record'
-            WHEN 130001 THEN N'Recurring Record'
-            WHEN 140001 THEN N'Commission Record'
+            WHEN 20000 THEN N'Merchant'
+            WHEN 20001 THEN N'Merchant User'
+            WHEN 20002 THEN N'Merchant Fee'
+            WHEN 20003 THEN N'Merchant Route'
+            WHEN 20004 THEN N'Merchant Service Fee'
+            WHEN 20005 THEN N'Merchant Email'
+            WHEN 30000 THEN N'Payment Channel'
+            WHEN 30001 THEN N'Payment Route'
+            WHEN 30002 THEN N'Payment Route Inquiry'
+            WHEN 30003 THEN N'Credit Card Config'
+            WHEN 30004 THEN N'ChillPay Maintenance'
+            WHEN 30005 THEN N'Bank Maintenance'
+            WHEN 30006 THEN N'Bank Payment Api Setting'
+            WHEN 30007 THEN N'SMS Route'
+            WHEN 30008 THEN N'Exchange Rate'
+            WHEN 30009 THEN N'Exchange Rate Log'
+            WHEN 10001 THEN N'Account'
+            WHEN 10002 THEN N'Role'
+            WHEN 40000 THEN N'Payment Transaction'
+            WHEN 50000 THEN N'Settlement Record'
+            WHEN 60000 THEN N'Managed Transaction'
+            WHEN 70000 THEN N'PayLink Record'
+            WHEN 80000 THEN N'Fraud Record'
+            WHEN 90000 THEN N'Etax Record'
+            WHEN 100000 THEN N'Odd Record'
+            WHEN 110000 THEN N'Chill App Record'
+            WHEN 120000 THEN N'Wallet Record'
+            WHEN 130000 THEN N'Recurring Record'
+            WHEN 140000 THEN N'Commission Record'
             ELSE CAST(b.[Ref2Type] AS nvarchar(20))
         END
       END) AS [Ref2TypeText]

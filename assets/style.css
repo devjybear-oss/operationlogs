@@ -120,7 +120,9 @@ body {
 .main {
   margin-left: var(--sidebar-w);
   min-height: 100vh;
-  padding: 2.5rem 3rem 4rem;
+  width: calc(100% - var(--sidebar-w));
+  box-sizing: border-box;
+  padding: 2rem 2.5rem 3rem;
 }
 
 .page-header {
@@ -153,16 +155,18 @@ body {
 }
 
 .content {
-  max-width: 860px;
+  width: 100%;
+  max-width: none;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 2rem 2.25rem;
+  padding: 2rem 2.5rem;
   box-shadow: var(--shadow);
 }
 
 .page-footer {
-  max-width: 860px;
+  width: 100%;
+  max-width: none;
   margin-top: 1.5rem;
 }
 
@@ -286,9 +290,10 @@ body {
 /* Index nav cards */
 .nav-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 12px;
-  max-width: 860px;
+  width: 100%;
+  max-width: none;
   margin-bottom: 1.5rem;
 }
 
@@ -349,7 +354,7 @@ body {
   .sidebar.open { transform: translateX(0); }
   .sidebar-overlay.open { display: block; }
   .sidebar-toggle { display: grid; place-items: center; }
-  .main { margin-left: 0; padding: 5rem 1.25rem 3rem; }
+  .main { margin-left: 0; width: 100%; padding: 5rem 1.25rem 3rem; }
   .content { padding: 1.25rem 1rem; }
   .page-title { font-size: 1.75rem; }
 }

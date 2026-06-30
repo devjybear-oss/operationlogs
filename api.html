@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -25,16 +25,14 @@
     <nav class="sidebar-nav">
       <a class="nav-link" href="index.html"><span class="nav-icon">◈</span><span class="nav-text"><strong>ภาพรวม</strong><small>Summary & Checklist</small></span></a>
 <a class="nav-link" href="registry.html"><span class="nav-icon">▣</span><span class="nav-text"><strong>Registry</strong><small>ModuleType · MenuType · LogType</small></span></a>
-<a class="nav-link" href="ui.html"><span class="nav-icon">▦</span><span class="nav-text"><strong>UI</strong><small>List · Detail · ปุ่ม Logs</small></span></a>
-<a class="nav-link" href="search.html"><span class="nav-icon">⌕</span><span class="nav-text"><strong>Search</strong><small>การค้นหา & Filter</small></span></a>
+<a class="nav-link" href="ui.html"><span class="nav-icon">▦</span><span class="nav-text"><strong>UI</strong><small>List · Detail</small></span></a>
 <a class="nav-link active" href="api.html"><span class="nav-icon">⟡</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
-<a class="nav-link" href="database.html"><span class="nav-icon">⬡</span><span class="nav-text"><strong>Database</strong><small>Schema · Index · SQL Script</small></span></a>
-<a class="nav-link" href="files.html"><span class="nav-icon">◎</span><span class="nav-text"><strong>ไฟล์ที่เกี่ยวข้อง</strong><small>Repos & Source files</small></span></a>
-<a class="nav-link" href="deploy.html"><span class="nav-icon">▶</span><span class="nav-text"><strong>Deploy</strong><small>ลำดับ deploy & Smoke test</small></span></a>
+<a class="nav-link" href="database.html"><span class="nav-icon">⬡</span><span class="nav-text"><strong>Database</strong><small>Schema · Writer · SQL Script</small></span></a>
+<a class="nav-link" href="files.html"><span class="nav-icon">◎</span><span class="nav-text"><strong>โปรเจคที่เกี่ยวข้อง</strong><small>operation-logs-api · web-backend</small></span></a>
 <a class="nav-link" href="sync.html"><span class="nav-icon">↻</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
     </nav>
     <div class="sidebar-footer">
-      <span>อัปเดต 2026-06-28</span>
+      <span>อัปเดต 2026-06-29</span>
       <span>Phase 1</span>
     </div>
   </aside>
@@ -47,7 +45,7 @@
     </header>
     
     <article class="content prose">
-      <h2 id="6-api-design">6. API Design</h2>
+      <h2 id="api-design">API Design</h2>
 <p>Base path: <code>/api/v1/chillpayoperationlogs</code></p>
 <table>
 <thead>
@@ -61,12 +59,7 @@
 <tr>
 <td>POST</td>
 <td><code>/search</code></td>
-<td><strong>หน้า List</strong> — filter Module / Menu / LogType / Merchant / วันที่ (ใช้หลัก)</td>
-</tr>
-<tr>
-<td>POST</td>
-<td><code>/search/menu</code></td>
-<td>integration ที่ส่ง <code>moduleType</code> + <code>menuType</code> คู่เดียว</td>
+<td><strong>หน้า List</strong> — filter Module / Menu / LogType / Merchant / วันที่</td>
 </tr>
 <tr>
 <td>GET</td>
@@ -102,16 +95,16 @@
 <td>action (Create/Update/…)</td>
 </tr>
 <tr>
-<td><code>dataId</code></td>
-<td>entity id — จากปุ่ม Logs</td>
-</tr>
-<tr>
 <td><code>merchantId[]</code></td>
 <td><strong>Merchant filter</strong> — แบบ PayOut (<code>WHERE MerchantId IN (...)</code>)</td>
 </tr>
 <tr>
+<td><code>dataId</code></td>
+<td>id record — <em>(optional / legacy UI ไม่ใช้ deep link)</em></td>
+</tr>
+<tr>
 <td><code>refType[]</code> + <code>refId</code></td>
-<td>filter ตาม entity อ้างอิง (integration — ไม่ใช่ filter ร้านบน List)</td>
+<td><em>(legacy — Writer ไม่ populate RefType/RefId)</em></td>
 </tr>
 <tr>
 <td><code>addedDateFrom/To</code></td>
@@ -123,7 +116,35 @@
 </tr>
 </tbody>
 </table>
-<p><strong>Validation:</strong> <code>menuType / 100 == moduleType</code></p>
+<p><strong>Detail parameters</strong> (<code>GET /{id}/{system}/{by}</code>) — path parameters</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>ชนิด</th>
+<th>หมายเหตุ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>long</td>
+<td>Log Id จากหน้า List</td>
+</tr>
+<tr>
+<td><code>system</code></td>
+<td>string</td>
+<td>ระบบที่เรียก — <code>Admin</code>, <code>Backend</code>, <code>API</code>, <code>Job</code>, <code>MerchantApi</code></td>
+</tr>
+<tr>
+<td><code>by</code></td>
+<td>long</td>
+<td>user id ผู้เรียกดู (ต้อง &gt; 0)</td>
+</tr>
+</tbody>
+</table>
+<p>ตัวอย่าง: <code>GET /api/v1/chillpayoperationlogs/1234/Admin/42</code></p>
+<p><strong>Response:</strong> record จาก <code>VW_ChillpayOperationLogs</code> — หน้า Detail bind <strong>Merchant</strong> จาก <code>CompanyName</code> (+ <code>MerchantCode</code> ฯลฯ)</p>
 <p><strong>Add parameters หลัก</strong> (<code>POST /add</code>)</p>
 <table>
 <thead>
@@ -138,12 +159,16 @@
 <td>registry</td>
 </tr>
 <tr>
-<td><code>dataId</code>, <code>refType</code>, <code>refId</code>, <code>ref2Type</code>, <code>ref2Id</code></td>
-<td>entity อ้างอิง</td>
+<td><strong><code>dataId</code></strong></td>
+<td>id record ที่ถูก action</td>
 </tr>
 <tr>
 <td><strong><code>merchantId</code></strong></td>
-<td>id ร้าน — Module Merchant (Writer ใส่ · API resolve ถ้าไม่ส่ง)</td>
+<td>id ร้าน — Module Merchant</td>
+</tr>
+<tr>
+<td><code>refId</code>, <code>refType</code>, <code>ref2Type</code>, <code>ref2Id</code></td>
+<td><strong>ไม่ส่ง (<code>NULL</code>)</strong></td>
 </tr>
 <tr>
 <td><code>oldValue</code>, <code>newValue</code>, <code>message</code></td>

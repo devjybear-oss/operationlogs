@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -25,16 +25,14 @@
     <nav class="sidebar-nav">
       <a class="nav-link active" href="index.html"><span class="nav-icon">◈</span><span class="nav-text"><strong>ภาพรวม</strong><small>Summary & Checklist</small></span></a>
 <a class="nav-link" href="registry.html"><span class="nav-icon">▣</span><span class="nav-text"><strong>Registry</strong><small>ModuleType · MenuType · LogType</small></span></a>
-<a class="nav-link" href="ui.html"><span class="nav-icon">▦</span><span class="nav-text"><strong>UI</strong><small>List · Detail · ปุ่ม Logs</small></span></a>
-<a class="nav-link" href="search.html"><span class="nav-icon">⌕</span><span class="nav-text"><strong>Search</strong><small>การค้นหา & Filter</small></span></a>
+<a class="nav-link" href="ui.html"><span class="nav-icon">▦</span><span class="nav-text"><strong>UI</strong><small>List · Detail</small></span></a>
 <a class="nav-link" href="api.html"><span class="nav-icon">⟡</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
-<a class="nav-link" href="database.html"><span class="nav-icon">⬡</span><span class="nav-text"><strong>Database</strong><small>Schema · Index · SQL Script</small></span></a>
-<a class="nav-link" href="files.html"><span class="nav-icon">◎</span><span class="nav-text"><strong>ไฟล์ที่เกี่ยวข้อง</strong><small>Repos & Source files</small></span></a>
-<a class="nav-link" href="deploy.html"><span class="nav-icon">▶</span><span class="nav-text"><strong>Deploy</strong><small>ลำดับ deploy & Smoke test</small></span></a>
+<a class="nav-link" href="database.html"><span class="nav-icon">⬡</span><span class="nav-text"><strong>Database</strong><small>Schema · Writer · SQL Script</small></span></a>
+<a class="nav-link" href="files.html"><span class="nav-icon">◎</span><span class="nav-text"><strong>โปรเจคที่เกี่ยวข้อง</strong><small>operation-logs-api · web-backend</small></span></a>
 <a class="nav-link" href="sync.html"><span class="nav-icon">↻</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
     </nav>
     <div class="sidebar-footer">
-      <span>อัปเดต 2026-06-28</span>
+      <span>อัปเดต 2026-06-29</span>
       <span>Phase 1</span>
     </div>
   </aside>
@@ -45,17 +43,17 @@
       <h1 class="page-title">ภาพรวม</h1>
       <p class="page-subtitle">Summary & Checklist</p>
     </header>
-    <div class="nav-cards"><a class="nav-card" href="registry.html"><span class="nav-card-icon">▣</span><span class="nav-card-title">Registry</span><span class="nav-card-desc">ModuleType · MenuType · LogType</span></a><a class="nav-card" href="ui.html"><span class="nav-card-icon">▦</span><span class="nav-card-title">UI</span><span class="nav-card-desc">List · Detail · ปุ่ม Logs</span></a><a class="nav-card" href="search.html"><span class="nav-card-icon">⌕</span><span class="nav-card-title">Search</span><span class="nav-card-desc">การค้นหา & Filter</span></a><a class="nav-card" href="api.html"><span class="nav-card-icon">⟡</span><span class="nav-card-title">API</span><span class="nav-card-desc">Endpoints & Parameters</span></a><a class="nav-card" href="database.html"><span class="nav-card-icon">⬡</span><span class="nav-card-title">Database</span><span class="nav-card-desc">Schema · Index · SQL Script</span></a><a class="nav-card" href="files.html"><span class="nav-card-icon">◎</span><span class="nav-card-title">ไฟล์ที่เกี่ยวข้อง</span><span class="nav-card-desc">Repos & Source files</span></a><a class="nav-card" href="deploy.html"><span class="nav-card-icon">▶</span><span class="nav-card-title">Deploy</span><span class="nav-card-desc">ลำดับ deploy & Smoke test</span></a><a class="nav-card" href="sync.html"><span class="nav-card-icon">↻</span><span class="nav-card-title">Registry Sync</span><span class="nav-card-desc">Manual sync checklist</span></a></div>
+    <div class="nav-cards"><a class="nav-card" href="registry.html"><span class="nav-card-icon">▣</span><span class="nav-card-title">Registry</span><span class="nav-card-desc">ModuleType · MenuType · LogType</span></a><a class="nav-card" href="ui.html"><span class="nav-card-icon">▦</span><span class="nav-card-title">UI</span><span class="nav-card-desc">List · Detail</span></a><a class="nav-card" href="api.html"><span class="nav-card-icon">⟡</span><span class="nav-card-title">API</span><span class="nav-card-desc">Endpoints & Parameters</span></a><a class="nav-card" href="database.html"><span class="nav-card-icon">⬡</span><span class="nav-card-title">Database</span><span class="nav-card-desc">Schema · Writer · SQL Script</span></a><a class="nav-card" href="files.html"><span class="nav-card-icon">◎</span><span class="nav-card-title">โปรเจคที่เกี่ยวข้อง</span><span class="nav-card-desc">operation-logs-api · web-backend</span></a><a class="nav-card" href="sync.html"><span class="nav-card-icon">↻</span><span class="nav-card-title">Registry Sync</span><span class="nav-card-desc">Manual sync checklist</span></a></div>
     <article class="content prose">
       <h1>Chillpay Operation Logs</h1>
 <blockquote>
-<p><strong>เอกสารอ้างอิงหลัก</strong> · รวม registry, UI, API, writer, <strong>SQL script (§7.4)</strong><br />
+<p><strong>เอกสารอ้างอิงหลัก</strong> · รวม registry, UI, API, writer, <strong>SQL script (Script)</strong><br />
 <strong>สถานะ:</strong> Phase 1 code พร้อม — รอ deploy + smoke test<br />
 <strong>อัปเดต:</strong> 2026-06-28<br />
 <strong>ขอบเขต:</strong> Admin UI (web-backend) + Operation Logs API + Registry Module 1–14</p>
 </blockquote>
-<h2 id="1-summary">1. Summary</h2>
-<p>Chillpay Operation Logs เป็น <strong>registry กลาง</strong> สำหรับบันทึกการเปลี่ยนแปลงข้อมูลบน Web Admin แยกจาก PayOut โดยใช้โครงสร้าง <strong>ModuleType → MenuType → LogType (Action) + Ref</strong></p>
+<h2 id="summary">Summary</h2>
+<p>Chillpay Operation Logs เป็น <strong>registry กลาง</strong> สำหรับบันทึกการเปลี่ยนแปลงข้อมูลบน Web Admin แยกจาก PayOut โดยใช้โครงสร้าง <strong>ModuleType → MenuType → LogType (Action) + DataId + MerchantId</strong></p>
 <table>
 <thead>
 <tr>
@@ -66,15 +64,15 @@
 <tbody>
 <tr>
 <td>โครงสร้าง Registry</td>
-<td><strong>คง</strong> Module / Menu / LogType / Ref — ไม่เลียนแบบ Payout ทั้งหมด</td>
+<td><strong>คง</strong> Module / Menu / LogType — Writer ส่ง <strong>MenuType + DataId + MerchantId</strong> (ดู Database → นโยบาย Writer)</td>
 </tr>
 <tr>
 <td>หน้า List</td>
 <td>Browse ด้วย <strong>Module + Menu + Log Type + Merchant + วันที่</strong> — ลบ LogMode 2–9 แล้ว</td>
 </tr>
 <tr>
-<td>ปุ่ม <strong>Logs</strong> บน Detail</td>
-<td><strong>ใช้</strong> — deep link ไปหน้า List (ส่ง <code>menuType</code> + <code>dataId</code> โดยตรง ไม่ใช้ LogMode เดิม)</td>
+<td>ปุ่ม <strong>Logs</strong> / deep link</td>
+<td><strong>ไม่ทำ</strong> — ไม่ filter ตาม entity id บน List</td>
 </tr>
 <tr>
 <td>OldValue / NewValue (Update)</td>
@@ -90,15 +88,11 @@
 </tr>
 <tr>
 <td>API</td>
-<td><strong>Search หลัก</strong> <code>POST /search</code> (List) · <strong>Writer</strong> <code>POST /add</code> · <strong>Detail</strong> <code>GET /{id}</code> · <strong>Integration</strong> <code>POST /search/menu</code> — ดู §6</td>
-</tr>
-<tr>
-<td>Deploy</td>
-<td>⏳ รอ SQL + API + web-backend ทุก env</td>
+<td><strong>Search</strong> <code>POST /search</code> (List) · <strong>Writer</strong> <code>POST /add</code> · <strong>Detail</strong> <code>GET /{id}/{system}/{by}</code> — ดู API Design</td>
 </tr>
 </tbody>
 </table>
-<h2 id="2-checklist">2. Checklist</h2>
+<h2 id="checklist">Checklist</h2>
 <table>
 <thead>
 <tr>
@@ -115,7 +109,7 @@
 </tr>
 <tr>
 <td>2</td>
-<td>SQL <code>ChillpayOperationLogs</code> + view <code>VW_ChillpayOperationLogs</code> (script ใน §7.4)</td>
+<td>SQL <code>ChillpayOperationLogs</code> + view <code>VW_ChillpayOperationLogs</code> (script ใน Script)</td>
 <td>operation-logs-api</td>
 </tr>
 <tr>
@@ -135,7 +129,7 @@
 </tr>
 <tr>
 <td>6</td>
-<td>หน้า Detail <code>ChillpayOperationLogsDetail.cshtml</code></td>
+<td>หน้า Detail <code>ChillpayOperationLogsDetail.cshtml</code> — label <strong>Merchant</strong> (แทน Company Name)</td>
 <td>web-backend</td>
 </tr>
 <tr>
@@ -145,21 +139,11 @@
 </tr>
 <tr>
 <td>8</td>
-<td><strong>ปุ่ม Logs</strong> + <code>_ChillpayOperationLogButtonPartial</code> (~15 หน้า)</td>
-<td>web-backend</td>
-</tr>
-<tr>
-<td>9</td>
-<td>Deep link <code>localStorage.ChillpayLogSearchData</code> (<code>menuType</code> + <code>dataId</code>)</td>
-<td>web-backend</td>
-</tr>
-<tr>
-<td>10</td>
 <td>OldValue/NewValue ตอน Update = snapshot เต็ม</td>
 <td>web-backend</td>
 </tr>
 <tr>
-<td>11</td>
+<td>9</td>
 <td><code>AjaxChillpayOperationLogsController</code> ส่ง <code>MerchantId[]</code> ไป API (แบบ PayOut)</td>
 <td>web-backend</td>
 </tr>

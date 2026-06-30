@@ -1,6 +1,6 @@
 /*
   Chillpay Operation Logs — Table + MerchantId migrate
-  เอกสาร: docs/Chillpay-Operation-Logs.md §7.4.1
+  เอกสาร: docs/Chillpay-Operation-Logs.md Table script
 */
 SET ANSI_NULLS ON;
 GO
@@ -41,8 +41,8 @@ GO
 -- backfill MerchantId สำหรับ row เก่า (Module Merchant)
 UPDATE [dbo].[ChillpayOperationLogs]
 SET [MerchantId] = COALESCE(
-        CASE WHEN [RefType] = 10000 THEN [RefId] END,
-        CASE WHEN [Ref2Type] = 10000 THEN [Ref2Id] END,
+        CASE WHEN [RefType] = 20000 THEN [RefId] END,
+        CASE WHEN [Ref2Type] = 20000 THEN [Ref2Id] END,
         CASE WHEN [MenuType] = 200 THEN [DataId] END
     )
 WHERE [ModuleType] = 2

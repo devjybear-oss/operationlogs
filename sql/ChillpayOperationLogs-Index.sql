@@ -1,6 +1,6 @@
 /*
   Chillpay Operation Logs — Indexes
-  เอกสาร: docs/Chillpay-Operation-Logs.md §7.4.2
+  เอกสาร: docs/Chillpay-Operation-Logs.md Index script
   ต้องรัน Table script ก่อน
 */
 SET ANSI_NULLS ON;

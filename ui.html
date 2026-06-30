@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -9,10 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
 
-  <script type="module">
-    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
-    mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
-  </script>
 </head>
 <body>
   <button class="sidebar-toggle" id="sidebarToggle" aria-label="เปิดเมนู">☰</button>
@@ -29,16 +25,14 @@
     <nav class="sidebar-nav">
       <a class="nav-link" href="index.html"><span class="nav-icon">◈</span><span class="nav-text"><strong>ภาพรวม</strong><small>Summary & Checklist</small></span></a>
 <a class="nav-link" href="registry.html"><span class="nav-icon">▣</span><span class="nav-text"><strong>Registry</strong><small>ModuleType · MenuType · LogType</small></span></a>
-<a class="nav-link active" href="ui.html"><span class="nav-icon">▦</span><span class="nav-text"><strong>UI</strong><small>List · Detail · ปุ่ม Logs</small></span></a>
-<a class="nav-link" href="search.html"><span class="nav-icon">⌕</span><span class="nav-text"><strong>Search</strong><small>การค้นหา & Filter</small></span></a>
+<a class="nav-link active" href="ui.html"><span class="nav-icon">▦</span><span class="nav-text"><strong>UI</strong><small>List · Detail</small></span></a>
 <a class="nav-link" href="api.html"><span class="nav-icon">⟡</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
-<a class="nav-link" href="database.html"><span class="nav-icon">⬡</span><span class="nav-text"><strong>Database</strong><small>Schema · Index · SQL Script</small></span></a>
-<a class="nav-link" href="files.html"><span class="nav-icon">◎</span><span class="nav-text"><strong>ไฟล์ที่เกี่ยวข้อง</strong><small>Repos & Source files</small></span></a>
-<a class="nav-link" href="deploy.html"><span class="nav-icon">▶</span><span class="nav-text"><strong>Deploy</strong><small>ลำดับ deploy & Smoke test</small></span></a>
+<a class="nav-link" href="database.html"><span class="nav-icon">⬡</span><span class="nav-text"><strong>Database</strong><small>Schema · Writer · SQL Script</small></span></a>
+<a class="nav-link" href="files.html"><span class="nav-icon">◎</span><span class="nav-text"><strong>โปรเจคที่เกี่ยวข้อง</strong><small>operation-logs-api · web-backend</small></span></a>
 <a class="nav-link" href="sync.html"><span class="nav-icon">↻</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
     </nav>
     <div class="sidebar-footer">
-      <span>อัปเดต 2026-06-28</span>
+      <span>อัปเดต 2026-06-29</span>
       <span>Phase 1</span>
     </div>
   </aside>
@@ -47,12 +41,12 @@
     <header class="page-header">
       <p class="page-eyebrow">Chillpay Operation Logs</p>
       <h1 class="page-title">UI</h1>
-      <p class="page-subtitle">List · Detail · ปุ่ม Logs</p>
+      <p class="page-subtitle">List · Detail</p>
     </header>
     
     <article class="content prose">
-      <h2 id="4-ui">4. UI</h2>
-<h3 id="41-หน้า-list--chillpay-operation-logs">4.1 หน้า List — Chillpay Operation Logs</h3>
+      <h2 id="ui">UI</h2>
+<h3 id="หน้า-list--chillpay-operation-logs">หน้า List — Chillpay Operation Logs</h3>
 <p><strong>Route:</strong> <code>GET /OperationLog/ChillpayOperationLogs</code></p>
 <p><img alt="หน้า List — Chillpay Operation Logs" src="images/chillpay-operation-logs-list.png" /></p>
 <p><strong>คอลัมน์ตาราง:</strong> Log Id, Log Type (ชื่อ action), Message, Menu (ชื่อเมนู), Data Id, NewValue (ย่อ), Module (ชื่อ module), Adddate</p>
@@ -86,113 +80,13 @@
 <li>เมนูที่ไม่มีใน map (เช่น 302, 311) ใช้ <strong>default</strong> <code>[1,2,3,4,5,7,8]</code> (<code>ChillpayOperationLogDefaultMenuActions</code>)</li>
 </ul>
 <p><strong>Ajax Search:</strong> <code>POST /AjaxChillpayOperationLogs/Search</code> เท่านั้น (ลบ <code>SearchMerchant</code> / <code>SearchSettings</code> แล้ว)</p>
-<h3 id="42-หน้า-detail--chillpay-operation-logs-detail">4.2 หน้า Detail — Chillpay Operation Logs Detail</h3>
+<h3 id="หน้า-detail--chillpay-operation-logs-detail">หน้า Detail — Chillpay Operation Logs Detail</h3>
 <p><strong>Route:</strong> <code>GET /OperationLog/ChillpayOperationLogsDetail/{id}</code></p>
 <p><img alt="หน้า Detail — Chillpay Operation Logs Detail" src="images/chillpay-operation-logs-detail.png" /></p>
-<p>แสดง read-only: ID, Module, Menu Type, Merchant (ถ้า module 2), Log Type, Message, <strong>OldValue / NewValue</strong> (JSON เต็ม), Added System/Date/By, Data Id, Ref*</p>
-<h3 id="43-ปุ่ม-logs-บนหน้า-detail--update">4.3 ปุ่ม Logs บนหน้า Detail / Update</h3>
-<p><strong>Partial:</strong> <code>_ChillpayOperationLogButtonPartial.cshtml</code><br />
-<strong>ปุ่ม:</strong> <code>btn-info</code> + ไอคอน <code>fa-history</code> + ข้อความ <strong>Logs</strong></p>
-<p><img alt="ปุ่ม Logs บนหน้า Detail / Update" src="images/chillpay-operation-logs-button.png" /></p>
-<p><strong>หน้าที่มีปุ่ม (ตัวอย่าง):</strong></p>
-<table>
-<thead>
-<tr>
-<th>หน้า</th>
-<th>ModuleType</th>
-<th>MenuType</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Merchant Detail</td>
-<td>2</td>
-<td>200</td>
-</tr>
-<tr>
-<td>Merchant Fee Detail</td>
-<td>2</td>
-<td>202</td>
-</tr>
-<tr>
-<td>Merchant Route Detail</td>
-<td>2</td>
-<td>203</td>
-</tr>
-<tr>
-<td>Merchant Service Fee Detail</td>
-<td>2</td>
-<td>204</td>
-</tr>
-<tr>
-<td>Merchant Email Detail</td>
-<td>2</td>
-<td>206</td>
-</tr>
-<tr>
-<td>Merchant User Detail</td>
-<td>2</td>
-<td>201</td>
-</tr>
-<tr>
-<td>Generate Merchant Keys</td>
-<td>2</td>
-<td>205</td>
-</tr>
-<tr>
-<td>Payment Channel Update</td>
-<td>3</td>
-<td>300</td>
-</tr>
-<tr>
-<td>Payment Route View/Update</td>
-<td>3</td>
-<td>301</td>
-</tr>
-<tr>
-<td>Credit Card Config Update</td>
-<td>3</td>
-<td>303</td>
-</tr>
-<tr>
-<td>Bank Payment Api Detail</td>
-<td>3</td>
-<td>308</td>
-</tr>
-<tr>
-<td>Exchange Rate Update</td>
-<td>3</td>
-<td>310</td>
-</tr>
-<tr>
-<td>SMS Route Detail</td>
-<td>3</td>
-<td>309</td>
-</tr>
-<tr>
-<td>ChillPay Maintenance</td>
-<td>3</td>
-<td>306</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Flow deep link (ใหม่ — ไม่ใช้ LogMode):</strong></p>
-<pre class="mermaid">sequenceDiagram
-    participant User
-    participant Detail as Merchant Fee Detail
-    participant LS as localStorage
-    participant List as Operation Logs List
-    participant API as operation-logs-api
-
-    User-&gt;&gt;Detail: กดปุ่ม Logs
-    Detail-&gt;&gt;LS: ChillpayLogSearchData&lt;br/&gt;{moduleType:2, menuType:202, dataId:501, merchantId:100}
-    Detail-&gt;&gt;List: window.open (แท็บใหม่)
-    List-&gt;&gt;LS: อ่าน + ลบ (ใช้ครั้งเดียว)
-    List-&gt;&gt;List: ตั้ง Module, Menu, Merchant, dataId
-    List-&gt;&gt;API: POST /search
-    API--&gt;&gt;User: แสดง log ของ fee 501</pre>
-
-<p><strong>หมายเหตุ:</strong> เปลี่ยน Module / Menu / กด Search บนหน้า List จะ <strong>เคลียร์ dataId</strong> จาก deep link</p>
+<p>แสดง read-only: ID, Module, <strong>Menu Type</strong>, <strong>Merchant</strong> (ถ้า module 2 — label <strong>Merchant</strong> แทน Company Name · ค่าจาก <code>CompanyName</code> ใน View), Log Type, Message, <strong>OldValue / NewValue</strong> (JSON เต็ม), <strong>Added System</strong>, Added Date, Added By, <strong>Data Id</strong></p>
+<blockquote>
+<p><strong>ไม่แสดง</strong> Ref Type, Ref Id, Ref2 Type / Ref2 Id — Writer ไม่เก็บคอลัมน์ Ref · ชนิด entity จาก <strong>Menu Type</strong></p>
+</blockquote>
     </article>
     <footer class="page-footer">
       <a href="index.html" class="footer-link">← กลับภาพรวม</a>
