@@ -1,0 +1,77 @@
+# Build and deploy on SIT (.NET 8)
+PreBuild_NET8_SIT:
+  stage: build
+  tags:
+    - chillpay-operation-logs-api, sit2
+  only:
+    - /^deploy-sit/
+  except:
+    - main
+    - tags
+  when: delayed
+  start_in: 10 seconds
+  before_script:
+    - 'xcopy "$NUGET_CONFIG_PATH" ".\" /y /s'
+    - 'dotnet restore "$SOLUTION_NET8_FILENAME" --packages $NUGET_PACKAGES_DIRECTORY --no-cache --force -r win-x64'
+  script:
+    - 'dotnet build "$SOLUTION_NET8_FILENAME" -c Release --no-restore'
+  environment:
+    name: SIT
+
+Build_NET8_SIT:
+  stage: build
+  tags:
+    - chillpay-operation-logs-api, sit2
+  only:
+    - /^sit-v.*$/i
+  except:
+    - main
+    - branches
+  when: delayed
+  start_in: 10 seconds
+  before_script:
+    - 'xcopy "$NUGET_CONFIG_PATH" ".\" /y /s'
+    - 'dotnet restore "$SOLUTION_NET8_FILENAME" --packages $NUGET_PACKAGES_DIRECTORY --no-cache --force -r win-x64'
+  script:
+    - 'dotnet build "$SOLUTION_NET8_FILENAME" -c Release --no-restore'
+    - 'dotnet publish "$PROJECT_NET8_FILENAME" -c Release -o "$PUBLISH_FOLDER\" /p:PublishProfile=DEPLOY.pubxml --no-restore'
+  artifacts:
+    when: on_success
+    expire_in: 1 days
+    paths:
+      - $PUBLISH_FOLDER\
+  environment:
+    name: SIT
+
+Deploy_NET8_SIT:
+  stage: deploy
+  tags:
+    - chillpay-operation-logs-api, sit2
+  only:
+    - /^sit-v.*$/i
+  except:
+    - main
+    - branches
+  when: delayed
+  start_in: 10 seconds
+  before_script:
+    - echo "Stop Site Name >> $APPPOOLNAME_NET8_LB1"
+    - Stop-WebAppPool -Name "$APPPOOLNAME_NET8_LB1"; Sleep 10
+    - taskkill /f /fi "username eq $APPPOOLNAME_NET8_LB1" /im w3wp.exe
+  script:
+    - echo "Deploy to folder >> $DEPLOY_FOLDER_NET8_LB1_SIT"; Sleep 10
+    - xcopy /y /s "$PUBLISH_FOLDER\*.*" "$DEPLOY_FOLDER_NET8_LB1_SIT"
+    - xcopy /y /s "$CONFIGS_NET8_FOLDER\sit\*.*" "$DEPLOY_FOLDER_NET8_LB1_SIT"
+  after_script:
+    - Get-ChildItem -Path "IIS:\AppPools" | Where {$_.Name -eq "$APPPOOLNAME_NET8_LB1" -and $_.State -eq "Stopped"} | Start-WebAppPool; Sleep 10
+    - echo "Start New WebSite >> $IIS_WEBSITE_NAME_LB1"
+    - Start-WebSite -Name "$IIS_WEBSITE_NAME_LB1"
+  retry:
+    max: 1
+    when:
+      - runner_system_failure
+      - script_failure
+  environment:
+    name: SIT
+    url: http://apioperationlogs.internal-chillpay.sit/
+  needs: ["Build_NET8_SIT"]

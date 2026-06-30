@@ -1,0 +1,15 @@
+**/.vs/
+*.user
+**/bin/
+**/obj/
+**/packages/
+packages
+secrets/
+env_vars
+task-def.json
+**/.idea/
+**/.sonarlint/
+**/.sonarqube/
+**/.vscode/
+**/publish/
+deploy/publish/

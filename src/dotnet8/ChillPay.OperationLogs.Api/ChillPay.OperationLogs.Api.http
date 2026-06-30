@@ -1,0 +1,61 @@
+@ChillPay.OperationLogs.Api_HostAddress = http://localhost:8135
+@ChillPayToken = KspwiRSO58oJHyTB2NAqraDKxYlYpyXYdBdQka1EjlVFaSFqujaemRVrjlzx
+
+### Health check
+GET {{ChillPay.OperationLogs.Api_HostAddress}}/healthz
+Accept: application/json
+
+### Find by ID
+GET {{ChillPay.OperationLogs.Api_HostAddress}}/api/v1/chillpayoperationlogs/1/Admin/1
+Accept: application/json
+CHILLPAY-TOKEN: {{ChillPayToken}}
+
+### Search
+POST {{ChillPay.OperationLogs.Api_HostAddress}}/api/v1/chillpayoperationlogs/search
+Content-Type: application/json
+Accept: application/json
+CHILLPAY-TOKEN: {{ChillPayToken}}
+
+{
+  "draw": 1,
+  "orderBy": "AddedDate",
+  "orderDir": "desc",
+  "start": 0,
+  "pageSize": 10,
+  "requestSystem": "Admin",
+  "requestBy": 1
+}
+
+### Search by menu
+POST {{ChillPay.OperationLogs.Api_HostAddress}}/api/v1/chillpayoperationlogs/search/menu
+Content-Type: application/json
+Accept: application/json
+CHILLPAY-TOKEN: {{ChillPayToken}}
+
+{
+  "draw": 1,
+  "orderBy": "AddedDate",
+  "orderDir": "desc",
+  "start": 0,
+  "pageSize": 10,
+  "moduleType": 1,
+  "menuType": 101,
+  "requestSystem": "Admin",
+  "requestBy": 1
+}
+
+### Add operation log
+POST {{ChillPay.OperationLogs.Api_HostAddress}}/api/v1/chillpayoperationlogs/add
+Content-Type: application/json
+Accept: application/json
+CHILLPAY-TOKEN: {{ChillPayToken}}
+
+{
+  "moduleType": 1,
+  "menuType": 101,
+  "logType": 1,
+  "message": "Test add from .http",
+  "requestSystem": "Admin",
+  "requestBy": 1,
+  "requestByName": "dev-user"
+}

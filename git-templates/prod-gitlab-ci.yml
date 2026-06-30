@@ -1,0 +1,108 @@
+# Build and deploy on BETA / PROD (.NET 8)
+PreBuild_NET8_PROD:
+  stage: build
+  tags:
+    - chillpay-operation-logs-api, prod
+  only:
+    - main
+  except:
+    - tags
+  when: delayed
+  start_in: 10 seconds
+  before_script:
+    - 'xcopy "$NUGET_CONFIG_PATH" ".\" /y /s'
+    - 'dotnet restore "$SOLUTION_NET8_FILENAME" --packages $NUGET_PACKAGES_DIRECTORY --no-cache --force -r win-x64'
+  script:
+    - 'dotnet build "$SOLUTION_NET8_FILENAME" -c Release --no-restore'
+  environment:
+    name: PROD
+
+Build_NET8_PROD:
+  stage: build
+  tags:
+    - chillpay-operation-logs-api, prod
+  only:
+    - /^prod-v.*$/i
+  except:
+    - main
+    - branches
+  before_script:
+    - 'xcopy "$NUGET_CONFIG_PATH" ".\" /y /s'
+    - 'dotnet restore "$SOLUTION_NET8_FILENAME" --packages $NUGET_PACKAGES_DIRECTORY --no-cache --force -r win-x64'
+  script:
+    - 'dotnet build "$SOLUTION_NET8_FILENAME" -c Release --no-restore'
+    - 'dotnet publish "$PROJECT_NET8_FILENAME" -c Release -o "$PUBLISH_FOLDER\" /p:PublishProfile=DEPLOY.pubxml --no-restore'
+  when: delayed
+  start_in: 10 seconds
+  artifacts:
+    when: on_success
+    expire_in: 1 days
+    paths:
+      - '$PUBLISH_FOLDER\'
+  environment:
+    name: PROD
+
+Deploy_NET8_BETA:
+  stage: BETA
+  tags:
+    - chillpay-operation-logs-api, prod
+  only:
+    - /^prod-v.*$/i
+  except:
+    - main
+    - branches
+  when: delayed
+  start_in: 10 seconds
+  before_script:
+    - echo "Stop Site Name >> $APPPOOLNAME_NET8_LB1"
+    - Stop-WebAppPool -Name "$APPPOOLNAME_NET8_LB1"; Sleep 10
+    - taskkill /f /fi "username eq $APPPOOLNAME_NET8_LB1" /im w3wp.exe
+  script:
+    - echo "Deploy to folder >> $DEPLOY_FOLDER_NET8_LB1_BETA"; Sleep 10
+    - xcopy /y /s "$PUBLISH_FOLDER\*.*" "$DEPLOY_FOLDER_NET8_LB1_BETA"
+    - xcopy /y /s "$CONFIGS_NET8_FOLDER\beta\*.*" "$DEPLOY_FOLDER_NET8_LB1_BETA"
+  after_script:
+    - Get-ChildItem -Path "IIS:\AppPools" | Where {$_.Name -eq "$APPPOOLNAME_NET8_LB1" -and $_.State -eq "Stopped"} | Start-WebAppPool; Sleep 10
+    - echo "Start New WebSite >> $IIS_WEBSITE_NAME_LB1"
+    - Start-WebSite -Name "$IIS_WEBSITE_NAME_LB1"
+  retry:
+    max: 1
+    when:
+      - runner_system_failure
+      - script_failure
+  environment:
+    name: BETA
+    url: http://apioperationlogs.internal-chillpay.beta/
+  needs: ["Build_NET8_PROD"]
+
+Deploy_NET8_PROD:
+  stage: PROD
+  tags:
+    - chillpay-operation-logs-api, prod
+  only:
+    - /^prod-v.*$/i
+  except:
+    - main
+    - branches
+  when: manual
+  before_script:
+    - echo "Stop Site Name >> $APPPOOLNAME_NET8_LB1"
+    - Stop-WebAppPool -Name "$APPPOOLNAME_NET8_LB1"; Sleep 10
+    - taskkill /f /fi "username eq $APPPOOLNAME_NET8_LB1" /im w3wp.exe
+  script:
+    - echo "Deploy to folder >> $DEPLOY_FOLDER_NET8_LB1_PROD"; Sleep 10
+    - xcopy /y /s "$PUBLISH_FOLDER\*.*" "$DEPLOY_FOLDER_NET8_LB1_PROD"
+    - xcopy /y /s "$CONFIGS_NET8_FOLDER\prod\*.*" "$DEPLOY_FOLDER_NET8_LB1_PROD"
+  after_script:
+    - Get-ChildItem -Path "IIS:\AppPools" | Where {$_.Name -eq "$APPPOOLNAME_NET8_LB1" -and $_.State -eq "Stopped"} | Start-WebAppPool; Sleep 10
+    - echo "Start New WebSite >> $IIS_WEBSITE_NAME_LB1"
+    - Start-WebSite -Name "$IIS_WEBSITE_NAME_LB1"
+  retry:
+    max: 1
+    when:
+      - runner_system_failure
+      - script_failure
+  environment:
+    name: PROD
+    url: http://apioperationlogs.internal-chillpay.prod/
+  needs: ["Build_NET8_PROD"]

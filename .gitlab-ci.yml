@@ -1,0 +1,28 @@
+# ChillPay Operation Logs API — .NET 8 only
+
+variables:
+  SOLUTION_NET8_FILENAME: '.\src\dotnet8\ChillPay.OperationLogsApi-NET8.sln'
+  PROJECT_NET8_FILENAME: '.\src\dotnet8\ChillPay.OperationLogs.Api\ChillPay.OperationLogs.Api.csproj'
+  PUBLISH_FOLDER: '.\deploy\publish'
+  CONFIGS_NET8_FOLDER: '.\deploy\configs'
+
+include:
+  - local: "/git-templates/sit-gitlab-ci.yml"
+  - local: "/git-templates/sandbox-gitlab-ci.yml"
+  - local: "/git-templates/prod-gitlab-ci.yml"
+
+stages:
+  - build
+  - deploy
+  - SANDBOX
+  - BETA
+  - PROD
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - "src/dotnet8/ChillPay.OperationLogs.Api/obj/project.assets.json"
+    - "src/dotnet8/ChillPay.OperationLogs.Api/obj/*.csproj.nuget.*"
+    - "src/dotnet8/ChillPay.Core/obj/project.assets.json"
+    - "src/dotnet8/ChillPay.Core/obj/*.csproj.nuget.*"
+  policy: pull-push
