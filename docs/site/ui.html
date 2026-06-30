@@ -80,13 +80,12 @@
 <li>เมนูที่ไม่มีใน map (เช่น 302, 311) ใช้ <strong>default</strong> <code>[1,2,3,4,5,7,8]</code> (<code>ChillpayOperationLogDefaultMenuActions</code>)</li>
 </ul>
 <p><strong>Ajax Search:</strong> <code>POST /AjaxChillpayOperationLogs/Search</code> เท่านั้น (ลบ <code>SearchMerchant</code> / <code>SearchSettings</code> แล้ว)</p>
+<p><strong>แทน Exchange Rate Logs (เมนูเดิม):</strong> ไม่ใช้ <code>/ExchangeRateLog</code> + ตาราง <code>ExchangeRateLogs</code> สำหรับ log ใหม่ — filter หน้านี้ด้วย Module <strong>Settings</strong> · Menu <strong>Exchange Rate</strong> · <strong>Data Id</strong> (เทียบ <code>ExchangeRateId</code> เดิม) · Log Type · วันที่</p>
 <h3 id="หน้า-detail--chillpay-operation-logs-detail">หน้า Detail — Chillpay Operation Logs Detail</h3>
 <p><strong>Route:</strong> <code>GET /OperationLog/ChillpayOperationLogsDetail/{id}</code></p>
+<p><strong>ปุ่ม Back:</strong> มุมขวาบน (dark) และล่างซ้าย (primary) — กลับหน้า List (<code>/OperationLog/ChillpayOperationLogs</code>)</p>
 <p><img alt="หน้า Detail — Chillpay Operation Logs Detail" src="../images/chillpay-operation-logs-detail.png" /></p>
-<p>แสดง read-only: ID, Module, <strong>Menu Type</strong>, <strong>Merchant</strong> (ถ้า module 2 — label <strong>Merchant</strong> แทน Company Name · ค่าจาก <code>CompanyName</code> ใน View), Log Type, Message, <strong>OldValue / NewValue</strong> (JSON เต็ม), <strong>Added System</strong>, Added Date, Added By, <strong>Data Id</strong></p>
-<blockquote>
-<p><strong>ไม่แสดง</strong> Ref Type, Ref Id, Ref2 Type / Ref2 Id — Writer ไม่เก็บคอลัมน์ Ref · ชนิด entity จาก <strong>Menu Type</strong></p>
-</blockquote>
+<p>แสดง read-only: ID, Module, <strong>Menu Type</strong>, <strong>Merchant</strong> (ถ้า module 2), Log Type, Message, <strong>OldValue / NewValue</strong>, Added System/Date/By, <strong>Data Id</strong></p>
     </article>
     <footer class="page-footer">
       <a href="index.html" class="footer-link">← กลับภาพรวม</a>

@@ -100,11 +100,11 @@
 </tr>
 <tr>
 <td><code>dataId</code></td>
-<td>id record — <em>(optional / legacy UI ไม่ใช้ deep link)</em></td>
+<td>id record — filter ตาม record (เช่น Exchange Rate id)</td>
 </tr>
 <tr>
 <td><code>refType[]</code> + <code>refId</code></td>
-<td><em>(legacy — Writer ไม่ populate RefType/RefId)</em></td>
+<td><em>(legacy / optional)</em> — log เก่าหรือ integration · Phase 1 List ใช้ <code>menuType[]</code> + <code>dataId</code> แทน</td>
 </tr>
 <tr>
 <td><code>addedDateFrom/To</code></td>
@@ -156,19 +156,15 @@
 <tbody>
 <tr>
 <td><code>moduleType</code>, <code>menuType</code>, <code>logType</code></td>
-<td>registry</td>
+<td>registry — <strong>บังคับ</strong></td>
 </tr>
 <tr>
 <td><strong><code>dataId</code></strong></td>
-<td>id record ที่ถูก action</td>
+<td>id record ที่ถูก action — <strong>บังคับ</strong> (เทียบ <code>ExchangeRateId</code>)</td>
 </tr>
 <tr>
 <td><strong><code>merchantId</code></strong></td>
-<td>id ร้าน — Module Merchant</td>
-</tr>
-<tr>
-<td><code>refId</code>, <code>refType</code>, <code>ref2Type</code>, <code>ref2Id</code></td>
-<td><strong>ไม่ส่ง (<code>NULL</code>)</strong></td>
+<td>id ร้าน — <strong>Module Merchant เท่านั้น</strong></td>
 </tr>
 <tr>
 <td><code>oldValue</code>, <code>newValue</code>, <code>message</code></td>
@@ -177,6 +173,10 @@
 <tr>
 <td><code>requestSystem</code>, <code>requestBy</code></td>
 <td>ผู้เขียน log</td>
+</tr>
+<tr>
+<td><code>refType</code>, <code>refId</code>, <code>ref2Type</code>, <code>ref2Id</code></td>
+<td><em>(Phase 1 ไม่ส่ง — <code>NULL</code> ใน DB)</em> · คอลัมน์ nullable รองรับ log เก่า / อนาคต</td>
 </tr>
 </tbody>
 </table>

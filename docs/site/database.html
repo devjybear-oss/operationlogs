@@ -78,33 +78,109 @@ Admin List/Detail     →  SELECT VW_ChillpayOperationLogs
                         →  filter ร้าน: WHERE MerchantId IN (...)
 </code></pre>
 <p><strong>Prerequisite:</strong> ตาราง <code>[dbo].[Merchants]</code> ต้องมีอยู่แล้วใน DB เดียวกัน — View join เพื่อแสดง MerchantCode, CompanyName บนหน้า List</p>
-<h3 id="นโยบาย-writer-ใช้งานจริง">นโยบาย Writer (ใช้งานจริง)</h3>
-<p>สำหรับ <strong>web-backend Writer</strong> ตอน <code>POST /add</code> — ต่างจาก PayOut ที่ใช้ <code>RefType</code> + <code>RefId</code></p>
-<p><strong>เก็บ:</strong> <code>MenuType</code>, <code>DataId</code>, <code>MerchantId</code> (Module Merchant)<br />
-<strong>ไม่เก็บ:</strong> <code>RefType</code>, <code>RefId</code>, <code>Ref2Type</code>, <code>Ref2Id</code> — ทั้งหมด <code>NULL</code> · ชนิด entity จาก <strong>MenuType</strong></p>
+<h3 id="นโยบาย-writer-phase-1">นโยบาย Writer (Phase 1)</h3>
+<p>สำหรับ <strong>web-backend Writer</strong> ตอน <code>POST /add</code> — อ้างอิงรูปแบบเก็บข้อมูลจาก <strong><code>ExchangeRateLogs</code></strong> แล้วขยายด้วย <strong>ModuleType / MenuType</strong> · <strong>ไม่ส่ง Ref*</strong> (<code>NULL</code> ใน DB)</p>
+<h4 id="map-จาก-exchangeratelogs--chillpayoperationlogs">Map จาก <code>ExchangeRateLogs</code> → <code>ChillpayOperationLogs</code></h4>
 <table>
 <thead>
 <tr>
-<th>ฟิลด์</th>
-<th>Writer ส่ง</th>
+<th><code>ExchangeRateLogs</code></th>
+<th><code>ChillpayOperationLogs</code></th>
+<th>หมายเหตุ</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>MenuType</strong></td>
-<td><strong>ใช่</strong> — หน้าเมนู / ชนิด action</td>
+<td><code>Id</code></td>
+<td><code>Id</code></td>
+<td>IDENTITY</td>
+</tr>
+<tr>
+<td><code>LogType</code></td>
+<td><code>LogType</code></td>
+<td>registry กลาง — Delete ใช้ <strong>5</strong> (ไม่ใช่ 3 แบบตารางเดิม)</td>
+</tr>
+<tr>
+<td><code>Message</code></td>
+<td><code>Message</code></td>
+<td>เช่น "Exchange rate updated"</td>
+</tr>
+<tr>
+<td><code>ExchangeRateId</code></td>
+<td><strong><code>DataId</code></strong></td>
+<td>id record เดียวกัน</td>
+</tr>
+<tr>
+<td><code>OldValue</code></td>
+<td><code>OldValue</code></td>
+<td>JSON snapshot ก่อน action</td>
+</tr>
+<tr>
+<td><code>NewValue</code></td>
+<td><code>NewValue</code></td>
+<td>JSON snapshot หลัง action</td>
+</tr>
+<tr>
+<td><code>AddedDate</code></td>
+<td><code>AddedDate</code></td>
+<td>default <code>GETDATE()</code></td>
+</tr>
+<tr>
+<td><code>AddedBy</code></td>
+<td><strong><code>RequestBy</code></strong></td>
+<td>user id ผู้กระทำ</td>
+</tr>
+<tr>
+<td><em>(ไม่มี)</em></td>
+<td><strong><code>ModuleType</code></strong></td>
+<td><code>3</code> = Settings</td>
+</tr>
+<tr>
+<td><em>(ไม่มี)</em></td>
+<td><strong><code>MenuType</code></strong></td>
+<td><code>310</code> = Exchange Rate</td>
+</tr>
+<tr>
+<td><em>(ไม่มี)</em></td>
+<td><strong><code>RequestSystem</code></strong></td>
+<td><code>Admin</code></td>
+</tr>
+<tr>
+<td><em>(ไม่มี)</em></td>
+<td><strong><code>MerchantId</code></strong></td>
+<td><code>NULL</code> (นอก Module Merchant)</td>
+</tr>
+<tr>
+<td><em>(ไม่มี)</em></td>
+<td><strong><code>RefType</code> / <code>RefId</code> / <code>Ref2*</code></strong></td>
+<td><code>NULL</code> (Phase 1)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Writer</strong> (<code>WriteMerchantLogAsync</code> / <code>WriteSettingsLogAsync</code> / <code>LogSettings*Async</code>): ส่ง <code>moduleType</code>, <code>menuType</code>, <code>logType</code>, <strong><code>dataId</code></strong>, <code>oldValue</code>, <code>newValue</code>, <code>message</code>, <code>requestBy</code>, <code>requestSystem</code> · <strong><code>merchantId</code></strong> เมื่อ Module Merchant</p>
+<table>
+<thead>
+<tr>
+<th>ฟิลด์</th>
+<th>Writer ส่ง (Phase 1)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ModuleType / MenuType</strong></td>
+<td><strong>ใช่</strong> — registry</td>
 </tr>
 <tr>
 <td><strong>DataId</strong></td>
-<td><strong>ใช่</strong> — id record ที่ถูก action</td>
+<td><strong>ใช่</strong> — id record (เทียบ <code>ExchangeRateId</code>)</td>
 </tr>
 <tr>
 <td><strong>MerchantId</strong></td>
-<td><strong>ใช่</strong> — Module Merchant (filter List)</td>
+<td>Module Merchant <strong>เท่านั้น</strong></td>
 </tr>
 <tr>
-<td><strong>RefType / RefId / Ref2Type / Ref2Id</strong></td>
-<td><strong>ไม่ส่ง</strong> — <code>NULL</code> ใน DB</td>
+<td><strong>RefType / RefId / Ref2*</strong></td>
+<td><strong>ไม่ส่ง</strong> (<code>NULL</code>)</td>
 </tr>
 </tbody>
 </table>
@@ -115,6 +191,7 @@ Admin List/Detail     →  SELECT VW_ChillpayOperationLogs
 <th>MenuType</th>
 <th>DataId</th>
 <th>MerchantId</th>
+<th>Ref* ใน DB</th>
 </tr>
 </thead>
 <tbody>
@@ -123,121 +200,54 @@ Admin List/Detail     →  SELECT VW_ChillpayOperationLogs
 <td>200</td>
 <td>100</td>
 <td>100</td>
+<td><code>NULL</code></td>
 </tr>
 <tr>
 <td>แก้ Merchant Fee id 501 ร้าน 100</td>
 <td>202</td>
 <td>501</td>
 <td>100</td>
-</tr>
-<tr>
-<td>แก้ Merchant User ร้าน 100</td>
-<td>201</td>
-<td>user id</td>
-<td>100</td>
-</tr>
-<tr>
-<td>Gen Keys ร้าน 100</td>
-<td>205</td>
-<td>100</td>
-<td>100</td>
+<td><code>NULL</code></td>
 </tr>
 <tr>
 <td>แก้ Payment Channel (Settings)</td>
 <td>300</td>
-<td>channel id</td>
+<td>7</td>
 <td><em>(ไม่ส่ง)</em></td>
+<td><code>NULL</code></td>
 </tr>
 <tr>
-<td>แก้ Account (User)</td>
-<td>101</td>
-<td>account id</td>
+<td>แก้ Exchange Rate id 7 (Settings)</td>
+<td>310</td>
+<td>7</td>
 <td><em>(ไม่ส่ง)</em></td>
+<td><code>NULL</code></td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p><strong>กฎง่าย:</strong> Module Merchant → ส่ง <strong><code>menuType</code> + <code>dataId</code> + <code>merchantId</code></strong></p>
+<p><strong>กฎง่าย:</strong> <code>menuType</code> + <code>dataId</code> (+ <code>merchantId</code> ถ้า Module Merchant) — ชนิด entity อ่านจาก <strong>MenuType</strong> ไม่ต้องส่ง RefType แยก</p>
 </blockquote>
-<p><strong>MenuType กับ DataId — คนละอย่าง</strong></p>
-<table>
-<thead>
-<tr>
-<th>ชุด</th>
-<th>ตัวอย่าง</th>
-<th>ความหมาย</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>MenuType</strong></td>
-<td><code>200</code>, <code>202</code></td>
-<td>หน้าเมนู (enum คงที่) — <strong>ไม่ใช่</strong> id record</td>
-</tr>
-<tr>
-<td><strong>DataId</strong></td>
-<td><code>100</code>, <code>501</code></td>
-<td><strong>id จริง</strong> ในตารางธุรกิจ</td>
-</tr>
-<tr>
-<td><strong>MerchantId</strong></td>
-<td><code>100</code></td>
-<td>id ร้าน — filter List</td>
-</tr>
-</tbody>
-</table>
-<pre><code>แก้ร้าน Chill Coffee (Merchants.Id = 100):
-  MenuType   = 200
-  DataId     = 100
-  MerchantId = 100
-  Ref*       = NULL
-
-แก้ Fee id 501 ของร้านเดียวกัน:
-  MenuType   = 202
-  DataId     = 501
-  MerchantId = 100
-  Ref*       = NULL
+<pre><code>แก้ Exchange Rate id 7 (เทียบ ExchangeRateLogs):
+  ModuleType = 3
+  MenuType   = 310
+  LogType    = 2 (Update)
+  Message    = Exchange rate updated
+  DataId     = 7          ← ExchangeRateId
+  OldValue   = { ... }
+  NewValue   = { ... }
+  RequestBy  = user id    ← AddedBy
+  RequestSystem = Admin
+  MerchantId = NULL
+  RefType / RefId / Ref2* = NULL
 </code></pre>
-<p><strong><code>POST /add</code> — web-backend ส่ง</strong></p>
+<p><strong><code>POST /add</code> — web-backend ส่ง (Phase 1)</strong></p>
 <ul>
 <li><code>moduleType</code>, <code>menuType</code>, <code>logType</code></li>
 <li><strong><code>dataId</code></strong></li>
 <li><strong><code>merchantId</code></strong> (Module Merchant)</li>
 <li><code>oldValue</code>, <code>newValue</code>, <code>message</code>, <code>requestSystem</code>, <code>requestBy</code></li>
-<li><strong>ไม่ส่ง</strong> <code>refId</code>, <code>refType</code>, <code>ref2Type</code>, <code>ref2Id</code></li>
 </ul>
-<p><strong>ตัวอย่าง Merchant Update</strong> (ร้าน 100)</p>
-<table>
-<thead>
-<tr>
-<th>คอลัมน์</th>
-<th>Writer ส่ง</th>
-<th>ใน DB</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>MenuType</td>
-<td>200</td>
-<td>200</td>
-</tr>
-<tr>
-<td>DataId</td>
-<td>100</td>
-<td>100</td>
-</tr>
-<tr>
-<td>MerchantId</td>
-<td>100</td>
-<td>100</td>
-</tr>
-<tr>
-<td>RefType / RefId / Ref2</td>
-<td><em>(ไม่ส่ง)</em></td>
-<td><strong>NULL</strong></td>
-</tr>
-</tbody>
-</table>
 <p><strong>ตัวอย่าง Merchant Fee Update</strong> (fee 501, ร้าน 100)</p>
 <table>
 <thead>
@@ -263,46 +273,54 @@ Admin List/Detail     →  SELECT VW_ChillpayOperationLogs
 <td>100</td>
 <td>100</td>
 </tr>
-<tr>
-<td>RefType / RefId / Ref2</td>
-<td><em>(ไม่ส่ง)</em></td>
-<td><strong>NULL</strong></td>
-</tr>
 </tbody>
 </table>
-<p><strong>ตัวอย่าง Payment Channel Update</strong> (Settings)</p>
+<p><strong>ตัวอย่าง Exchange Rate Update</strong> (Settings — แทน <code>ExchangeRateLogs</code>)</p>
+<p>Writer: <strong>web-backend</strong> (<code>ExchangeRateController</code> → <code>LogSettings*Async</code>) หลัง admin-api CRUD สำเร็จ</p>
 <table>
 <thead>
 <tr>
 <th>คอลัมน์</th>
-<th>Writer ส่ง</th>
 <th>ใน DB</th>
+<th><code>ExchangeRateLogs</code> เดิม</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>MenuType</td>
-<td>300</td>
-<td>300</td>
+<td>ModuleType / MenuType</td>
+<td>3 / 310</td>
+<td>—</td>
 </tr>
 <tr>
 <td>DataId</td>
 <td>7</td>
-<td>7</td>
+<td><code>ExchangeRateId = 7</code></td>
 </tr>
 <tr>
-<td>MerchantId</td>
-<td><em>(ไม่ส่ง)</em></td>
-<td><strong>NULL</strong></td>
+<td>LogType</td>
+<td>2 (Update)</td>
+<td>2 — Delete ใช้ <strong>5</strong></td>
 </tr>
 <tr>
-<td>RefType / RefId / Ref2</td>
-<td><em>(ไม่ส่ง)</em></td>
-<td><strong>NULL</strong></td>
+<td>OldValue / NewValue</td>
+<td>JSON เต็ม</td>
+<td>เหมือนกัน</td>
+</tr>
+<tr>
+<td>RequestBy</td>
+<td>user id</td>
+<td><code>AddedBy</code></td>
+</tr>
+<tr>
+<td>Ref* / MerchantId</td>
+<td><code>NULL</code></td>
+<td>—</td>
 </tr>
 </tbody>
 </table>
-<p>Writer <strong>ส่ง <code>merchantId</code> เอง</strong> สำหรับ Module Merchant — <code>ResolveMerchantId()</code> เป็น fallback จาก <code>MenuType=200</code> + <code>DataId</code> (เมื่อ Writer ไม่ส่ง)</p>
+<p><strong>อ่าน log (แทน <code>/ExchangeRateLog</code>):</strong> List กลาง → Module <strong>Settings (3)</strong> · Menu <strong>Exchange Rate (310)</strong> · <strong>Data Id</strong> = exchange rate id</p>
+<p><strong>Detail:</strong> Data Id ลิงก์ไป <code>/ExchangeRate/Update/{dataId}</code></p>
+<p>Writer <strong>ส่ง <code>merchantId</code> เอง</strong> สำหรับ Module Merchant — <code>ResolveMerchantId()</code> เป็น fallback จาก <code>DataId</code> / <code>MenuType</code> เมื่อ Writer ไม่ส่ง</p>
 <h3 id="ตาราง-chillpayoperationlogs--คอลัมน์">ตาราง <code>ChillpayOperationLogs</code> — คอลัมน์</h3>
 <table>
 <thead>
@@ -351,27 +369,27 @@ Admin List/Detail     →  SELECT VW_ChillpayOperationLogs
 <tr>
 <td><strong>DataId</strong></td>
 <td>bigint</td>
-<td>id ของ record ที่ถูก action — อ่านคู่ <strong>MenuType</strong></td>
+<td>id ของ record ที่ถูก action — เทียบ <code>ExchangeRateId</code> · อ่านคู่ <strong>MenuType</strong></td>
 </tr>
 <tr>
 <td><strong>RefType</strong></td>
 <td>int</td>
-<td><strong>NULL</strong> — Writer ไม่ส่ง (ชนิด entity จาก MenuType)</td>
+<td><em>(legacy / Phase 1 = <code>NULL</code>)</em> — ชนิด entity รุ่นก่อน</td>
 </tr>
 <tr>
 <td><strong>RefId</strong></td>
 <td>bigint</td>
-<td><strong>NULL</strong> — Writer ไม่ส่ง (ใช้ DataId แทน)</td>
+<td><em>(legacy / Phase 1 = <code>NULL</code>)</em></td>
 </tr>
 <tr>
 <td><strong>Ref2Type</strong></td>
 <td>int</td>
-<td><strong>NULL</strong> — Writer ไม่ส่ง (legacy ใน schema)</td>
+<td><em>(legacy / Phase 1 = <code>NULL</code>)</em></td>
 </tr>
 <tr>
 <td><strong>Ref2Id</strong></td>
 <td>bigint</td>
-<td><strong>NULL</strong> — Writer ไม่ส่ง (legacy ใน schema)</td>
+<td><em>(legacy / Phase 1 = <code>NULL</code>)</em></td>
 </tr>
 <tr>
 <td><strong>MerchantId</strong></td>
@@ -400,7 +418,7 @@ Admin List/Detail     →  SELECT VW_ChillpayOperationLogs
 </tr>
 </tbody>
 </table>
-<p>คอลัมน์ <strong>Ref*</strong> ยังอยู่ใน schema (legacy / PayOut) — Writer ใหม่ไม่ populate · ดู <strong>นโยบาย Writer</strong> ด้านบน</p>
+<p>คอลัมน์ <strong>Ref*</strong> ยังอยู่ใน schema (<code>nullable</code>) — Phase 1 Writer <strong>ไม่ populate</strong> · log เก่าที่มีค่าอาจยังแสดงใน View <code>*Text</code></p>
 <h3 id="index-และ-view">Index และ View</h3>
 <p><strong>Index</strong></p>
 <table>
@@ -435,7 +453,7 @@ Admin List/Detail     →  SELECT VW_ChillpayOperationLogs
 <tr>
 <td><code>IX_ChillpayOperationLogs_RefType_RefId</code></td>
 <td>RefType, RefId (filtered)</td>
-<td>legacy — Writer ไม่ populate</td>
+<td><em>(legacy)</em> — log เก่า / integration</td>
 </tr>
 <tr>
 <td><code>IX_ChillpayOperationLogs_MerchantId</code></td>
@@ -481,7 +499,7 @@ Admin List/Detail     →  SELECT VW_ChillpayOperationLogs
 </tr>
 <tr>
 <td><code>RefTypeText</code> / <code>Ref2TypeText</code></td>
-<td>ชื่อ entity จาก CASE (แบบ PayOut)</td>
+<td>ชื่อ entity จาก CASE — ว่างเมื่อ Ref* เป็น <code>NULL</code> (Phase 1)</td>
 </tr>
 <tr>
 <td><code>MerchantCode</code>, <code>CompanyName</code>, …</td>
@@ -514,7 +532,7 @@ Admin List/Detail     →  SELECT VW_ChillpayOperationLogs
 <tr>
 <td>3</td>
 <td><a href="sql/ChillpayOperationLogs-View.sql"><code>ChillpayOperationLogs-View.sql</code></a></td>
-<td>สร้าง/อัปเดต View <code>*Text</code> (รันบ่อยเมื่อเพิ่ม Menu/Ref)</td>
+<td>สร้าง/อัปเดต View <code>*Text</code> (รันบ่อยเมื่อเพิ่ม Menu/Module/Log)</td>
 </tr>
 </tbody>
 </table>

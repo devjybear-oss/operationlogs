@@ -46,8 +46,8 @@
     
     <article class="content prose">
       <h2 id="registry-sync-manual">Registry Sync (Manual)</h2>
-<p>Registry ต้อง <strong>sync มือ</strong> ทุกครั้งที่เพิ่มหรือแก้ <code>ModuleType</code> / <code>MenuType</code> / <code>LogType</code> / <code>RefType</code> — กระจาย <strong>4 จุด</strong> ระหว่าง <strong>operation-logs-api</strong>, <strong>web-backend</strong> และ <strong>SQL View</strong> (ดู โปรเจคที่เกี่ยวข้อง)</p>
-<p><strong>ไม่ต้อง sync:</strong> <strong>web-frontend</strong> (web-frontend (Frontend)) — Phase 1 ไม่มีไฟล์ Operation Logs</p>
+<p>Registry ต้อง <strong>sync มือ</strong> ทุกครั้งที่เพิ่มหรือแก้ <code>ModuleType</code> / <code>MenuType</code> / <code>LogType</code> — กระจาย <strong>4 จุด</strong> ระหว่าง <strong>operation-logs-api</strong>, <strong>web-backend</strong> และ <strong>SQL View</strong> (ดู โปรเจคที่เกี่ยวข้อง)</p>
+<p><strong>ไม่ต้อง sync:</strong> <strong>web-frontend</strong> (web-frontend (Frontend)) — Phase 1 ไม่มีไฟล์ Operation Logs · <strong>RefType enum</strong> — Phase 1 Writer ไม่ใช้ (คอลัมน์ Ref ใน DB เป็น <code>NULL</code>)</p>
 <h3 id="แหล่งอ้างอิงหลัก--ไฟล์ต้นฉบับของ-registry">แหล่งอ้างอิงหลัก — ไฟล์ต้นฉบับของ Registry</h3>
 <p><strong>ต้นฉบับ:</strong> <code>operation-logs-api</code> → <code>OperationLogConstants.cs</code> (operation-logs-api (API))</p>
 <p>เวลาเพิ่มหรือแก้ registry <strong>แก้ที่ไฟล์นี้ก่อน</strong> แล้วค่อยไปอัปจุดอื่นให้ตรงกัน — API ใช้ enum นี้ validate ตอน <code>POST /add</code> และ <code>POST /search</code></p>
@@ -73,11 +73,11 @@
 </tr>
 <tr>
 <td><code>ResolveMerchantId()</code></td>
-<td>fallback <code>MerchantId</code> จาก <code>MenuType=200</code> + <code>DataId</code> (ดู Database → นโยบาย Writer)</td>
+<td>fallback <code>MerchantId</code> จาก <code>DataId</code> / <code>MenuType</code> (ดู Database → นโยบาย Writer)</td>
 </tr>
 </tbody>
 </table>
-<p><code>ChillpayOperationLogRegistryConstants.cs</code> ใน <strong>web-backend</strong> (web-backend (Backend)) เป็น <strong>สำเนา</strong> สำหรับ writer และ UI — ตัวเลขต้องตรงกับต้นฉบับใน API เสมอ</p>
+<p><code>ChillpayOperationLogRegistryConstants.cs</code> ใน <strong>web-backend</strong> (web-backend (Backend)) เป็น <strong>สำเนา</strong> สำหรับ writer และ UI — ตัวเลข <strong>Module / Menu / LogType</strong> ต้องตรงกับต้นฉบับใน API</p>
 <h3 id="จุดที่ต้อง-sync">จุดที่ต้อง sync</h3>
 <table>
 <thead>
@@ -93,13 +93,13 @@
 <td>1</td>
 <td>operation-logs-api (operation-logs-api (API))</td>
 <td><code>OperationLogConstants.cs</code></td>
-<td><strong>ต้นฉบับ</strong> — enum Module / Menu / LogType / RefType + validate + <code>AllModuleTypes</code></td>
+<td><strong>ต้นฉบับ</strong> — enum Module / Menu / LogType + validate + <code>AllModuleTypes</code></td>
 </tr>
 <tr>
 <td>2</td>
 <td>web-backend (web-backend (Backend))</td>
 <td><code>ChillpayOperationLogRegistryConstants.cs</code></td>
-<td>สำเนา + <code>Get*Text</code> + <code>GetAllowedActions</code> + <code>DefaultAllowedActions</code> + <code>ResolveModuleTypes</code></td>
+<td>สำเนา + <code>GetMenuTypeText</code> + <code>GetAllowedActions</code></td>
 </tr>
 <tr>
 <td>3</td>
@@ -111,7 +111,7 @@
 <td>4</td>
 <td>SQL Server (View script)</td>
 <td><code>docs/sql/ChillpayOperationLogs-View.sql</code></td>
-<td><code>CASE</code> ใน <code>ModuleTypeText</code>, <code>MenuTypeText</code>, <code>LogTypeText</code>, <code>RefTypeText</code>, <code>Ref2TypeText</code></td>
+<td><code>CASE</code> ใน <code>ModuleTypeText</code>, <code>MenuTypeText</code>, <code>LogTypeText</code> (+ <code>RefTypeText</code> ถ้ามี log เก่า)</td>
 </tr>
 </tbody>
 </table>
@@ -119,19 +119,19 @@
 <h3 id="ขั้นตอนเมื่อเพิ่ม-menutype-ใหม่">ขั้นตอนเมื่อเพิ่ม MenuType ใหม่</h3>
 <p><strong>ตัวอย่าง:</strong> เพิ่มเมนูใหม่ใน Module 3 (Settings)</p>
 <ol>
-<li><strong>API (operation-logs-api (API))</strong> — เพิ่มใน <code>ChillpayOperationLogMenuType</code> (+ <code>ChillpayOperationLogRefType</code> ถ้ามี entity ใหม่) ใน <code>OperationLogConstants.cs</code></li>
-<li><strong>web-backend C# (web-backend (Backend))</strong> — เพิ่ม <code>Menu*</code> / <code>Ref*</code> ใน <code>ChillpayOperationLogRegistryConstants.cs</code> พร้อม <code>GetMenuTypeText</code>, <code>GetRefTypeText</code>, <code>GetAllowedActions</code></li>
+<li><strong>API (operation-logs-api (API))</strong> — เพิ่มใน <code>ChillpayOperationLogMenuType</code> ใน <code>OperationLogConstants.cs</code></li>
+<li><strong>web-backend C# (web-backend (Backend))</strong> — เพิ่ม <code>Menu*</code> ใน <code>ChillpayOperationLogRegistryConstants.cs</code> พร้อม <code>GetMenuTypeText</code>, <code>GetAllowedActions</code></li>
 <li><strong>web-backend JS (web-backend (Backend))</strong> — เพิ่มใน <code>ChillpayOperationLogMenuFilterByModule</code>, allowed actions ใน <code>*MenuActions</code> และ <code>ChillpayOperationLogDefaultMenuActions</code> ถ้าใช้ default</li>
-<li><strong>SQL View (View script)</strong> — เพิ่ม <code>WHEN … THEN N'…'</code> ใน View แล้วรัน <code>ChillpayOperationLogs-View.sql</code> บน DB ทุก env (<code>python docs/extract-sql.py</code> ถ้าแก้ใน MD)</li>
-<li><strong>Writer (web-backend (Backend))</strong> — <code>ChillpayOperationLogWriter</code> + controller ของเมนูนั้น (เรียกหลัง business success)</li>
+<li><strong>SQL View (View script)</strong> — เพิ่ม <code>WHEN … THEN N'…'</code> ใน <code>MenuTypeText</code> (และ <code>ModuleTypeText</code> ถ้า module ใหม่) แล้วรัน <code>ChillpayOperationLogs-View.sql</code> บน DB ทุก env (<code>python docs/extract-sql.py</code> ถ้าแก้ใน MD)</li>
+<li><strong>Writer (web-backend (Backend))</strong> — <code>ChillpayOperationLogWriter</code> + controller ของเมนูนั้น — ส่ง <code>menuType</code> + <code>dataId</code> (+ <code>merchantId</code> ถ้า Module Merchant)</li>
 <li><strong>ตรวจ</strong> — Save → row ใน <code>ChillpayOperationLogs</code> → หน้า List เห็นชื่อเมนู → Detail แสดง <code>MenuTypeText</code> ถูก</li>
 </ol>
 <h3 id="checklist-สำหรับ-pr">Checklist สำหรับ PR</h3>
-<pre><code>[ ] OperationLogConstants.cs — MenuType (+ RefType ถ้ามี) + AllModuleTypes
-[ ] ChillpayOperationLogRegistryConstants.cs — const + Get*Text + GetAllowedActions + DefaultAllowedActions
+<pre><code>[ ] OperationLogConstants.cs — MenuType + AllModuleTypes
+[ ] ChillpayOperationLogRegistryConstants.cs — Menu const + GetMenuTypeText + GetAllowedActions
 [ ] chillpay-operation-log-constants.js — MenuFilter + *MenuActions + DefaultMenuActions
-[ ] ChillpayOperationLogs-View.sql — CASE Module/Menu/Log/Ref/Ref2 (+ รัน SQL ทุก env)
-[ ] Writer — controller ของเมนูที่เพิ่ม/แก้ (web-backend (Backend))
+[ ] ChillpayOperationLogs-View.sql — CASE Module/Menu/Log (+ รัน SQL ทุก env)
+[ ] Writer — controller ของเมนูที่เพิ่ม/แก้ (menuType + dataId + merchantId)
 [ ] PR รวม operation-logs-api + web-backend
 </code></pre>
 <h3 id="ถ้า-sync-ไม่ครบ--อาการและวิธีแก้">ถ้า sync ไม่ครบ — อาการและวิธีแก้</h3>
