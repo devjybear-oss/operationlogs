@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registry — Chillpay Operation Logs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+
+</head>
+<body>
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="เปิดเมนู">☰</button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">CP</div>
+      <div>
+        <div class="brand-title">Operation Logs</div>
+        <div class="brand-sub">Chillpay Docs</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-link" href="index.html"><span class="nav-icon">◈</span><span class="nav-text"><strong>ภาพรวม</strong><small>Summary & Checklist</small></span></a>
+<a class="nav-link active" href="registry.html"><span class="nav-icon">▣</span><span class="nav-text"><strong>Registry</strong><small>ModuleType · MenuType · LogType</small></span></a>
+<a class="nav-link" href="ui.html"><span class="nav-icon">▦</span><span class="nav-text"><strong>UI</strong><small>List · Detail</small></span></a>
+<a class="nav-link" href="api.html"><span class="nav-icon">⟡</span><span class="nav-text"><strong>API</strong><small>Endpoints & Parameters</small></span></a>
+<a class="nav-link" href="database.html"><span class="nav-icon">⬡</span><span class="nav-text"><strong>Database</strong><small>Schema · Writer · SQL Script</small></span></a>
+<a class="nav-link" href="files.html"><span class="nav-icon">◎</span><span class="nav-text"><strong>โปรเจคที่เกี่ยวข้อง</strong><small>operation-logs-api · web-backend</small></span></a>
+<a class="nav-link" href="sync.html"><span class="nav-icon">↻</span><span class="nav-text"><strong>Registry Sync</strong><small>Manual sync checklist</small></span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <span>อัปเดต 2026-06-29</span>
+      <span>Phase 1</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="page-header">
+      <p class="page-eyebrow">Chillpay Operation Logs</p>
+      <h1 class="page-title">Registry</h1>
+      <p class="page-subtitle">ModuleType · MenuType · LogType</p>
+    </header>
+    
+    <article class="content prose">
+      <h2 id="อธิบาย-registry--moduletype-menutype-logtype">อธิบาย Registry — ModuleType, MenuType, LogType</h2>
+<h3 id="ภาพรวม-3-ชั้น">ภาพรวม 3 ชั้น</h3>
+<pre><code>ModuleType (1–14)          ← หมวดใหญ่ = sidebar Admin (Merchant, Settings, …)
+    └── MenuType           ← หน้าย่อยที่เขียน log ได้ (Fee, Route, Payment Channel, …)
+            └── LogType    ← action ที่เกิดขึ้น (Create, Update, Delete, …)
+                    └── DataId + MerchantId  ← id record + ร้าน (Module Merchant)
+</code></pre>
+<p><strong>ทำไมแยก 3 ชั้น?</strong></p>
+<table>
+<thead>
+<tr>
+<th>ชั้น</th>
+<th>ตอบคำถาม</th>
+<th>ตัวอย่าง</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ModuleType</strong></td>
+<td>log นี้อยู่ <strong>หมวดไหน</strong> ของ Admin?</td>
+<td>2 = Merchant</td>
+</tr>
+<tr>
+<td><strong>MenuType</strong></td>
+<td>log นี้มาจาก <strong>หน้า/เมนูไหน</strong>?</td>
+<td>202 = Merchant Fee</td>
+</tr>
+<tr>
+<td><strong>LogType</strong></td>
+<td><strong>ทำอะไร</strong> กับ record นั้น?</td>
+<td>2 = Update</td>
+</tr>
+</tbody>
+</table>
+<p>แยกจาก PayOut ที่ใช้ LogType เป็นช่วงเลขแทน Menu — แบบ Chillpay map กับ sidebar Admin ได้ตรง</p>
+<h3 id="moduletype--หมวดใหญ่-1-14">ModuleType — หมวดใหญ่ (1–14)</h3>
+<p><code>ModuleType</code> = ลำดับ module ตาม sidebar Web Admin — กำหนดใน enum <code>ChillpayOperationLogModuleType</code> (<code>OperationLogConstants.cs</code>)</p>
+<pre><code class="language-csharp">public enum ChillpayOperationLogModuleType
+{
+    User = 1,
+    Merchant = 2,
+    Settings = 3,
+    Transactions = 4,
+    Settlements = 5,
+    ManageTransaction = 6,
+    PayLink = 7,
+    Fraud = 8,
+    Etax = 9,
+    OddService = 10,
+    ChillAppPartner = 11,
+    Wallet = 12,
+    Recurring = 13,
+    Commission = 14,
+}
+</code></pre>
+<p><strong>บนหน้า List:</strong> dropdown <strong>Module</strong> — เลือกหมวดเดียว หรือ Select All (ค้นทุก module ที่เปิดใช้)</p>
+<h3 id="menutype--เมนูย่อยที่เขียน-log-ได้">MenuType — เมนูย่อยที่เขียน log ได้</h3>
+<p><code>MenuType</code> = หน้า Admin ที่มี operation log (create / update / delete ฯลฯ) — กำหนดใน enum <code>ChillpayOperationLogMenuType</code> (<code>OperationLogConstants.cs</code>)</p>
+<pre><code class="language-csharp">public enum ChillpayOperationLogMenuType
+{
+    // Module 1 — User
+    Account = 101,
+    Role = 102,
+
+    // Module 2 — Merchant
+    Merchant = 200,
+    MerchantUser = 201,
+    MerchantFee = 202,
+    MerchantRoute = 203,
+    MerchantServiceFee = 204,
+    GenerateMerchantKeys = 205,
+    MerchantEmails = 206,
+
+    // Module 3 — Settings
+    PaymentChannel = 300,
+    PaymentRoute = 301,
+    PaymentRouteInquiry = 302,
+    CreditCardConfig = 303,
+    SwitchPaymentRouteChannel = 305,
+    ChillPayMaintenance = 306,
+    BankMaintenance = 307,
+    BankPaymentApiSetting = 308,
+    SMSRoute = 309,
+    ExchangeRate = 310,
+    ExchangeRateLog = 311,
+
+    // Module 4 — Transactions
+    Payment = 401,
+    Void = 402,
+    RefundOld = 403,
+    RefundTransaction = 404,
+    ApproveRefund = 405,
+    SettlementOld = 406,
+    PaymentSummaryOld = 407,
+    ImportMcc = 408,
+    InquiryTransaction = 409,
+    WarningTransaction = 410,
+
+    // Module 5 — Settlements
+    SettlementDashboard = 501,
+    Settlement = 502,
+    SettlementUploadFile = 503,
+    SettlementMerchantTransfer = 504,
+    SettlementMerchantSetting = 505,
+    SettlementStatus = 506,
+    DownloadPaymentSummary = 507,
+
+    // Module 6 — Manage Transaction
+    UpdateTransactionStatus = 601,
+    UpdateSettlementStatus = 602,
+    UpdateTransferDate = 603,
+
+    // Module 7 — PayLink
+    PayLinkLink = 701,
+    PayLinkTransaction = 702,
+
+    // Module 8 — Fraud
+    FraudCreditCardTransactions = 801,
+    FraudObserveConfiguration = 802,
+    FraudObserveTransactions = 803,
+    FraudAlertConfiguration = 804,
+    FraudAlertTransactions = 805,
+
+    // Module 9 — Etax
+    EtaxMerchantProfile = 901,
+    EtaxEndUserProfile = 902,
+    EtaxSaleManage = 903,
+    EtaxUploadSettlement = 904,
+    EtaxUpdateSettlement = 905,
+    EtaxSettlementPayOut = 906,
+    EtaxInvoiceMerchant = 907,
+    EtaxInvoiceEndUser = 908,
+    EtaxInvoiceTransactions = 909,
+    EtaxPnd = 910,
+    EtaxInvoiceAbbTransactions = 911,
+    EtaxOutstandingInvoice = 912,
+    EtaxCancelInvoice = 913,
+    EtaxCreditNote = 914,
+    EtaxDebitNote = 915,
+    EtaxCreditNoteInvAbb = 916,
+
+    // Module 10 — Odd Service
+    OddRoute = 1001,
+    OddMerchantRoute = 1002,
+    OddRegister = 1003,
+    OddBayConfigs = 1004,
+    OddBayCustomer = 1005,
+    OddScbConfigs = 1006,
+    OddScbCustomer = 1007,
+    OddKtbConfigs = 1008,
+
+    // Module 11 — Chill App Partner
+    ChillAppMembers = 1101,
+    ChillAppTransactions = 1102,
+    ChillAppPartners = 1103,
+    ChillAppPayTransactions = 1104,
+    ChillAppSettlementPayTransactions = 1105,
+
+    // Module 12 — Wallet
+    WalletMerchant = 1201,
+    WalletShopSendMoneyFee = 1202,
+    WalletTransaction = 1203,
+    WalletSettlementTransaction = 1204,
+    WalletSettlementReport = 1205,
+    WalletSettleVersion = 1206,
+
+    // Module 13 — Recurring
+    RecurringMerchant = 1301,
+    RecurringSchedule = 1302,
+    RecurringTransactions = 1303,
+
+    // Module 14 — Commission
+    CommissionReseller = 1401,
+    CommissionResellerPayout = 1402,
+    CommissionReports = 1403,
+    CommissionDownloadReports = 1404,
+}
+</code></pre>
+<p><strong>บนหน้า List:</strong> dropdown <strong>Menu</strong> — แสดงเมื่อเลือก Module แล้ว; Select All = ไม่ส่ง <code>menuType</code> (ได้ทุกเมนูใน module)</p>
+<h3 id="logtype--action-ประเภทการกระทำ">LogType — Action (ประเภทการกระทำ)</h3>
+<p><code>LogType</code> = <strong>action กลาง</strong> ใช้ร่วมทุก module — ไม่ใช่ชื่อเมนู — กำหนดใน enum <code>ChillpayOperationLogActionType</code> (<code>OperationLogConstants.cs</code>)</p>
+<pre><code class="language-csharp">public enum ChillpayOperationLogActionType
+{
+    Create = 1,
+    Update = 2,
+    Activate = 3,
+    Inactivate = 4,
+    Delete = 5,
+    Generate = 7,
+    UpdateStatus = 8,
+    Approve = 9,
+    Reject = 10,
+}
+</code></pre>
+<p><strong>บนหน้า List:</strong> dropdown <strong>Log Type</strong> — filter ตาม action; รายการที่แสดงขึ้นกับ Menu ที่เลือก (แต่ละเมนูอนุญาต action ไม่เหมือนกัน เช่น Generate Keys มีแค่ action 7)</p>
+<p><strong>การตัดสิน LogType ตอน Update (Writer):</strong></p>
+<ol>
+<li>Serialize <code>beforeSnapshot</code> / <code>afterSnapshot</code> เต็ม</li>
+<li><code>GetChangedFieldsJson</code> → diff เฉพาะ field ที่เปลี่ยน</li>
+<li><code>ChillpayMerchantOperationLogResolver.ResolveUpdateAction(menuType, diff)</code> → เลือก Update / Activate / UpdateStatus</li>
+<li>บันทึก log ด้วย snapshot เต็มใน OldValue/NewValue</li>
+</ol>
+<h3 id="dataid-reftype-refid--อ้างอิง-entity">DataId, RefType, RefId — อ้างอิง entity</h3>
+<blockquote>
+<p><strong>นโยบายปัจจุบัน (Database → นโยบาย Writer):</strong> Writer เก็บ <strong><code>MenuType</code> + <code>DataId</code> + <code>MerchantId</code></strong> · <strong>ไม่เก็บ</strong> <code>RefType</code> / <code>RefId</code> / <code>Ref2Type</code> / <code>Ref2Id</code> (<code>NULL</code>) — ชนิด entity อ่านจาก <strong>MenuType</strong>
+ส่วนด้านล่างอธิบาย <code>RefType</code> / <code>RefId</code> / <code>Ref2</code> แบบ legacy / PayOut — Writer ใหม่ไม่ populate</p>
+<p><strong>entity คืออะไร?</strong><br />
+<strong>entity</strong> = <strong>ข้อมูล 1 รายการในระบบ</strong> ที่ถูก Create / Update / Delete แล้วเราบันทึก log ไว้<br />
+ไม่ใช่หน้าเมนู ไม่ใช่ module — คือ <strong>“สิ่ง” ที่ถูก action</strong> พร้อม <strong>id ของมัน</strong></p>
+<table>
+<thead>
+<tr>
+<th>ในชีวิตจริง</th>
+<th>entity ในระบบ</th>
+<th>id ตัวอย่าง</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ร้านค้า 1 ร้าน</td>
+<td>Merchant</td>
+<td>100</td>
+</tr>
+<tr>
+<td>ค่า Fee ของร้าน 1 รายการ</td>
+<td>MerchantFee</td>
+<td>501</td>
+</tr>
+<tr>
+<td>Payment Channel 1 ช่องทาง</td>
+<td>PaymentChannel</td>
+<td>7</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>RefType</code></strong> บอกว่า entity เป็น <strong>ชนิดไหน</strong> (Merchant, MerchantFee, …)<br />
+<strong><code>RefId</code></strong> บอกว่าเป็น <strong>ตัวที่เท่าไหร่</strong> (เลข id ในตารางนั้น)<br />
+ต้องอ่าน <strong>สองค่านี้คู่กัน</strong> — เลข id อย่างเดียวไม่รู้ว่าเป็น fee หรือ merchant</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>ความหมาย</th>
+<th>ตัวอย่าง (แก้ Fee id 501 ของ merchant 100)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DataId</strong></td>
+<td>id ของสิ่งที่ถูก action (มัก = RefId)</td>
+<td>501</td>
+</tr>
+<tr>
+<td><strong>RefType</strong></td>
+<td><strong>ชนิด</strong>ของสิ่งที่ถูก action</td>
+<td>20002 = Merchant Fee</td>
+</tr>
+<tr>
+<td><strong>RefId</strong></td>
+<td><strong>id</strong> ของสิ่งนั้น</td>
+<td>501</td>
+</tr>
+<tr>
+<td><strong>Ref2Type / Ref2Id</strong></td>
+<td>ชนิด + id ของสิ่งที่<strong>เกี่ยวข้อง</strong> (มักร้านแม่)</td>
+<td>20000 / 100 = Merchant</td>
+</tr>
+<tr>
+<td><strong>MerchantId</strong></td>
+<td>id ร้านค้า — เก็บในตารางตอน INSERT (แบบ PayOut)</td>
+<td>100</td>
+</tr>
+</tbody>
+</table>
+<h4 id="reftype--refid-คืออะไร">RefType + RefId คืออะไร</h4>
+<p><strong>RefType + RefId</strong> = บอกว่า log นี้เกี่ยวกับ <strong>ข้อมูลชนิดไหน ตัวไหน</strong> (สิ่งที่ถูก action)</p>
+<table>
+<thead>
+<tr>
+<th>ส่วน</th>
+<th>ฟิลด์</th>
+<th>ตอบคำถาม</th>
+<th>ตัวอย่าง</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ชนิด</td>
+<td><strong>RefType</strong></td>
+<td>มันคือ <strong>อะไร</strong></td>
+<td><code>20002</code> = MerchantFee</td>
+</tr>
+<tr>
+<td>ตัวไหน</td>
+<td><strong>RefId</strong></td>
+<td><strong>ตัวที่เท่าไหร่</strong></td>
+<td><code>501</code> = fee id 501</td>
+</tr>
+</tbody>
+</table>
+<p>รวมกัน → <strong>MerchantFee ตัวที่ 501</strong></p>
+<p>เลข <code>501</code> อย่างเดียวไม่บอกว่าเป็น fee, merchant หรือ route — ต้องมี <code>RefType</code> บอกชนิดด้วย:</p>
+<pre><code>RefType = 20002 (MerchantFee)  +  RefId = 501  →  แก้ Fee id 501
+RefType = 20000 (Merchant)     +  RefId = 100  →  แก้ Merchant id 100
+</code></pre>
+<p><strong>ตัวอย่างเปรียบเทียบ</strong></p>
+<table>
+<thead>
+<tr>
+<th>สถานการณ์</th>
+<th>RefType</th>
+<th>RefId</th>
+<th>Ref2Type / Ref2Id</th>
+<th>ความหมาย</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>แก้ Merchant โดยตรง (ตัวอย่าง — Merchant Update)</td>
+<td>20000 (Merchant)</td>
+<td>100</td>
+<td>20000 / 100</td>
+<td>แก้ร้าน id 100</td>
+</tr>
+<tr>
+<td>แก้ Merchant Fee (ตัวอย่าง record — Merchant Fee Update)</td>
+<td>20002 (MerchantFee)</td>
+<td>501</td>
+<td>20000 / 100</td>
+<td>แก้ fee 501 ของร้าน 100</td>
+</tr>
+</tbody>
+</table>
+<p><code>RefType</code> = รหัสชนิดของสิ่งที่ถูก action — กำหนดใน enum <code>ChillpayOperationLogRefType</code> (ไม่ใช่ <code>MenuType</code> · ดูตารางด้านล่าง)</p>
+<h4 id="menutype--reftype--คนละ-enum-คนละเลข">MenuType ↔ RefType — คนละ enum คนละเลข</h4>
+<p><code>MenuType</code> กับ <code>RefType</code> <strong>ไม่ใช่ค่าเดียวกัน</strong> — ชื่อ enum member อาจคล้ายกัน แต่ตัวเลขอยู่คนละช่วง:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>MenuType</strong></th>
+<th><strong>RefType</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ตอบว่า</td>
+<td>มาจาก <strong>หน้าเมนูไหน</strong></td>
+<td><strong>สิ่งที่ถูก action ชนิดไหน</strong> (คู่กับ <code>RefId</code>)</td>
+</tr>
+<tr>
+<td>ช่วงตัวเลข</td>
+<td>~<code>101</code>–<code>1404</code> (3–4 หลัก)</td>
+<td>~<code>10001</code>–<code>140000</code> (Module × 10000 + offset)</td>
+</tr>
+<tr>
+<td>ตัวอย่าง Merchant Fee</td>
+<td><strong>202</strong></td>
+<td><strong>20002</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Module ที่ map แบบ 1:1</strong> (ชื่อและลำดับสอดคล้องกัน — RefType เรียงตาม MenuType ใน module เดียวกัน, ข้ามเมนูที่ไม่มี RefType):</p>
+<table>
+<thead>
+<tr>
+<th>ชื่อ</th>
+<th>MenuType</th>
+<th>RefType</th>
+<th>หมายเหตุ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module 1 — User</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Account</td>
+<td>101</td>
+<td>10001</td>
+<td></td>
+</tr>
+<tr>
+<td>Role</td>
+<td>102</td>
+<td>10002</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Module 2 — Merchant</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Merchant</td>
+<td>200</td>
+<td>20000</td>
+<td></td>
+</tr>
+<tr>
+<td>MerchantUser</td>
+<td>201</td>
+<td>20001</td>
+<td></td>
+</tr>
+<tr>
+<td>MerchantFee</td>
+<td>202</td>
+<td>20002</td>
+<td>ตัวอย่าง ตัวอย่าง record — Merchant Fee Update</td>
+</tr>
+<tr>
+<td>MerchantRoute</td>
+<td>203</td>
+<td>20003</td>
+<td></td>
+</tr>
+<tr>
+<td>MerchantServiceFee</td>
+<td>204</td>
+<td>20004</td>
+<td></td>
+</tr>
+<tr>
+<td>GenerateMerchantKeys</td>
+<td>205</td>
+<td><em>(ไม่มี RefType แยก)</em></td>
+<td>มักอ้าง <code>Merchant</code> (20000) ของร้านที่ gen key</td>
+</tr>
+<tr>
+<td>MerchantEmails</td>
+<td>206</td>
+<td>20005 (MerchantEmail)</td>
+<td>ชื่อ enum ต่างกันเล็กน้อย</td>
+</tr>
+<tr>
+<td><strong>Module 3 — Settings</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>PaymentChannel</td>
+<td>300</td>
+<td>30000</td>
+<td></td>
+</tr>
+<tr>
+<td>PaymentRoute</td>
+<td>301</td>
+<td>30001</td>
+<td></td>
+</tr>
+<tr>
+<td>PaymentRouteInquiry</td>
+<td>302</td>
+<td>30002</td>
+<td></td>
+</tr>
+<tr>
+<td>CreditCardConfig</td>
+<td>303</td>
+<td>30003</td>
+<td></td>
+</tr>
+<tr>
+<td>SwitchPaymentRouteChannel</td>
+<td>305</td>
+<td><em>(ไม่มี RefType แยก)</em></td>
+<td></td>
+</tr>
+<tr>
+<td>ChillPayMaintenance</td>
+<td>306</td>
+<td>30004</td>
+<td></td>
+</tr>
+<tr>
+<td>BankMaintenance</td>
+<td>307</td>
+<td>30005</td>
+<td></td>
+</tr>
+<tr>
+<td>BankPaymentApiSetting</td>
+<td>308</td>
+<td>30006</td>
+<td></td>
+</tr>
+<tr>
+<td>SMSRoute</td>
+<td>309</td>
+<td>30007</td>
+<td></td>
+</tr>
+<tr>
+<td>ExchangeRate</td>
+<td>310</td>
+<td>30008</td>
+<td></td>
+</tr>
+<tr>
+<td>ExchangeRateLog</td>
+<td>311</td>
+<td>30009</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Module อื่น — หลาย <code>MenuType</code> ใช้ <code>RefType</code> ก้อนเดียว</strong> (ระบุชนิด entity หยาบ ไม่แยกทุกหน้าเมนู):</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>MenuType (ตัวอย่าง)</th>
+<th>RefType ที่ใช้</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4 Transactions</td>
+<td>401–410 (Payment, Void, Refund …)</td>
+<td>40000 (PaymentTransaction)</td>
+</tr>
+<tr>
+<td>5 Settlements</td>
+<td>501–507</td>
+<td>50000 (SettlementRecord)</td>
+</tr>
+<tr>
+<td>6 Manage Transaction</td>
+<td>601–603</td>
+<td>60000 (ManagedTransaction)</td>
+</tr>
+<tr>
+<td>7 PayLink</td>
+<td>701–702</td>
+<td>70000 (PayLinkRecord)</td>
+</tr>
+<tr>
+<td>8 Fraud</td>
+<td>801–805</td>
+<td>80000 (FraudRecord)</td>
+</tr>
+<tr>
+<td>9 Etax</td>
+<td>901–916</td>
+<td>90000 (EtaxRecord)</td>
+</tr>
+<tr>
+<td>10 Odd Service</td>
+<td>1001–1008</td>
+<td>100000 (OddRecord)</td>
+</tr>
+<tr>
+<td>11 Chill App Partner</td>
+<td>1101–1105</td>
+<td>110000 (ChillAppRecord)</td>
+</tr>
+<tr>
+<td>12 Wallet</td>
+<td>1201–1206</td>
+<td>120000 (WalletRecord)</td>
+</tr>
+<tr>
+<td>13 Recurring</td>
+<td>1301–1303</td>
+<td>130000 (RecurringRecord)</td>
+</tr>
+<tr>
+<td>14 Commission</td>
+<td>1401–1404</td>
+<td>140000 (CommissionRecord)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>สรุป:</strong> <code>MenuType</code> บอก <strong>แหล่งที่มา (หน้า UI)</strong> · <code>RefType</code> + <code>RefId</code> บอก <strong>record ที่ถูก action</strong> — เลขไม่ซ้ำกัน แม้ชื่อจะคล้าย</p>
+</blockquote>
+<p><strong>Merchant filter บนหน้า List:</strong> <code>merchantId=[100]</code> — ดึง log ทุกเมนูของร้านนั้น (ใช้ index <code>IX_ChillpayOperationLogs_MerchantId</code> · แบบเดียวกับ PayOut <code>MerchantId.Contains</code>)</p>
+<pre><code class="language-csharp">public enum ChillpayOperationLogRefType
+{
+    Undefined = 0,
+
+    // User (Module 1 — 10001+)
+    Account = 10001,
+    Role = 10002,
+
+    // Merchant (Module 2 — 20000+)
+    Merchant = 20000,
+    MerchantUser = 20001,
+    MerchantFee = 20002,
+    MerchantRoute = 20003,
+    MerchantServiceFee = 20004,
+    MerchantEmail = 20005,
+
+    // Settings (Module 3 — 30000+)
+    PaymentChannel = 30000,
+    PaymentRoute = 30001,
+    PaymentRouteInquiry = 30002,
+    CreditCardConfig = 30003,
+    ChillPayMaintenance = 30004,
+    BankMaintenance = 30005,
+    BankPaymentApiSetting = 30006,
+    SMSRoute = 30007,
+    ExchangeRate = 30008,
+    ExchangeRateLog = 30009,
+
+    // Transactions (Module 4 — 40000+)
+    PaymentTransaction = 40000,
+
+    // Settlements (Module 5 — 50000+)
+    SettlementRecord = 50000,
+
+    // Manage Transaction (Module 6 — 60000+)
+    ManagedTransaction = 60000,
+
+    // PayLink (Module 7 — 70000+)
+    PayLinkRecord = 70000,
+
+    // Fraud (Module 8 — 80000+)
+    FraudRecord = 80000,
+
+    // Etax (Module 9 — 90000+)
+    EtaxRecord = 90000,
+
+    // Odd Service (Module 10 — 100000+)
+    OddRecord = 100000,
+
+    // Chill App Partner (Module 11 — 110000+)
+    ChillAppRecord = 110000,
+
+    // Wallet (Module 12 — 120000+)
+    WalletRecord = 120000,
+
+    // Recurring (Module 13 — 130000+)
+    RecurringRecord = 130000,
+
+    // Commission (Module 14 — 140000+)
+    CommissionRecord = 140000,
+}
+</code></pre>
+<p><strong>Merchant filter บนหน้า List (เดิม):</strong> ~~<code>refType=[20000], refId=merchantId</code>~~ → ใช้ <strong><code>merchantId=[merchantId]</code></strong> แทนแล้ว</p>
+<h3 id="flow-การเขียน-log">Flow การเขียน Log</h3>
+<p><strong>กฎ:</strong> บันทึก Operation Log <strong>ต่อเมื่อรายการนั้น success เท่านั้น</strong> — เรียก writer หลัง business action ผ่าน (เช่น <code>CreateOrUpdateAsync</code> คืน <code>Succeeded</code>)</p>
+<table>
+<thead>
+<tr>
+<th>สถานการณ์</th>
+<th>เขียน Log?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save / Create / Update / Delete <strong>ไม่สำเร็จ</strong></td>
+<td><strong>ไม่</strong></td>
+</tr>
+<tr>
+<td>Business action <strong>สำเร็จ</strong></td>
+<td><strong>ใช่</strong> — เรียก <code>LogMerchantCreatedAsync</code>, <code>LogMerchantChangeAsync</code> ฯลฯ</td>
+</tr>
+<tr>
+<td>Business สำเร็จ แต่เรียก operation-logs-api <strong>ไม่ผ่าน</strong></td>
+<td>business ยัง success — log อาจไม่เข้า DB</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Flow การเขียน Operation Log" src="../images/flow-write-operation-log.png" /></p>
+<blockquote>
+<p>ขั้น <code>POST /add</code> และ validate เกิดภายใน <code>ChillpayOperationLogService.AddAsync</code> — ไม่แยกเป็น step ใน flow</p>
+</blockquote>
+<ul>
+<li><strong>LogAudit</strong> แยกต่างหาก — เก็บเฉพาะ field ที่เปลี่ยน</li>
+</ul>
+<p><strong>ไฟล์หลัก</strong></p>
+<table>
+<thead>
+<tr>
+<th>Repo</th>
+<th>บทบาท</th>
+<th>ไฟล์</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>web-backend</td>
+<td>Controller</td>
+<td><code>MerchantController.cs</code> — เรียก log หลัง save</td>
+</tr>
+<tr>
+<td>web-backend</td>
+<td>Helper</td>
+<td><code>BaseController.cs</code> — <code>LogMerchantCreatedAsync</code>, <code>LogMerchantChangeAsync</code></td>
+</tr>
+<tr>
+<td>web-backend</td>
+<td>Writer</td>
+<td><code>ChillpayOperationLogWriter.cs</code> — <code>WriteMerchantLogAsync</code> → operation-logs-api</td>
+</tr>
+<tr>
+<td>operation-logs-api</td>
+<td>Service</td>
+<td><code>IChillpayOperationLogService</code> / <code>ChillpayOperationLogService.cs</code> — <code>AddAsync</code> (validate + INSERT)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>หมายเหตุ:</strong> <code>ChillpayOperationLogWriter</code> (web-backend) เรียก API · <code>ChillpayOperationLogService</code> (operation-logs-api) รับ request แล้ว validate + บันทึกลง DB</p>
+</blockquote>
+<h3 id="ตัวอย่าง--merchant-create">ตัวอย่าง — Merchant Create</h3>
+<p><strong>หน้า:</strong> Merchant Create → กด Save (เฉพาะเมื่อ <code>CreateOrUpdateAsync</code> success)</p>
+<p><img alt="Flow Merchant Create — Operation Log" src="../images/flow-merchant-create-log.png" /></p>
+<blockquote>
+<p>ขั้น <code>POST /add</code> และ validate เกิดภายใน <code>ChillpayOperationLogService.AddAsync</code> — ไม่แยกเป็น step ใน flow</p>
+</blockquote>
+<p><strong>record ในตาราง <code>ChillpayOperationLogs</code> (ตัวอย่าง merchant id 100)</strong></p>
+<table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ค่า</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ModuleType</td>
+<td>2 (Merchant)</td>
+</tr>
+<tr>
+<td>MenuType</td>
+<td>200 (Merchant)</td>
+</tr>
+<tr>
+<td>LogType</td>
+<td>1 (Create)</td>
+</tr>
+<tr>
+<td>DataId</td>
+<td>100</td>
+</tr>
+<tr>
+<td>RefType</td>
+<td><code>NULL</code></td>
+</tr>
+<tr>
+<td>RefId</td>
+<td><code>NULL</code></td>
+</tr>
+<tr>
+<td>Ref2Type / Ref2Id</td>
+<td><code>NULL</code></td>
+</tr>
+<tr>
+<td>MerchantId</td>
+<td>100</td>
+</tr>
+<tr>
+<td>OldValue</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td>NewValue</td>
+<td>JSON snapshot merchant ทั้งก้อนหลังสร้าง</td>
+</tr>
+<tr>
+<td>Message</td>
+<td>Merchant created</td>
+</tr>
+<tr>
+<td>RequestSystem</td>
+<td>Admin</td>
+</tr>
+<tr>
+<td>RequestBy</td>
+<td>user id ผู้สร้าง</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ตัวอย่าง--merchant-update">ตัวอย่าง — Merchant Update</h3>
+<p><strong>หน้า:</strong> Merchant Update → แก้ข้อมูล → กด Save (เฉพาะเมื่อ <code>CreateOrUpdateAsync</code> success)</p>
+<p><img alt="Flow Merchant Update — Operation Log" src="../images/flow-merchant-update-log.png" /></p>
+<blockquote>
+<p>ขั้น <code>POST /add</code> และ validate เกิดภายใน <code>ChillpayOperationLogService.AddAsync</code> — ไม่แยกเป็น step ใน flow</p>
+</blockquote>
+<p><strong>record ในตาราง (ตัวอย่าง แก้ CompanyName ของ merchant 100)</strong></p>
+<table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ค่า</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ModuleType</td>
+<td>2</td>
+</tr>
+<tr>
+<td>MenuType</td>
+<td>200</td>
+</tr>
+<tr>
+<td>LogType</td>
+<td>2 (Update) — หรือ 3/8 ถ้า resolver เห็นว่าเปลี่ยนแค่ status</td>
+</tr>
+<tr>
+<td>DataId</td>
+<td>100</td>
+</tr>
+<tr>
+<td>RefType</td>
+<td><code>NULL</code></td>
+</tr>
+<tr>
+<td>RefId</td>
+<td><code>NULL</code></td>
+</tr>
+<tr>
+<td>Ref2Type / Ref2Id</td>
+<td><code>NULL</code></td>
+</tr>
+<tr>
+<td>MerchantId</td>
+<td>100</td>
+</tr>
+<tr>
+<td>OldValue</td>
+<td>JSON snapshot merchant <strong>ก่อน</strong>แก้</td>
+</tr>
+<tr>
+<td>NewValue</td>
+<td>JSON snapshot merchant <strong>หลัง</strong>แก้</td>
+</tr>
+<tr>
+<td>Message</td>
+<td>Merchant updated</td>
+</tr>
+<tr>
+<td>RequestSystem</td>
+<td>Admin</td>
+</tr>
+</tbody>
+</table>
+<p><strong>อ่าน log กลับ:</strong> หน้า List filter Module=Merchant, Merchant=100</p>
+<h3 id="ตัวอย่าง-record--merchant-fee-update">ตัวอย่าง record — Merchant Fee Update</h3>
+<p>แก้ Merchant Fee id <strong>501</strong> ของ merchant <strong>100</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>คอลัมน์</th>
+<th>ค่า</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ModuleType</td>
+<td>2</td>
+</tr>
+<tr>
+<td>MenuType</td>
+<td>202</td>
+</tr>
+<tr>
+<td>LogType</td>
+<td>2 (Update)</td>
+</tr>
+<tr>
+<td>DataId</td>
+<td>501</td>
+</tr>
+<tr>
+<td>RefType</td>
+<td><code>NULL</code></td>
+</tr>
+<tr>
+<td>RefId</td>
+<td><code>NULL</code></td>
+</tr>
+<tr>
+<td>Ref2Type / Ref2Id</td>
+<td><code>NULL</code></td>
+</tr>
+<tr>
+<td>MerchantId</td>
+<td>100</td>
+</tr>
+<tr>
+<td>OldValue</td>
+<td>JSON snapshot เต็มก่อนแก้</td>
+</tr>
+<tr>
+<td>NewValue</td>
+<td>JSON snapshot เต็มหลังแก้</td>
+</tr>
+<tr>
+<td>Message</td>
+<td>Merchant fee updated</td>
+</tr>
+<tr>
+<td>RequestSystem</td>
+<td>Admin</td>
+</tr>
+<tr>
+<td>RequestBy</td>
+<td>user id</td>
+</tr>
+</tbody>
+</table>
+    </article>
+    <footer class="page-footer">
+      <a href="index.html" class="footer-link">← กลับภาพรวม</a>
+    </footer>
+  </main>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
