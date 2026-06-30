@@ -71,18 +71,6 @@
 <td><code>ChillpayOperationLogRepository.cs</code></td>
 <td>query DB — filter <code>merchantId[]</code></td>
 </tr>
-<tr>
-<td><code>docs/sql/ChillpayOperationLogs-Table.sql</code></td>
-<td>สร้างตาราง + <code>MerchantId</code></td>
-</tr>
-<tr>
-<td><code>docs/sql/ChillpayOperationLogs-Index.sql</code></td>
-<td>index บนตาราง</td>
-</tr>
-<tr>
-<td><code>docs/sql/ChillpayOperationLogs-View.sql</code></td>
-<td>View <code>VW_ChillpayOperationLogs</code> + <code>*Text</code></td>
-</tr>
 </tbody>
 </table>
 <h3 id="web-backend-backend">web-backend (Backend)</h3>
@@ -125,6 +113,30 @@
 </tbody>
 </table>
 <h3 id="web-frontend-frontend">web-frontend (Frontend)</h3>
+<h3 id="chillpay-database-update">Chillpay database update</h3>
+<table>
+<thead>
+<tr>
+<th>ไฟล์</th>
+<th>หมายเหตุ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ChillpayOperationLogs-Table.sql</code></td>
+<td>สร้างตาราง <code>ChillpayOperationLogs</code> + <code>MerchantId</code> + backfill</td>
+</tr>
+<tr>
+<td><code>ChillpayOperationLogs-Index.sql</code></td>
+<td>index บนตาราง</td>
+</tr>
+<tr>
+<td><code>ChillpayOperationLogs-View.sql</code></td>
+<td>View <code>VW_ChillpayOperationLogs</code> + <code>*Text</code></td>
+</tr>
+</tbody>
+</table>
+<p>ต้นฉบับ script อยู่ใน <code>operation-logs-api</code> → <code>docs/sql/</code> (ดู Database → Script) · รันบน <strong>Chillpay DB</strong> ทุก env</p>
     </article>
     <footer class="page-footer">
       <a href="index.html" class="footer-link">← กลับภาพรวม</a>
